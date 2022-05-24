@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"goland-discord-bot/config"
+	"math/rand"
+	"strconv"
+	"strings"
 )
 
 var BotId string
@@ -51,5 +54,10 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//If we message ping to our bot in our discord it will return us pong .
 	if m.Content == "ping" {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
+	}
+	if strings.Contains(m.Content, "!roll 1d20") {
+
+		var response = strconv.Itoa(rand.Intn(20))
+		_, _ = s.ChannelMessageSend(m.ChannelID, response)
 	}
 }
