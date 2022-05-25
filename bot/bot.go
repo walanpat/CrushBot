@@ -63,6 +63,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		var amountOfRolls, amountError = strconv.Atoi(m.Content[6:dIndex])
 		var diceRolled int
 		var diceError error
+
 		if len(m.Content) == 10 {
 			diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+3])
 		}
@@ -70,9 +71,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+4])
 		}
 		if len(m.Content) == 12 {
-
 			diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+5])
-
 		}
 
 		//fmt.Println("length of !roll 1d20 " + strconv.Itoa(len(m.Content)))
@@ -85,6 +84,9 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				response += "Roll " + strconv.Itoa(i+1) + " Value: " + strconv.Itoa(rand.Intn(diceRolled-1)+1) + "\n"
 			}
 			_, _ = s.ChannelMessageSend(m.ChannelID, response)
+		} else if diceRolled > 100 {
+			_, _ = s.ChannelMessageSend(m.ChannelID, "I don't own anything higher than a d100, get your own dice.")
+
 		} else {
 			_, _ = s.ChannelMessageSend(m.ChannelID, "There was an error in your roll request.")
 
