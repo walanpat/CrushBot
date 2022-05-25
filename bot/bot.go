@@ -55,9 +55,40 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Content == "ping" {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
 	}
-	if strings.Contains(m.Content, "!roll 1d20") {
 
-		var response = strconv.Itoa(rand.Intn(20))
-		_, _ = s.ChannelMessageSend(m.ChannelID, response)
+	//Here is our code specifically for responding to a roll request
+	if strings.Contains(m.Content, "!roll ") {
+		var dIndex = strings.Index(m.Content, "d")
+		var response string
+		var amountOfRolls, amountError = strconv.Atoi(m.Content[6:dIndex])
+		var diceRolled int
+		var diceError error
+		if len(m.Content) == 10 {
+			diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+3])
+		}
+		if len(m.Content) == 11 {
+			diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+4])
+		}
+		if len(m.Content) == 12 {
+
+			diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+5])
+
+		}
+
+		//fmt.Println("length of !roll 1d20 " + strconv.Itoa(len(m.Content)))
+		//fmt.Println("amount of rolls " + strconv.Itoa(amountOfRolls))
+		//fmt.Println("dice rolled " + strconv.Itoa(diceRolled))
+
+		if amountError == nil && diceError == nil && diceRolled <= 100 {
+			response += m.Author.Username + " has rolled.....\n"
+			for i := 0; i < amountOfRolls; i++ {
+				response += "Roll " + strconv.Itoa(i+1) + " Value: " + strconv.Itoa(rand.Intn(diceRolled-1)+1) + "\n"
+			}
+			_, _ = s.ChannelMessageSend(m.ChannelID, response)
+		} else {
+			_, _ = s.ChannelMessageSend(m.ChannelID, "There was an error in your roll request.")
+
+		}
+
 	}
 }
