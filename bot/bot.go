@@ -58,8 +58,32 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//Here is our code specifically for responding to a roll request
 	if strings.Contains(m.Content, "!roll") {
 		//var message = m.Content
-		re := regexp.MustCompile(`(?:!roll)\s(\d+)?d(\d+)([\+\-]\d+)*`)
-		fmt.Println(re.FindStringSubmatch(m.Content))
+		re := regexp.MustCompile(`(?:!roll)\s(\d+)?d(\d+)([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?`)
+		variablesArr := re.FindAllStringSubmatch(m.Content, -1)
+		//variablesArr[0]
+
+		fmt.Println(variablesArr)
+
+		//Here's the thought process Alan.  Write it such that we take in
+		//xdzz+a+b+c+d.... STOP at dzz^2 (the d is the stopping letter, triggers a stop)
+		//if, another dzz roll is detected, trim previous one by 1
+		//(based on the fact I'm running into this silly issue)
+
+		//Regex expression that takes everything up intil we encounter a dice indiciator.
+		//trim the last digit that's incorrectly added
+
+		//we will run into matches based on that.
+		//then, run a for loop for the number of matches,
+		//Convert that into dice rolling baby.
+		
+		//for i := 0; i < len(variablesArr); i++ {
+		//	for j := 0; j < len(variablesArr); j++ {
+		//		_, _ = s.ChannelMessageSend(m.ChannelID, variablesArr[i][j])
+		//	}
+		//}
+
+		//_, _ = s.ChannelMessageSend(m.ChannelID, re.FindAllStringSubmatch(m.Content, -1)[0][3])
+
 		//fmt.Println("Hit")
 
 		//var dIndex = strings.Index(m.Content, "d")
