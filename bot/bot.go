@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"goland-discord-bot/config"
-	"math/rand"
-	"strconv"
+	"regexp"
 	"strings"
 )
 
@@ -57,40 +56,45 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	//Here is our code specifically for responding to a roll request
-	if strings.Contains(m.Content, "!roll ") {
-		var dIndex = strings.Index(m.Content, "d")
-		var response string
-		var amountOfRolls, amountError = strconv.Atoi(m.Content[6:dIndex])
-		var diceRolled int
-		var diceError error
+	if strings.Contains(m.Content, "!roll") {
+		//var message = m.Content
+		re := regexp.MustCompile(`(?:!roll)\s(\d+)?d(\d+)([\+\-]\d+)*`)
+		fmt.Println(re.FindStringSubmatch(m.Content))
+		//fmt.Println("Hit")
 
-		if len(m.Content) == 10 {
-			diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+3])
-		}
-		if len(m.Content) == 11 {
-			diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+4])
-		}
-		if len(m.Content) == 12 {
-			diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+5])
-		}
-
-		//fmt.Println("length of !roll 1d20 " + strconv.Itoa(len(m.Content)))
-		//fmt.Println("amount of rolls " + strconv.Itoa(amountOfRolls))
-		//fmt.Println("dice rolled " + strconv.Itoa(diceRolled))
-
-		if amountError == nil && diceError == nil && diceRolled <= 100 {
-			response += m.Author.Username + " has rolled.....\n"
-			for i := 0; i < amountOfRolls; i++ {
-				response += "Roll " + strconv.Itoa(i+1) + " Value: " + strconv.Itoa(rand.Intn(diceRolled-1)+1) + "\n"
-			}
-			_, _ = s.ChannelMessageSend(m.ChannelID, response)
-		} else if diceRolled > 100 {
-			_, _ = s.ChannelMessageSend(m.ChannelID, "I don't own anything higher than a d100, get your own dice.")
-
-		} else {
-			_, _ = s.ChannelMessageSend(m.ChannelID, "There was an error in your roll request.")
-
-		}
+		//var dIndex = strings.Index(m.Content, "d")
+		//var response string
+		//var amountOfRolls, amountError = strconv.Atoi(m.Content[6:dIndex])
+		//var diceRolled int
+		//var diceError error
+		//
+		//if len(m.Content) == 10 {
+		//	diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+3])
+		//}
+		//if len(m.Content) == 11 {
+		//	diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+4])
+		//}
+		//if len(m.Content) == 12 {
+		//	diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+5])
+		//}
+		//
+		////fmt.Println("length of !roll 1d20 " + strconv.Itoa(len(m.Content)))
+		////fmt.Println("amount of rolls " + strconv.Itoa(amountOfRolls))
+		////fmt.Println("dice rolled " + strconv.Itoa(diceRolled))
+		//
+		//if amountError == nil && diceError == nil && diceRolled <= 100 && len(m.Content) < 13 {
+		//	response += m.Author.Username + " has rolled.....\n"
+		//	for i := 0; i < amountOfRolls; i++ {
+		//		response += "Roll " + strconv.Itoa(i+1) + " Value: " + strconv.Itoa(rand.Intn(diceRolled-1)+1) + "\n"
+		//	}
+		//	_, _ = s.ChannelMessageSend(m.ChannelID, response)
+		//} else if diceRolled > 100 {
+		//	_, _ = s.ChannelMessageSend(m.ChannelID, "I don't own anything higher than a d100, get your own dice.")
+		//
+		//} else {
+		//	_, _ = s.ChannelMessageSend(m.ChannelID, "There was an error in your roll request.")
+		//
+		//}
 
 	}
 }
