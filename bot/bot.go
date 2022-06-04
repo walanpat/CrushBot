@@ -75,7 +75,12 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//we will run into matches based on that.
 		//then, run a for loop for the number of matches,
 		//Convert that into dice rolling baby.
-		
+
+		//Current REGEX Expression in the works
+		//(\d+)*d(\d+)(([\+\-]\d[^d]+)*)*
+		//It returns all additional +/- constants being added to a dice roll,
+		//it DOES NOT fix our 1d20+3d20 issue.
+
 		//for i := 0; i < len(variablesArr); i++ {
 		//	for j := 0; j < len(variablesArr); j++ {
 		//		_, _ = s.ChannelMessageSend(m.ChannelID, variablesArr[i][j])
