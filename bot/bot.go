@@ -69,7 +69,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//if, another dzz roll is detected, trim previous one by 1
 		//(based on the fact I'm running into this silly issue)
 
-		//Regex expression that takes everything up intil we encounter a dice indiciator.
+		//Regex expression that takes everything up until we encounter a die indicator.
 		//trim the last digit that's incorrectly added
 
 		//we will run into matches based on that.
