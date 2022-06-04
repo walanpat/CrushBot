@@ -77,7 +77,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//Convert that into dice rolling baby.
 
 		//Current REGEX Expression in the works
-		//(\d+)*d(\d+)(([\+\-]\d[^d]+)*)*
+		//(\d+)*d(\d+)([\+\-]\d[^d]*)*
 		//It returns all additional +/- constants being added to a dice roll,
 		//it DOES NOT fix our 1d20+3d20 issue.
 
