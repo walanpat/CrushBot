@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"goland-discord-bot/config"
+	"math/rand"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -57,73 +59,94 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	//Here is our code specifically for responding to a roll request
 	if strings.Contains(m.Content, "!roll") {
-		//var message = m.Content
-		re := regexp.MustCompile(`(?:!roll)\s(\d+)?d(\d+)([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?([\+\-]\d+)?`)
+		re := regexp.MustCompile(`([\+\-]?\d+)*d(\d+)([\+\-]?\d*[^\dd][^d]+)*`)
 		variablesArr := re.FindAllStringSubmatch(m.Content, -1)
-		//variablesArr[0]
 
 		fmt.Println(variablesArr)
+		message := ""
 
-		//Here's the thought process Alan.  Write it such that we take in
-		//xdzz+a+b+c+d.... STOP at dzz^2 (the d is the stopping letter, triggers a stop)
-		//if, another dzz roll is detected, trim previous one by 1
-		//(based on the fact I'm running into this silly issue)
+		for i := 0; i < len(variablesArr); i++ {
+			//Alright, our baseline tomfoolery is up to speed.
+			//You can roll 1 dice with any number of modifiers (positive or negative) here
+			if len(variablesArr) == 1 {
+				fmt.Println("TESTING BASE LINE")
+				numbOfRoll, _ := strconv.Atoi(variablesArr[i][1])
+				diceToBeRolled, _ := strconv.Atoi(variablesArr[i][2])
+				basicMathRE := regexp.MustCompile(`([\+\-]?\d*)`)
+				arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][3], -1)
+				fmt.Println(arithmetic)
+				message += m.Author.Username + " LETS ROLL\n"
+				for j := 0; j < numbOfRoll; j++ {
+					//This has to be diceToBeRolled +1 because rand.intn uses [0,n) noninclusive n.
+					message += "Roll " + strconv.Itoa(j+1) + ": " + strconv.Itoa(rand.Intn(diceToBeRolled+1)) + "\n"
+				}
+				arithmeticResult := 0
 
-		//Regex expression that takes everything up until we encounter a die indicator.
-		//trim the last digit that's incorrectly added
+				for j := 0; j < len(arithmetic); j++ {
+					x, _ := strconv.Atoi(arithmetic[j][0])
+					arithmeticResult += x
+				}
+				if arithmeticResult != 0 {
+					message += "Modifiers: " + strconv.Itoa(arithmeticResult)
+				}
 
-		//we will run into matches based on that.
-		//then, run a for loop for the number of matches,
-		//Convert that into dice rolling baby.
+			} else if i == 0 && len(variablesArr) > 1 {
+				fmt.Println("hit 0")
+				numbOfRoll, _ := strconv.Atoi(variablesArr[i][1])
+				diceToBeRolled, _ := strconv.Atoi(variablesArr[i][2])
 
-		//Current REGEX Expression in the works
-		//(\d+)*d(\d+)([\+\-]\d[^d]*)*
-		//It returns all additional +/- constants being added to a dice roll,
-		//it DOES NOT fix our 1d20+3d20 issue.
+				basicMathRE := regexp.MustCompile(`([\+\-]?\d*)*`)
+				arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][3], -1)
+				//fmt.Println(arithmetic)
+				message += m.Author.Username + " LETS ROLL\n"
+				for j := 0; j < numbOfRoll; j++ {
+					//This has to be diceToBeRolled +1 because rand.intn uses [0,n) noninclusive n.
+					message += "Roll " + strconv.Itoa(j+1) + ": " + strconv.Itoa(rand.Intn(diceToBeRolled+1)) + "\n"
+				}
+				arithmeticResult := 0
+				for j := 0; j < len(arithmetic)-1; j++ {
+					x, _ := strconv.Atoi(arithmetic[j][0])
+					arithmeticResult += x
+				}
+				if arithmeticResult != 0 {
+					message += "Modifiers: " + strconv.Itoa(arithmeticResult)
+				}
 
-		//for i := 0; i < len(variablesArr); i++ {
-		//	for j := 0; j < len(variablesArr); j++ {
-		//		_, _ = s.ChannelMessageSend(m.ChannelID, variablesArr[i][j])
-		//	}
-		//}
+			} else {
+				fmt.Println("HIT HIT HIT")
+				//Code for if there are MULTIPLE types of dice rolls in a single situation.
+				basicMathRE := regexp.MustCompile(`([\+\-]?\d*)*`)
 
-		//_, _ = s.ChannelMessageSend(m.ChannelID, re.FindAllStringSubmatch(m.Content, -1)[0][3])
+				numbOfRoll, _ := strconv.Atoi(variablesArr[i][1])
+				//Make sure this pulls the correct sign if needeD????????????? not sure if necessary
+				if i != 0 {
+					numbOfRoll, _ = strconv.Atoi(basicMathRE.FindAllStringSubmatch(variablesArr[i-1][3], -1)[0][len(basicMathRE.FindAllStringSubmatch(variablesArr[i-1][3], -1)[0])-1])
+				}
+				//this has to be initialized weirdly.  So.  Here's what we do
+				diceToBeRolled, _ := strconv.Atoi(variablesArr[i][2])
+				arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][2], -1)
+				message += strconv.Itoa(numbOfRoll) + "d" + strconv.Itoa(diceToBeRolled) + "\n"
+				for j := 0; j < numbOfRoll; j++ {
+					//This has to be diceToBeRolled +1 because rand.intn uses [0,n) noninclusive n.
+					message += "Roll " + strconv.Itoa(j+1) + ": " + strconv.Itoa(rand.Intn(diceToBeRolled+1)) + "\n"
+				}
+				arithmeticResult := 0
+				if i+1 != len(variablesArr) {
+					for j := 1; j < len(arithmetic)-1; j++ {
+						arithmeticResult, _ = strconv.Atoi(arithmetic[0][j])
+					}
+				} else {
+					for j := 1; j < len(arithmetic); j++ {
+						arithmeticResult, _ = strconv.Atoi(arithmetic[0][j])
+					}
+				}
+				if arithmeticResult != 0 {
+					message += "Modifiers: " + strconv.Itoa(arithmeticResult)
+				}
+			}
 
-		//fmt.Println("Hit")
-
-		//var dIndex = strings.Index(m.Content, "d")
-		//var response string
-		//var amountOfRolls, amountError = strconv.Atoi(m.Content[6:dIndex])
-		//var diceRolled int
-		//var diceError error
-		//
-		//if len(m.Content) == 10 {
-		//	diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+3])
-		//}
-		//if len(m.Content) == 11 {
-		//	diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+4])
-		//}
-		//if len(m.Content) == 12 {
-		//	diceRolled, diceError = strconv.Atoi(m.Content[dIndex+1 : dIndex+5])
-		//}
-		//
-		////fmt.Println("length of !roll 1d20 " + strconv.Itoa(len(m.Content)))
-		////fmt.Println("amount of rolls " + strconv.Itoa(amountOfRolls))
-		////fmt.Println("dice rolled " + strconv.Itoa(diceRolled))
-		//
-		//if amountError == nil && diceError == nil && diceRolled <= 100 && len(m.Content) < 13 {
-		//	response += m.Author.Username + " has rolled.....\n"
-		//	for i := 0; i < amountOfRolls; i++ {
-		//		response += "Roll " + strconv.Itoa(i+1) + " Value: " + strconv.Itoa(rand.Intn(diceRolled-1)+1) + "\n"
-		//	}
-		//	_, _ = s.ChannelMessageSend(m.ChannelID, response)
-		//} else if diceRolled > 100 {
-		//	_, _ = s.ChannelMessageSend(m.ChannelID, "I don't own anything higher than a d100, get your own dice.")
-		//
-		//} else {
-		//	_, _ = s.ChannelMessageSend(m.ChannelID, "There was an error in your roll request.")
-		//
-		//}
+		}
+		_, _ = s.ChannelMessageSend(m.ChannelID, message)
 
 	}
 }
