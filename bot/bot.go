@@ -62,23 +62,21 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		re := regexp.MustCompile(`([\+\-]?\d+)*d(\d+)([\+\-]?\d*[^\dd][^d]+)*`)
 		variablesArr := re.FindAllStringSubmatch(m.Content, -1)
 
-		fmt.Println(variablesArr)
+		//fmt.Println(variablesArr)
 		message := ""
 
 		for i := 0; i < len(variablesArr); i++ {
 			//Alright, our baseline tomfoolery is up to speed.
 			//You can roll 1 dice with any number of modifiers (positive or negative) here
 			if len(variablesArr) == 1 {
-				fmt.Println("TESTING BASE LINE")
 				numbOfRoll, _ := strconv.Atoi(variablesArr[i][1])
 				diceToBeRolled, _ := strconv.Atoi(variablesArr[i][2])
 				basicMathRE := regexp.MustCompile(`([\+\-]?\d*)`)
 				arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][3], -1)
-				fmt.Println(arithmetic)
 				message += m.Author.Username + " LETS ROLL\n"
 				for j := 0; j < numbOfRoll; j++ {
 					//This has to be diceToBeRolled +1 because rand.intn uses [0,n) noninclusive n.
-					message += "Roll " + strconv.Itoa(j+1) + ": " + strconv.Itoa(rand.Intn(diceToBeRolled+1)) + "\n"
+					message += "Roll " + strconv.Itoa(j+1) + ": " + strconv.Itoa(rand.Intn(diceToBeRolled)+1) + "\n"
 				}
 				arithmeticResult := 0
 
@@ -101,7 +99,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				message += m.Author.Username + " LETS ROLL\n"
 				for j := 0; j < numbOfRoll; j++ {
 					//This has to be diceToBeRolled +1 because rand.intn uses [0,n) noninclusive n.
-					message += "Roll " + strconv.Itoa(j+1) + ": " + strconv.Itoa(rand.Intn(diceToBeRolled+1)) + "\n"
+					message += "Roll " + strconv.Itoa(j+1) + ": " + strconv.Itoa(rand.Intn(diceToBeRolled)+1) + "\n"
 				}
 				arithmeticResult := 0
 				for j := 0; j < len(arithmetic)-1; j++ {
@@ -124,13 +122,18 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				}
 				//this has to be initialized weirdly.  So.  Here's what we do
 				diceToBeRolled, _ := strconv.Atoi(variablesArr[i][2])
-				arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][2], -1)
+				arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][3], -1)
 				message += strconv.Itoa(numbOfRoll) + "d" + strconv.Itoa(diceToBeRolled) + "\n"
 				for j := 0; j < numbOfRoll; j++ {
 					//This has to be diceToBeRolled +1 because rand.intn uses [0,n) noninclusive n.
-					message += "Roll " + strconv.Itoa(j+1) + ": " + strconv.Itoa(rand.Intn(diceToBeRolled+1)) + "\n"
+					message += "Roll " + strconv.Itoa(j+1) + ": " + strconv.Itoa(rand.Intn(diceToBeRolled)+1) + "\n"
 				}
 				arithmeticResult := 0
+
+				//fmt.Println("Arithmetic Post")
+				//fmt.Println(arithmetic)
+				//fmt.Println(arithmetic[0][0])
+
 				if i+1 != len(variablesArr) {
 					for j := 1; j < len(arithmetic)-1; j++ {
 						arithmeticResult, _ = strconv.Atoi(arithmetic[0][j])
@@ -140,6 +143,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 						arithmeticResult, _ = strconv.Atoi(arithmetic[0][j])
 					}
 				}
+				fmt.Println(arithmeticResult)
 				if arithmeticResult != 0 {
 					message += "Modifiers: " + strconv.Itoa(arithmeticResult)
 				}
