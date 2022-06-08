@@ -96,8 +96,21 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		//message += "\n- Red text in Discord\n+ Light green text in Discord\n```"
 
-		//This is the key to what we want to do.  CHECK THIS SHIT KING
-
+		//ansi reading
+		//```ansi
+		//\u001b[{a};{b};{c}m
+		//```
+		//a is formatting
+		//b is background
+		//c is text color
+		//30: Gray
+		//31: Red
+		//32: Green
+		//33: Yellow
+		//34: Blue
+		//35: Pink
+		//36: Cyan
+		//37: White
 		message += "\u001B[0;33m\u001B[0m.\u001B[31m(\u001B[36m[\u001B[34m\\w\u001B[0m.@\u001B[36m]\u001B[34m+\u001B[31m)\u001B[0m!\u001B[34m?\u001B[36m[\u001B[0m+-\u001B[36m]\u001B[34m?\u001B[0m\n\n"
 		message += "\u001B[31m("
 
@@ -106,12 +119,30 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		_, _ = s.ChannelMessageSend(m.ChannelID, message)
 	}
 
+	if strings.Contains(m.Content, "!test") {
+		re := regexp.MustCompile(`([+-]\d+(d\d+)?)`)
+		//only caviat to using this is you need to add a + or - at the very beginning of the expression.
+		//THEN calculate the regex.
+		variablesArr := re.FindAllStringSubmatch(m.Content, -1)
+		//message := ""
+		//for i := 0; i < len(variablesArr); i++ {
+		//
+		//}
+		fmt.Println(variablesArr)
+		//for index, element := range variablesArr{
+		//	for indexZ, elementZ := range element[index]{
+		//
+		//		message +=
+		//	}
+		//}
+
+	}
+
 	if strings.Contains(m.Content, "!roll") {
 		//Initializing our "base" regex expression
 		re := regexp.MustCompile(`([\+\-]?\d+)*d(\d+)([\+\-]?\d*[^\dd][^d]+)*`)
 		variablesArr := re.FindAllStringSubmatch(m.Content, -1)
-		message := "```\n"
-		//message := ""
+		message := "```ansi\n"
 		sumTotal := 0
 		for i := 0; i < len(variablesArr); i++ {
 			total := 0
@@ -124,7 +155,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				basicMathRE := regexp.MustCompile(`([\+\-]?\d*)`)
 				arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][3], -1)
 				message += m.Author.Username + " LETS ROLL\n"
-				message += strconv.Itoa(numbOfRoll) + "d" + strconv.Itoa(diceToBeRolled) + "		"
+				message += strconv.Itoa(numbOfRoll) + "d" + strconv.Itoa(diceToBeRolled) + "	"
 
 				//Actual for loop for the "dice rolls"
 				for j := 0; j < numbOfRoll; j++ {
@@ -133,13 +164,13 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					rollValueStr := strconv.Itoa(rollValueInt)
 					total += rollValueInt
 					if rollValueInt == 1 {
-						message += "Roll " + strconv.Itoa(j+1) + ": [" + "\u001B[31m" + rollValueStr + "\u001B[0;33m\u001B[0m]		"
+						message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[31m" + rollValueStr + "\u001B[37m]	"
 
 					} else if rollValueInt == diceToBeRolled {
-						message += "Roll " + strconv.Itoa(j+1) + ": [__**`" + rollValueStr + "`**__]		"
+						message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[32m" + rollValueStr + "\u001B[37m]	"
 
 					} else {
-						message += "Roll " + strconv.Itoa(j+1) + ": [`" + rollValueStr + "`]		"
+						message += "Roll " + strconv.Itoa(j+1) + ": [" + rollValueStr + "]	"
 
 					}
 				}
@@ -165,7 +196,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][3], -1)
 
 				message += m.Author.Username + " LETS ROLL\n"
-				message += strconv.Itoa(numbOfRoll) + "d" + strconv.Itoa(diceToBeRolled) + "		"
+				message += strconv.Itoa(numbOfRoll) + "d" + strconv.Itoa(diceToBeRolled) + "	"
 
 				//Actual for loop for the "dice rolls"
 				for j := 0; j < numbOfRoll; j++ {
@@ -174,7 +205,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					rollValueStr := strconv.Itoa(rollValueInt)
 					total += rollValueInt
 					sumTotal += rollValueInt
-					message += "Roll " + strconv.Itoa(j+1) + ": [" + rollValueStr + "]		"
+					message += "Roll " + strconv.Itoa(j+1) + ": [" + rollValueStr + "]	"
 				}
 				arithmeticResult := 0
 				//Adds any and all modifiers, makes sure we don't add the next dice roll
@@ -204,7 +235,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				diceToBeRolled, _ := strconv.Atoi(variablesArr[i][2])
 				arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][3], -1)
 				//message now tells us what we're rolling
-				message += strconv.Itoa(numbOfRoll) + "d" + strconv.Itoa(diceToBeRolled) + "		"
+				message += strconv.Itoa(numbOfRoll) + "d" + strconv.Itoa(diceToBeRolled) + "	"
 
 				//Actual for loop for the "dice rolls"
 				for j := 0; j < numbOfRoll; j++ {
@@ -213,7 +244,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					rollValueStr := strconv.Itoa(rollValueInt)
 					total += rollValueInt
 					sumTotal += rollValueInt
-					message += "Roll " + strconv.Itoa(j+1) + ": [" + rollValueStr + "]		"
+					message += "Roll " + strconv.Itoa(j+1) + ": [" + rollValueStr + "]	"
 				}
 				arithmeticResult := 0
 				//If, we are NOT at the last modifier/read value
