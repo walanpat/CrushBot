@@ -119,25 +119,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		_, _ = s.ChannelMessageSend(m.ChannelID, message)
 	}
 
-	if strings.Contains(m.Content, "!test") {
-		re := regexp.MustCompile(`([+-]\d+(d\d+)?)`)
-		//only caviat to using this is you need to add a + or - at the very beginning of the expression.
-		//THEN calculate the regex.
-		variablesArr := re.FindAllStringSubmatch(m.Content, -1)
-		//message := ""
-		//for i := 0; i < len(variablesArr); i++ {
-		//
-		//}
-		fmt.Println(variablesArr)
-		//for index, element := range variablesArr{
-		//	for indexZ, elementZ := range element[index]{
-		//
-		//		message +=
-		//	}
-		//}
-
-	}
-
 	if strings.Contains(m.Content, "!roll") {
 		//Initializing our "base" regex expression
 		re := regexp.MustCompile(`([\+\-]?\d+)*d(\d+)([\+\-]?\d*[^\dd][^d]+)*`)
