@@ -123,7 +123,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//Initializing our "base" regex expression
 		re := regexp.MustCompile(`([\+\-]?\d+)*d(\d+)([\+\-]?\d*[^\dd][^d]+)*`)
 		variablesArr := re.FindAllStringSubmatch(m.Content, -1)
-		message := "```ansi\n"
+		message := "```ansi\n\u001B[37m"
 		sumTotal := 0
 		for i := 0; i < len(variablesArr); i++ {
 			total := 0
@@ -146,13 +146,10 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					total += rollValueInt
 					if rollValueInt == 1 {
 						message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[31m" + rollValueStr + "\u001B[37m]	"
-
 					} else if rollValueInt == diceToBeRolled {
 						message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[32m" + rollValueStr + "\u001B[37m]	"
-
 					} else {
 						message += "Roll " + strconv.Itoa(j+1) + ": [" + rollValueStr + "]	"
-
 					}
 				}
 				arithmeticResult := 0
@@ -186,7 +183,13 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					rollValueStr := strconv.Itoa(rollValueInt)
 					total += rollValueInt
 					sumTotal += rollValueInt
-					message += "Roll " + strconv.Itoa(j+1) + ": [" + rollValueStr + "]	"
+					if rollValueInt == 1 {
+						message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[31m" + rollValueStr + "\u001B[37m]	"
+					} else if rollValueInt == diceToBeRolled {
+						message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[32m" + rollValueStr + "\u001B[37m]	"
+					} else {
+						message += "Roll " + strconv.Itoa(j+1) + ": [" + rollValueStr + "]	"
+					}
 				}
 				arithmeticResult := 0
 				//Adds any and all modifiers, makes sure we don't add the next dice roll
@@ -225,7 +228,13 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					rollValueStr := strconv.Itoa(rollValueInt)
 					total += rollValueInt
 					sumTotal += rollValueInt
-					message += "Roll " + strconv.Itoa(j+1) + ": [" + rollValueStr + "]	"
+					if rollValueInt == 1 {
+						message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[31m" + rollValueStr + "\u001B[37m]	"
+					} else if rollValueInt == diceToBeRolled {
+						message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[32m" + rollValueStr + "\u001B[37m]	"
+					} else {
+						message += "Roll " + strconv.Itoa(j+1) + ": [" + rollValueStr + "]	"
+					}
 				}
 				arithmeticResult := 0
 				//If, we are NOT at the last modifier/read value
