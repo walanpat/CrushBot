@@ -11,7 +11,9 @@ import (
 )
 
 var Id string
-var goBot *discordgo.Session
+
+//Not sure if this variable/nomenclature will be needed later.  Add to cleanup list.
+//var goBot *discordgo.Session
 
 func Start() {
 
