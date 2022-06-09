@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var BotId string
+var Id string
 var goBot *discordgo.Session
 
 func Start() {
@@ -31,7 +31,7 @@ func Start() {
 		return
 	}
 	// Storing our id from u to BotId .
-	BotId = u.ID
+	Id = u.ID
 
 	// Adding handler function to handle our messages using AddHandler from discordgo package. We will declare messageHandler function later.
 	goBot.AddHandler(messageHandler)
@@ -49,7 +49,7 @@ func Start() {
 //Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//Bot musn't reply to it's own messages , to confirm it we perform this check.
-	if m.Author.ID == BotId {
+	if m.Author.ID == Id {
 		return
 	}
 	//If we message ping to our bot in our discord it will return us pong .
@@ -77,8 +77,8 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//we don't do anything insane like adding a "# of rolls" variable to our basic addition modifiers
 
 	if strings.Contains(m.Content, "ff") {
-		message := "```ansi\n"
-		message += "\u001B[4m bold \u001B[0m   "
+		//message := "```ansi\n"
+		//message += "\u001B[4m bold \u001B[0m   "
 		////message += " *italics* "
 		////message += "__underlined text__ "
 		////message += "`Highlighted text` "
@@ -113,15 +113,15 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//37: White
 		//message += "\u001B[0;33m\u001B[0m.\u001B[31m(\u001B[36m[\u001B[34m\\w\u001B[0m.@\u001B[36m]\u001B[34m+\u001B[31m)\u001B[0m!\u001B[34m?\u001B[36m[\u001B[0m+-\u001B[36m]\u001B[34m?\u001B[0m\n\n"
 		//message += "\u001B[31m("
-
-		message += "\n```"
-
-		_, _ = s.ChannelMessageSend(m.ChannelID, message)
+		//
+		//message += "\n```"
+		//
+		//_, _ = s.ChannelMessageSend(m.ChannelID, message)
 	}
 
 	if strings.Contains(m.Content, "!roll") {
 		//Initializing our "base" regex expression
-		re := regexp.MustCompile(`([\+\-]?\d+)*d(\d+)([\+\-]?\d*[^\dd][^d]+)*`)
+		re := regexp.MustCompile(`([+\-]?\d+)*d(\d+)([+\-]?\d*[^\dd][^d]+)*`)
 		variablesArr := re.FindAllStringSubmatch(m.Content, -1)
 		message := "```ansi\n \u001B[0m"
 		sumTotal := 0
@@ -133,7 +133,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				diceToBeRolled, _ := strconv.Atoi(variablesArr[i][2])
 
 				//Basic math, modifier regexp
-				basicMathRE := regexp.MustCompile(`([\+\-]?\d*)`)
+				basicMathRE := regexp.MustCompile(`([+\-]?\d*)`)
 				arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][3], -1)
 				message += m.Author.Username + " LETS ROLL\n\n"
 				message += "\u001B[3m" + strconv.Itoa(numbOfRoll) + "d" + strconv.Itoa(diceToBeRolled) + "\u001B[0m	"
@@ -170,7 +170,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				diceToBeRolled, _ := strconv.Atoi(variablesArr[i][2])
 
 				//used to find any modifiers added or subtracted to various dice roll
-				basicMathRE := regexp.MustCompile(`([\+\-]?\d*)`)
+				basicMathRE := regexp.MustCompile(`([+\-]?\d*)`)
 				arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][3], -1)
 
 				message += m.Author.Username + " LETS ROLL\n\n"
@@ -205,7 +205,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				message += "\n	Total Roll: " + "[\u001B[37m" + strconv.Itoa(total) + "\u001B[0m]\n\n"
 			} else {
 				//This code block is for ALL code after the original (x^n)d(y^n)+(z^n) amount of dice/things rolled.
-				basicMathRE := regexp.MustCompile(`([\+\-]?\d*)`)
+				basicMathRE := regexp.MustCompile(`([+\-]?\d*)`)
 				numbOfRoll, _ := strconv.Atoi(variablesArr[i][1])
 
 				if i != 0 {
