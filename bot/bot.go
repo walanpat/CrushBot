@@ -274,7 +274,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		message := "```ansi\n"
 		message += getCard("")
-		message += "bruh"
+		//message += "bruh"
 
 		message += "\n```"
 
