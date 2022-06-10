@@ -1,3 +1,5 @@
+github.com/MagicTheGathering/mtg-sdk-go v0.0.0-20190109105601-3aaea97721aa h1:OJtPSYA2qr4d+51NY3mR+cmpSvQoWSnTDjU0OkOtjg0=
+github.com/MagicTheGathering/mtg-sdk-go v0.0.0-20190109105601-3aaea97721aa/go.mod h1:N2gc+5YwVfphpjWbjtIfh8/XKQowEXSMNefQeyyQ/lk=
 github.com/bwmarrin/discordgo v0.25.0 h1:NXhdfHRNxtwso6FPdzW2i3uBvvU7UIQTghmV2T4nqAs=
 github.com/bwmarrin/discordgo v0.25.0/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
 github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0Ufc=

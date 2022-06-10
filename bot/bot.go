@@ -78,49 +78,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//I had to write more complicated logic to get around this issue and watch our edge cases so that
 	//we don't do anything insane like adding a "# of rolls" variable to our basic addition modifiers
 
-	if strings.Contains(m.Content, "ff") {
-		//message := "```ansi\n"
-		//message += "\u001B[4m bold \u001B[0m   "
-		////message += " *italics* "
-		////message += "__underlined text__ "
-		////message += "`Highlighted text` "
-		////message += "\n > quote text \n"
-		////message += "~~strikethrough text ~~ \n"
-		//message += " ```diff\n- Discord red text\n```"
-		//message += "```css\n[Discord orange-red text]\n```"
-		//message += "```fix\nDiscord yellow text\n```"
-		//message += "```apache\nDiscord_dark_yellow_text\n```"
-		//message += "```css\n.Discord_blue_text\n```"
-		//message += "```ini\n[Discord blue text]\n```"
-		//message += "```diff\n+ Discord light green text\n```"
-		//message += "```yaml\nCyan text in Discord\n```"
-		//message += "\n[](Red text in Discord)\n```"
-
-		//message += "\n- Red text in Discord\n+ Light green text in Discord\n```"
-
-		//ansi reading
-		//```ansi
-		//\u001b[{a};{b};{c}m
-		//```
-		//a is formatting
-		//b is background
-		//c is text color
-		//30: Gray
-		//31: Red
-		//32: Green
-		//33: Yellow
-		//34: Blue
-		//35: Pink
-		//36: Cyan
-		//37: White
-		//message += "\u001B[0;33m\u001B[0m.\u001B[31m(\u001B[36m[\u001B[34m\\w\u001B[0m.@\u001B[36m]\u001B[34m+\u001B[31m)\u001B[0m!\u001B[34m?\u001B[36m[\u001B[0m+-\u001B[36m]\u001B[34m?\u001B[0m\n\n"
-		//message += "\u001B[31m("
-		//
-		//message += "\n```"
-		//
-		//_, _ = s.ChannelMessageSend(m.ChannelID, message)
-	}
-
 	if strings.Contains(m.Content, "!roll") {
 		//Initializing our "base" regex expression
 		re := regexp.MustCompile(`([+\-]?\d+)*d(\d+)([+\-]?\d*[^\dd][^d]+)*`)
@@ -265,5 +222,63 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		message += "\n```"
 		_, _ = s.ChannelMessageSend(m.ChannelID, message)
+	}
+
+	///test code
+	if strings.Contains(m.Content, "ff") {
+		//message := "```ansi\n"
+		//message += "\u001B[4m bold \u001B[0m   "
+		////message += " *italics* "
+		////message += "__underlined text__ "
+		////message += "`Highlighted text` "
+		////message += "\n > quote text \n"
+		////message += "~~strikethrough text ~~ \n"
+		//message += " ```diff\n- Discord red text\n```"
+		//message += "```css\n[Discord orange-red text]\n```"
+		//message += "```fix\nDiscord yellow text\n```"
+		//message += "```apache\nDiscord_dark_yellow_text\n```"
+		//message += "```css\n.Discord_blue_text\n```"
+		//message += "```ini\n[Discord blue text]\n```"
+		//message += "```diff\n+ Discord light green text\n```"
+		//message += "```yaml\nCyan text in Discord\n```"
+		//message += "\n[](Red text in Discord)\n```"
+
+		//message += "\n- Red text in Discord\n+ Light green text in Discord\n```"
+
+		//ansi reading
+		//```ansi
+		//\u001b[{a};{b};{c}m
+		//```
+		//a is formatting
+		//b is background
+		//c is text color
+		//30: Gray
+		//31: Red
+		//32: Green
+		//33: Yellow
+		//34: Blue
+		//35: Pink
+		//36: Cyan
+		//37: White
+		//message += "\u001B[0;33m\u001B[0m.\u001B[31m(\u001B[36m[\u001B[34m\\w\u001B[0m.@\u001B[36m]\u001B[34m+\u001B[31m)\u001B[0m!\u001B[34m?\u001B[36m[\u001B[0m+-\u001B[36m]\u001B[34m?\u001B[0m\n\n"
+		//message += "\u001B[31m("
+		//
+		//message += "\n```"
+		//
+		//_, _ = s.ChannelMessageSend(m.ChannelID, message)
+	}
+
+	//Mtg Code
+	if strings.Contains(m.Content, "!card") {
+		//request := m.Content
+
+		message := "```ansi\n"
+		message += getCard("")
+		message += "bruh"
+
+		message += "\n```"
+
+		_, _ = s.ChannelMessageSend(m.ChannelID, message)
+
 	}
 }
