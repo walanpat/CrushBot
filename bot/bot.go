@@ -272,13 +272,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if strings.Contains(m.Content, "!card") {
 		//request := m.Content
 
-		message := "```ansi\n"
-		message += getCard("")
-		//message += "bruh"
-
-		message += "\n```"
-
-		_, _ = s.ChannelMessageSend(m.ChannelID, message)
+		_, _ = s.ChannelMessageSendEmbed(m.ChannelID, getCard(""))
 
 	}
 }

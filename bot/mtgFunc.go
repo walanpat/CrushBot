@@ -4,20 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/MagicTheGathering/mtg-sdk-go"
+	"github.com/bwmarrin/discordgo"
 	"log"
 	"net/http"
 )
 
-func getCard(cardName string) string {
-
-	//log.Println("Fetching all cards with CMC >= 16")
-	//cards, err := mtg.NewQuery().Where(mtg.CardName, "avacyn").All()
-	//if err != nil {
-	//	log.Panic(err)
-	//}
-	//for _, card := range cards {
-	//	log.Println(card)
-	//}
+func getCard(cardName string) *discordgo.MessageEmbed {
 	type Card struct {
 		// The card name. For split, double-faced and flip cards, just the name of one side of the card. Basically each ‘sub-card’ has its own record.
 		Name string `json:"name"`
@@ -104,7 +96,6 @@ func getCard(cardName string) string {
 		Card  *Card   `json:"card"`
 		Cards []*Card `json:"cards"`
 	}
-
 	res, err := http.Get("https://api.magicthegathering.io/v1/cards?name=avacyn")
 	if err != nil {
 		log.Fatal("Error get Request")
@@ -119,7 +110,26 @@ func getCard(cardName string) string {
 	if err != nil {
 		fmt.Printf("%T\n%s\n%#v\n", err, err, err)
 	}
-	fmt.Println(data.Cards[0].Name)
+	//fmt.Println(data.Cards[0].Name)
+	//fmt.Println(data.Cards[0].ImageUrl)
+	//fmt.Println(data.Cards[0].CMC)
+	//fmt.Println(data.Cards[0].Rulings[0])
+	//fmt.Println(data.Cards[0].Rulings[1])
+	//message+= data.Cards[0].Name
+	res, err = http.Get(data.Cards[0].ImageUrl)
+	if err != nil {
+		log.Fatal("Error get Request")
+	}
+	var embed *discordgo.MessageEmbed
+	embed.Image.URL = data.Cards[0].ImageUrl
+	fmt.Println(data.Cards[0].ImageUrl)
 
-	return cardName
+	//message += data.Cards[0].ImageUrl
+	//message+= data.Cards[0].Name
+	//message+= data.Cards[0].Name
+
+	fmt.Println()
+	fmt.Println(embed)
+
+	return embed
 }
