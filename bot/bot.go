@@ -270,9 +270,8 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	//Mtg Code
 	if strings.Contains(m.Content, "!card") {
-		//request := m.Content
-
-		_, _ = s.ChannelMessageSendEmbed(m.ChannelID, getCard(""))
-
+		cardName := m.Content[6:len(m.Content)]
+		fmt.Println(cardName)
+		getCard(cardName, m.ChannelID, s)
 	}
 }

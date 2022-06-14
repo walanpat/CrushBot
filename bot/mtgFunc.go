@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func getCard(cardName string) *discordgo.MessageEmbed {
+func getCard(cardName string, channelId string, s *discordgo.Session) string {
 	type Card struct {
 		// The card name. For split, double-faced and flip cards, just the name of one side of the card. Basically each ‘sub-card’ has its own record.
 		Name string `json:"name"`
@@ -96,7 +96,8 @@ func getCard(cardName string) *discordgo.MessageEmbed {
 		Card  *Card   `json:"card"`
 		Cards []*Card `json:"cards"`
 	}
-	res, err := http.Get("https://api.magicthegathering.io/v1/cards?name=avacyn")
+
+	res, err := http.Get("https://api.magicthegathering.io/v1/cards?name=" + cardName)
 	if err != nil {
 		log.Fatal("Error get Request")
 	}
@@ -110,26 +111,24 @@ func getCard(cardName string) *discordgo.MessageEmbed {
 	if err != nil {
 		fmt.Printf("%T\n%s\n%#v\n", err, err, err)
 	}
-	//fmt.Println(data.Cards[0].Name)
-	//fmt.Println(data.Cards[0].ImageUrl)
-	//fmt.Println(data.Cards[0].CMC)
-	//fmt.Println(data.Cards[0].Rulings[0])
-	//fmt.Println(data.Cards[0].Rulings[1])
-	//message+= data.Cards[0].Name
+	fmt.Println(len(data.Cards))
+	if len(data.Cards) == 0 {
+		_, err = s.ChannelMessageSend(channelId, "Crush can't find card :(")
+		return "Error"
+	}
+
 	res, err = http.Get(data.Cards[0].ImageUrl)
 	if err != nil {
 		log.Fatal("Error get Request")
 	}
-	var embed *discordgo.MessageEmbed
-	embed.Image.URL = data.Cards[0].ImageUrl
-	fmt.Println(data.Cards[0].ImageUrl)
+	if res.StatusCode == 200 {
+		_, err = s.ChannelFileSend(channelId, data.Cards[0].Name+".png", res.Body)
+		if err != nil {
+			fmt.Println(err)
+		}
+	} else {
+		fmt.Println("Error: Can't get random card!")
+	}
 
-	//message += data.Cards[0].ImageUrl
-	//message+= data.Cards[0].Name
-	//message+= data.Cards[0].Name
-
-	fmt.Println()
-	fmt.Println(embed)
-
-	return embed
+	return data.Cards[0].ImageUrl
 }
