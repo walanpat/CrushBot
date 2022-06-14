@@ -59,25 +59,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
 	}
 
-	//Here is our code specifically for responding to a roll request
-
-	//The key to understanding this is understanding how GO uses regexp.
-	//If you can understand how it returns regex using the .FindAllStringSubmatch
-	//Then you can understand this code
-
-	//To explain it as basic as I can,
-	//We are reading a input, (example 1d20+2+6d6)
-	//We have 3 if statements here,
-	//1.If  there's just a single 1d20 or 3d20 or 900d2 dice roll and modifiers is the first IF block
-	//If there's more than 1d20+9+4-2 specifically it looks more like 6d6+1d20+9d10
-	//then, we have to use the next 2 if statements
-	//2.The next 2 "if" statements will read and calculate and NOT interact with the ending number of a
-	//The issue we run into is that our regexp will read 1d20+6d6 and return
-	//[[1d20+6 1 20 +6][d6 6]]
-	//This causes a problem
-	//I had to write more complicated logic to get around this issue and watch our edge cases so that
-	//we don't do anything insane like adding a "# of rolls" variable to our basic addition modifiers
-
 	if strings.Contains(m.Content, "!roll") {
 		//Initializing our "base" regex expression
 		re := regexp.MustCompile(`([+\-]?\d+)*d(\d+)([+\-]?\d*[^\dd][^d]+)*`)

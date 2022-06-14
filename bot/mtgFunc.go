@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/MagicTheGathering/mtg-sdk-go"
 	"github.com/bwmarrin/discordgo"
-	"log"
 	"net/http"
 )
 
@@ -99,11 +98,14 @@ func getCard(cardName string, channelId string, s *discordgo.Session) string {
 
 	res, err := http.Get("https://api.magicthegathering.io/v1/cards?name=" + cardName)
 	if err != nil {
-		log.Fatal("Error get Request")
+		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
+		return "Error"
+
 	}
 	defer res.Body.Close()
 	if err != nil {
-		log.Fatal("Error get Request")
+		_, err = s.ChannelMessageSend(channelId, "Card database said no to that :(")
+		return "Error"
 	}
 	decoder := json.NewDecoder(res.Body)
 	var data cardResponse
@@ -119,15 +121,14 @@ func getCard(cardName string, channelId string, s *discordgo.Session) string {
 
 	res, err = http.Get(data.Cards[0].ImageUrl)
 	if err != nil {
-		log.Fatal("Error get Request")
+		_, err = s.ChannelMessageSend(channelId, "Crush can't GET that card image :(")
+		return "Error"
 	}
 	if res.StatusCode == 200 {
 		_, err = s.ChannelFileSend(channelId, data.Cards[0].Name+".png", res.Body)
 		if err != nil {
 			fmt.Println(err)
 		}
-	} else {
-		fmt.Println("Error: Can't get random card!")
 	}
 
 	return data.Cards[0].ImageUrl
