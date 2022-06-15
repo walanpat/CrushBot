@@ -6,6 +6,7 @@ import (
 	"github.com/MagicTheGathering/mtg-sdk-go"
 	"github.com/bwmarrin/discordgo"
 	"net/http"
+	"strconv"
 )
 
 func getCard(cardName string, channelId string, s *discordgo.Session) string {
@@ -130,6 +131,12 @@ func getCard(cardName string, channelId string, s *discordgo.Session) string {
 			fmt.Println(err)
 		}
 	}
+	var rulings = "```ansi\n"
+	rulings += data.Cards[0].Name + "\n"
+	for i := 0; i < len(data.Cards[0].Rulings); i++ {
+		rulings += "\n" + "[" + strconv.Itoa(i+1) + "] " + data.Cards[0].Rulings[i].Text + "\n"
 
-	return data.Cards[0].ImageUrl
+	}
+	rulings += "\n```"
+	return rulings
 }

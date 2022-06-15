@@ -14,6 +14,7 @@ var Id string
 
 //Not sure if this variable/nomenclature will be needed later.  Add to cleanup list.
 //var goBot *discordgo.Session
+var cachedCardRuling = ""
 
 func Start() {
 
@@ -250,9 +251,18 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	//Mtg Code
-	if strings.Contains(m.Content, "!card") {
-		cardName := m.Content[6:len(m.Content)]
+	if strings.Contains(m.Content, "!c") {
+		cardName := m.Content[3:len(m.Content)]
 		fmt.Println(cardName)
-		getCard(cardName, m.ChannelID, s)
+		cachedCardRuling = getCard(cardName, m.ChannelID, s)
+	}
+	if strings.Contains(m.Content, "!rules") {
+		if len(cachedCardRuling) > 1 {
+			_, _ = s.ChannelMessageSend(m.ChannelID, cachedCardRuling)
+		} else {
+			_, _ = s.ChannelMessageSend(m.ChannelID, "No card Selected :( ")
+
+		}
+
 	}
 }
