@@ -56,6 +56,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		fmt.Println("Trigger Test")
 		_, _ = s.ChannelMessageSend(m.ChannelID, "test react")
 	}
+
 	//Bot musn't reply to it's own messages , to confirm it we perform this check.
 	if m.Author.ID == Id {
 		return
@@ -64,7 +65,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Content == "ping" {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
 	}
-
 	if strings.Contains(m.Content, "!roll") {
 		//Initializing our "base" regex expression
 		re := regexp.MustCompile(`([+\-]?\d+)*d(\d+)([+\-]?\d*[^\dd][^d]+)*`)
@@ -210,7 +210,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		message += "\n```"
 		_, _ = s.ChannelMessageSend(m.ChannelID, message)
 	}
-
 	///test code
 	if strings.Contains(m.Content, "ff") {
 		//message := "```ansi\n"
@@ -254,7 +253,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//
 		//_, _ = s.ChannelMessageSend(m.ChannelID, message)
 	}
-
 	//Mtg Code
 	if strings.Contains(m.Content, "!c") {
 		cardName := m.Content[3:len(m.Content)]
