@@ -51,6 +51,11 @@ func Start() {
 
 //Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.Author.ID == Id && len(m.Reactions) > 0 {
+		//Cache the value or set a listener?
+		fmt.Println("Trigger Test")
+		_, _ = s.ChannelMessageSend(m.ChannelID, "test react")
+	}
 	//Bot musn't reply to it's own messages , to confirm it we perform this check.
 	if m.Author.ID == Id {
 		return
@@ -265,4 +270,5 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 	}
+
 }
