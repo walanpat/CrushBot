@@ -14,6 +14,7 @@ var Id string
 
 //Not sure if this variable/nomenclature will be needed later.  Add to cleanup list.
 //var goBot *discordgo.Session
+var cachedCardRuling = ""
 
 func Start() {
 
@@ -50,6 +51,12 @@ func Start() {
 
 //Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.Author.ID == Id && len(m.Reactions) > 0 {
+		//Cache the value or set a listener?
+		fmt.Println("Trigger Test")
+		_, _ = s.ChannelMessageSend(m.ChannelID, "test react")
+	}
+
 	//Bot musn't reply to it's own messages , to confirm it we perform this check.
 	if m.Author.ID == Id {
 		return
@@ -58,69 +65,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Content == "ping" {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
 	}
-
-	//Here is our code specifically for responding to a roll request
-
-	//The key to understanding this is understanding how GO uses regexp.
-	//If you can understand how it returns regex using the .FindAllStringSubmatch
-	//Then you can understand this code
-
-	//To explain it as basic as I can,
-	//We are reading a input, (example 1d20+2+6d6)
-	//We have 3 if statements here,
-	//1.If  there's just a single 1d20 or 3d20 or 900d2 dice roll and modifiers is the first IF block
-	//If there's more than 1d20+9+4-2 specifically it looks more like 6d6+1d20+9d10
-	//then, we have to use the next 2 if statements
-	//2.The next 2 "if" statements will read and calculate and NOT interact with the ending number of a
-	//The issue we run into is that our regexp will read 1d20+6d6 and return
-	//[[1d20+6 1 20 +6][d6 6]]
-	//This causes a problem
-	//I had to write more complicated logic to get around this issue and watch our edge cases so that
-	//we don't do anything insane like adding a "# of rolls" variable to our basic addition modifiers
-
-	if strings.Contains(m.Content, "ff") {
-		//message := "```ansi\n"
-		//message += "\u001B[4m bold \u001B[0m   "
-		////message += " *italics* "
-		////message += "__underlined text__ "
-		////message += "`Highlighted text` "
-		////message += "\n > quote text \n"
-		////message += "~~strikethrough text ~~ \n"
-		//message += " ```diff\n- Discord red text\n```"
-		//message += "```css\n[Discord orange-red text]\n```"
-		//message += "```fix\nDiscord yellow text\n```"
-		//message += "```apache\nDiscord_dark_yellow_text\n```"
-		//message += "```css\n.Discord_blue_text\n```"
-		//message += "```ini\n[Discord blue text]\n```"
-		//message += "```diff\n+ Discord light green text\n```"
-		//message += "```yaml\nCyan text in Discord\n```"
-		//message += "\n[](Red text in Discord)\n```"
-
-		//message += "\n- Red text in Discord\n+ Light green text in Discord\n```"
-
-		//ansi reading
-		//```ansi
-		//\u001b[{a};{b};{c}m
-		//```
-		//a is formatting
-		//b is background
-		//c is text color
-		//30: Gray
-		//31: Red
-		//32: Green
-		//33: Yellow
-		//34: Blue
-		//35: Pink
-		//36: Cyan
-		//37: White
-		//message += "\u001B[0;33m\u001B[0m.\u001B[31m(\u001B[36m[\u001B[34m\\w\u001B[0m.@\u001B[36m]\u001B[34m+\u001B[31m)\u001B[0m!\u001B[34m?\u001B[36m[\u001B[0m+-\u001B[36m]\u001B[34m?\u001B[0m\n\n"
-		//message += "\u001B[31m("
-		//
-		//message += "\n```"
-		//
-		//_, _ = s.ChannelMessageSend(m.ChannelID, message)
-	}
-
 	if strings.Contains(m.Content, "!roll") {
 		//Initializing our "base" regex expression
 		re := regexp.MustCompile(`([+\-]?\d+)*d(\d+)([+\-]?\d*[^\dd][^d]+)*`)
@@ -266,4 +210,63 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		message += "\n```"
 		_, _ = s.ChannelMessageSend(m.ChannelID, message)
 	}
+	///test code
+	if strings.Contains(m.Content, "ff") {
+		//message := "```ansi\n"
+		//message += "\u001B[4m bold \u001B[0m   "
+		////message += " *italics* "
+		////message += "__underlined text__ "
+		////message += "`Highlighted text` "
+		////message += "\n > quote text \n"
+		////message += "~~strikethrough text ~~ \n"
+		//message += " ```diff\n- Discord red text\n```"
+		//message += "```css\n[Discord orange-red text]\n```"
+		//message += "```fix\nDiscord yellow text\n```"
+		//message += "```apache\nDiscord_dark_yellow_text\n```"
+		//message += "```css\n.Discord_blue_text\n```"
+		//message += "```ini\n[Discord blue text]\n```"
+		//message += "```diff\n+ Discord light green text\n```"
+		//message += "```yaml\nCyan text in Discord\n```"
+		//message += "\n[](Red text in Discord)\n```"
+
+		//message += "\n- Red text in Discord\n+ Light green text in Discord\n```"
+
+		//ansi reading
+		//```ansi
+		//\u001b[{a};{b};{c}m
+		//```
+		//a is formatting
+		//b is background
+		//c is text color
+		//30: Gray
+		//31: Red
+		//32: Green
+		//33: Yellow
+		//34: Blue
+		//35: Pink
+		//36: Cyan
+		//37: White
+		//message += "\u001B[0;33m\u001B[0m.\u001B[31m(\u001B[36m[\u001B[34m\\w\u001B[0m.@\u001B[36m]\u001B[34m+\u001B[31m)\u001B[0m!\u001B[34m?\u001B[36m[\u001B[0m+-\u001B[36m]\u001B[34m?\u001B[0m\n\n"
+		//message += "\u001B[31m("
+		//
+		//message += "\n```"
+		//
+		//_, _ = s.ChannelMessageSend(m.ChannelID, message)
+	}
+	//Mtg Code
+	if strings.Contains(m.Content, "!c") {
+		cardName := m.Content[3:len(m.Content)]
+		fmt.Println(cardName)
+		cachedCardRuling = getCard(cardName, m.ChannelID, s)
+	}
+	if strings.Contains(m.Content, "!rules") {
+		if len(cachedCardRuling) > 1 {
+			_, _ = s.ChannelMessageSend(m.ChannelID, cachedCardRuling)
+		} else {
+			_, _ = s.ChannelMessageSend(m.ChannelID, "No card Selected :( ")
+
+		}
+
+	}
+
 }
