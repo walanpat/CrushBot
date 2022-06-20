@@ -14,6 +14,8 @@ var Id string
 
 //Not sure if this variable/nomenclature will be needed later.  Add to cleanup list.
 //var goBot *discordgo.Session
+var cachedCardMessageId = ""
+var cachedCardSet = ""
 var cachedCardRuling = ""
 
 func Start() {
@@ -38,7 +40,7 @@ func Start() {
 
 	// Adding handler function to handle our messages using AddHandler from discordgo package. We will declare messageHandler function later.
 	goBot.AddHandler(messageHandler)
-
+	goBot.AddHandler(reactionHandler)
 	err = goBot.Open()
 	//Error handling
 	if err != nil {
@@ -51,12 +53,10 @@ func Start() {
 
 //Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Author.ID == Id && len(m.Reactions) > 0 {
-		//Cache the value or set a listener?
-		fmt.Println("Trigger Test")
-		_, _ = s.ChannelMessageSend(m.ChannelID, "test react")
+	if m.Author.ID == Id && len(m.Reactions) == 0 && m.Content == "" {
+		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4DA")
+		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4C5")
 	}
-
 	//Bot musn't reply to it's own messages , to confirm it we perform this check.
 	if m.Author.ID == Id {
 		return
@@ -267,6 +267,16 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		}
 
+	}
+
+}
+
+func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
+	if m.MessageID == cachedCardMessageId && m.MessageReaction.Emoji.ID == "\U0001F4DA" {
+		fmt.Print("emote1")
+	}
+	if m.MessageID == cachedCardMessageId && m.MessageReaction.Emoji.ID == "\U0001F4DA" {
+		fmt.Print("emote2")
 	}
 
 }
