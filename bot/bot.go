@@ -256,7 +256,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//Mtg Code
 	if strings.Contains(m.Content, "!c") {
 		cardName := m.Content[3:len(m.Content)]
-		fmt.Println(cardName)
 		cachedCardRuling = getCard(cardName, m.ChannelID, s)
 	}
 	if strings.Contains(m.Content, "!rules") {
@@ -272,10 +271,18 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
-	if m.MessageID == cachedCardMessageId && m.MessageReaction.Emoji.ID == "\U0001F4DA" {
+	//_, _ = s.ChannelMessageSend(m.ChannelID, m.MessageID)
+	fmt.Println("Registered Reaction")
+	fmt.Println(m.Emoji.ID)
+
+	if m.Emoji.Name == ":books:" {
+		_, _ = s.ChannelMessageSend(m.ChannelID, "Match")
+
+	}
+	if m.MessageReaction.Emoji.ID == "\U0001F4DA" {
 		fmt.Print("emote1")
 	}
-	if m.MessageID == cachedCardMessageId && m.MessageReaction.Emoji.ID == "\U0001F4DA" {
+	if m.MessageReaction.Emoji.ID == "\U0001F4C5" {
 		fmt.Print("emote2")
 	}
 

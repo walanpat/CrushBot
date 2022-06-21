@@ -114,7 +114,6 @@ func getCard(cardName string, channelId string, s *discordgo.Session) string {
 	if err != nil {
 		fmt.Printf("%T\n%s\n%#v\n", err, err, err)
 	}
-	fmt.Println(len(data.Cards))
 	if len(data.Cards) == 0 {
 		_, err = s.ChannelMessageSend(channelId, "Crush can't find card :(")
 		return "Error"
