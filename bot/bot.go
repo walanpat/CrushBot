@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 var Id string
@@ -272,18 +273,14 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	//_, _ = s.ChannelMessageSend(m.ChannelID, m.MessageID)
-	fmt.Println("Registered Reaction")
-	fmt.Println(m.Emoji.ID)
+	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 
-	if m.Emoji.Name == ":books:" {
-		_, _ = s.ChannelMessageSend(m.ChannelID, "Match")
+	if decode == 128218 && length == 4 && cachedCardRuling != "" && m.MessageReaction.UserID != Id {
+		_, _ = s.ChannelMessageSend(m.ChannelID, cachedCardRuling)
 
 	}
-	if m.MessageReaction.Emoji.ID == "\U0001F4DA" {
-		fmt.Print("emote1")
-	}
-	if m.MessageReaction.Emoji.ID == "\U0001F4C5" {
-		fmt.Print("emote2")
-	}
+	//if m.MessageReaction.Emoji.ID == "\U0001F4C5" {
+	//	fmt.Print("emote2")
+	//}
 
 }
