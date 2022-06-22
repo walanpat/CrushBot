@@ -277,62 +277,28 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 
 	if decode == 128218 && length == 4 && cachedCardRuling != "" && m.MessageReaction.UserID != Id {
-		//fmt.Println(len(cachedCardRuling))
-		//fmt.Println(cachedCardRuling)
 		if len(cachedCardRuling) > 2000 {
-			fmt.Println(len(cachedCardRuling))
-			fmt.Println(float64(len(cachedCardRuling)) / 2000)
-			fmt.Println(int(math.Ceil(float64(len(cachedCardRuling)) / 2000)))
 			iterationsNeeded := int(math.Ceil(float64(len(cachedCardRuling)) / 2000))
 			for i := 0; i < iterationsNeeded; i++ {
-				fmt.Println(i)
 				if i+1 != iterationsNeeded {
-					fmt.Println(i * 2000)
-					fmt.Println((i+1)*2000 - 1)
 					if i == 0 {
-						_, err := s.ChannelMessageSend(m.ChannelID, cachedCardRuling[i*2000:(i+1)*2000-1]+"```")
+						_, err := s.ChannelMessageSend(m.ChannelID, cachedCardRuling[i*2000:(i+1)*2000]+"```")
 						if err != nil {
 							fmt.Println(err)
 						}
 					} else {
-						_, err := s.ChannelMessageSend(m.ChannelID, "```ansi\n"+cachedCardRuling[i*2000:(i+1)*2000-1]+"```")
+						_, err := s.ChannelMessageSend(m.ChannelID, "```ansi\n"+cachedCardRuling[i*2000:(i+1)*2000]+"```")
 						if err != nil {
 							fmt.Println(err)
 						}
 					}
 				} else {
-					fmt.Println(i * 2000)
-					fmt.Println((i+1)*2000 - 1)
-					fmt.Println("final test ")
-					var _, err = s.ChannelMessageSend(m.ChannelID, cachedCardRuling[i*2000:len(cachedCardRuling)]+"```")
+					var _, err = s.ChannelMessageSend(m.ChannelID, "```ansi\n"+cachedCardRuling[(i*2000):])
 					if err != nil {
 						fmt.Println(err)
 					}
 				}
 			}
-			//	if len(cachedCardRuling) < 3999 {
-			//		cardRuling1 := cachedCardRuling[0:len(cachedCardRuling)/2] + "```"
-			//		cardRuling2 := "```ansi\n" + cachedCardRuling[len(cardRuling1)+1:]
-			//		_, err := s.ChannelMessageSend(m.ChannelID, cardRuling1)
-			//		if err != nil {
-			//			fmt.Println(err)
-			//		}
-			//		_, err = s.ChannelMessageSend(m.ChannelID, cardRuling2)
-			//		if err != nil {
-			//			fmt.Println(err)
-			//		}
-			//	}
-			//} else {
-			//	_, err := s.ChannelMessageSend(m.ChannelID, cachedCardRuling)
-			//	if err != nil {
-			//		fmt.Println(err)
-			//	}
-			//}
-
 		}
 	}
-	//if m.MessageReaction.Emoji.ID == "\U0001F4C5" {
-	//	fmt.Print("emote2")
-	//}
-
 }
