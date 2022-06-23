@@ -304,6 +304,6 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 		}
 	}
 	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id {
-		_, _ = s.ChannelMessageSend(m.ChannelID, "```ansi\n Card Set: "+cachedCardSet+"```")
+		_, _ = s.ChannelMessageSend(m.ChannelID, "```ansi\n Card Sets: "+cachedCardSet+"```")
 	}
 }

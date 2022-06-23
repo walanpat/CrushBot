@@ -136,6 +136,11 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 		rulings += "\n" + "[" + strconv.Itoa(i+1) + "] " + data.Cards[0].Rulings[i].Text + "\n"
 	}
 	rulings += "\n```"
-
-	return rulings, data.Cards[0].SetName
+	setList := ""
+	for i := 0; i < len(data.Cards[0].Printings); i++ {
+		setListTemp, _ := data.Cards[0].Printings[i].Fetch()
+		setList += "\n " + setListTemp.Name
+	}
+	fmt.Println(data.Cards[0].Printings[0].Fetch())
+	return rulings, setList
 }
