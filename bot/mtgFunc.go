@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func getCard(cardName string, channelId string, s *discordgo.Session) string {
+func getCard(cardName string, channelId string, s *discordgo.Session) (string, string) {
 	type Card struct {
 		// The card name. For split, double-faced and flip cards, just the name of one side of the card. Basically each ‘sub-card’ has its own record.
 		Name string `json:"name"`
@@ -100,13 +100,13 @@ func getCard(cardName string, channelId string, s *discordgo.Session) string {
 	res, err := http.Get("https://api.magicthegathering.io/v1/cards?name=" + cardName)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
-		return "Error"
+		return "Error", "Error"
 
 	}
 	defer res.Body.Close()
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Card database said no to that :(")
-		return "Error"
+		return "Error", "Error"
 	}
 	decoder := json.NewDecoder(res.Body)
 	var data cardResponse
@@ -116,13 +116,13 @@ func getCard(cardName string, channelId string, s *discordgo.Session) string {
 	}
 	if len(data.Cards) == 0 {
 		_, err = s.ChannelMessageSend(channelId, "Crush can't find card :(")
-		return "Error"
+		return "Error", "Error"
 	}
 
 	res, err = http.Get(data.Cards[0].ImageUrl)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush can't GET that card image :(")
-		return "Error"
+		return "Error", "Error"
 	}
 	if res.StatusCode == 200 {
 		_, err = s.ChannelFileSend(channelId, data.Cards[0].Name+".png", res.Body)
@@ -134,8 +134,8 @@ func getCard(cardName string, channelId string, s *discordgo.Session) string {
 	rulings += data.Cards[0].Name + "\n"
 	for i := 0; i < len(data.Cards[0].Rulings); i++ {
 		rulings += "\n" + "[" + strconv.Itoa(i+1) + "] " + data.Cards[0].Rulings[i].Text + "\n"
-
 	}
 	rulings += "\n```"
-	return rulings
+
+	return rulings, data.Cards[0].SetName
 }

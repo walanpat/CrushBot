@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 	"unicode/utf8"
 )
 
@@ -16,9 +17,9 @@ var Id string
 
 //Not sure if this variable/nomenclature will be needed later.  Add to cleanup list.
 //var goBot *discordgo.Session
-var cachedCardMessageId = ""
 var cachedCardSet = ""
 var cachedCardRuling = ""
+var cachedCardRulingTimer = false
 
 func Start() {
 
@@ -258,25 +259,22 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//Mtg Code
 	if strings.Contains(m.Content, "!c") {
 		cardName := m.Content[3:len(m.Content)]
-		cachedCardRuling = getCard(cardName, m.ChannelID, s)
-	}
-	if strings.Contains(m.Content, "!rules") {
+		cachedCardRuling, cachedCardSet = getCard(cardName, m.ChannelID, s)
 		if len(cachedCardRuling) > 1 {
-			_, _ = s.ChannelMessageSend(m.ChannelID, cachedCardRuling)
-		} else {
-			_, _ = s.ChannelMessageSend(m.ChannelID, "No card Selected :( ")
-
+			cachedCardRulingTimer = true
 		}
-
+		cachedCardTimer := time.NewTimer(20 * time.Second)
+		<-cachedCardTimer.C
+		cachedCardRulingTimer = false
 	}
-
 }
 
 func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	//_, _ = s.ChannelMessageSend(m.ChannelID, m.MessageID)
-	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 
-	if decode == 128218 && length == 4 && cachedCardRuling != "" && m.MessageReaction.UserID != Id {
+	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
+	//Code for getting the ruling
+	if decode == 128218 && length == 4 && cachedCardRuling != "" && m.MessageReaction.UserID != Id && cachedCardRulingTimer {
 		if len(cachedCardRuling) > 2000 {
 			iterationsNeeded := int(math.Ceil(float64(len(cachedCardRuling)) / 2000))
 			for i := 0; i < iterationsNeeded; i++ {
@@ -299,6 +297,13 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 					}
 				}
 			}
+			cachedCardRulingTimer = false
+		} else {
+			_, _ = s.ChannelMessageSend(m.ChannelID, cachedCardRuling)
+			cachedCardRulingTimer = false
 		}
+	}
+	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id {
+		_, _ = s.ChannelMessageSend(m.ChannelID, "```ansi\n Card Set: "+cachedCardSet+"```")
 	}
 }
