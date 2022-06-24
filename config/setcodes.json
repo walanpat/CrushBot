@@ -1,0 +1,192 @@
+{
+  "sets":[
+  {
+  "name": "Limited Edition Alpha",
+    "code": "LEA"
+  },
+    {
+      "name": "Limited Edition Beta",
+      "code": "LEB"
+    },
+    {
+      "name": "Unlimited Edition",
+      "code": "2ED"
+    },
+    {
+      "name": "Revised Edition",
+      "code": "3ED"
+    },
+    {
+      "name": "Fourth Edition",
+      "code": "4ED"
+    },
+    {
+      "name": "Fifth Edition",
+      "code": "5ED"
+    },
+    {
+      "name": "Classic Sixth Edition",
+      "code": "6ED"
+    },
+    {
+      "name": "Seventh Edition",
+      "code": "7ED"
+    },
+    {
+      "name": "Eighth Edition",
+      "code": "8ED"
+    },
+    {
+      "name": "Ninth Edition",
+      "code": "9ED"
+    },
+    {
+      "name": "Tenth Edition",
+      "code": "10E"
+    },
+    {
+      "name": "Magic 2010",
+      "code": "M10"
+    },
+    {
+      "name": "Magic 2011",
+      "code": "M11"
+    },
+    {
+      "name": "Magic 2012",
+      "code": "M12"
+    },
+    {
+      "name": "Magic 2013",
+      "code": "M13"
+    },
+    {
+      "name": "Magic 2014",
+      "code": "M14"
+    },
+    {
+      "name": "Magic 2015",
+      "code": "M15"
+    },
+    {
+      "name": "Magic Origins",
+      "code": "ORI"
+    },
+    {
+      "name": "Core Set 2019",
+      "code": "M19"
+    },
+    {
+      "name": "Core Set 2020",
+      "code": "M20"
+    },
+    {
+      "name": "Core Set 2021",
+      "code": "M21"
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    },
+    {
+      "name": "",
+      "code": ""
+    }
+  ]
+}

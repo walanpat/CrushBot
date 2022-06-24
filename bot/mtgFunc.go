@@ -96,12 +96,11 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 		Card  *Card   `json:"card"`
 		Cards []*Card `json:"cards"`
 	}
-
+	//setMap := make(map[string]string)
 	res, err := http.Get("https://api.magicthegathering.io/v1/cards?name=" + cardName)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
 		return "Error", "Error"
-
 	}
 	defer res.Body.Close()
 	if err != nil {
@@ -118,7 +117,6 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 		_, err = s.ChannelMessageSend(channelId, "Crush can't find card :(")
 		return "Error", "Error"
 	}
-
 	res, err = http.Get(data.Cards[0].ImageUrl)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush can't GET that card image :(")
