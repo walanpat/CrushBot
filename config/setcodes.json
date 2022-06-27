@@ -85,96 +85,532 @@
       "code": "M21"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Arabian Nights",
+      "code": "ARN"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Antiquities",
+      "code": "ATQ"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Legends",
+      "code": "LEG"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "The Dark",
+      "code": "DRK"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Fallen Empires",
+      "code": "FEM"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Ice Age",
+      "code": "ICE"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Alliances",
+      "code": "ALL"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Mirage",
+      "code": "MIR"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Visions",
+      "code": "VIS"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Weatherlight",
+      "code": "WTH"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Tempest",
+      "code": "TMP"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Stronghold",
+      "code": "STH"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Exodus",
+      "code": "EXO"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Ursza's Saga",
+      "code": "USG"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Urza's Legacy",
+      "code": "ULG"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Ursa's Destiny",
+      "code": "UDS"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Mercadian Masques",
+      "code": "MMQ"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Nemesis",
+      "code": "NEM"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Prophecy",
+      "code": "PCY"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Invasion",
+      "code": "INV"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Planeshift",
+      "code": "PLS"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Apocalypse",
+      "code": "APC"
     },
     {
-      "name": "",
-      "code": ""
+      "name": "Odyssey",
+      "code": "ODY"
+    },
+    {
+      "name": "Torment",
+      "code": "TOR"
+    },
+    {
+      "name": "Judgement",
+      "code": "JUD"
+    },
+    {
+      "name": "Onslaught",
+      "code": "ONS"
+    },
+    {
+      "name": "Legions",
+      "code": "LGN"
+    },
+    {
+      "name": "Scourge",
+      "code": "SCG"
+    },
+    {
+      "name": "Mirrodin",
+      "code": "MRD"
+    },
+    {
+      "name": "Darksteel",
+      "code": "DST"
+    },
+    {
+      "name": "Fifth Dawn",
+      "code": "5DN"
+    },
+    {
+      "name": "Champions of Kamigawa",
+      "code": "CHK"
+    },
+    {
+      "name": "Betrayers of Kamigawa",
+      "code": "BOK"
+    },
+    {
+      "name": "Saviors of Kamigawa",
+      "code": "SOK"
+    },
+    {
+      "name": "Ravnica: City of Guilds",
+      "code": "RAV"
+    },
+    {
+      "name": "Guildpact",
+      "code": "GPT"
+    },
+    {
+      "name": "Dissension",
+      "code": "DIS"
+    },
+    {
+      "name": "Coldsnap",
+      "code": "CSP"
+    },
+    {
+      "name": "Time Spiral",
+      "code": "TSP"
+    },
+    {
+      "name": "Time Spiral",
+      "code": "TSB"
+    },
+    {
+      "name": "Planar Chaos",
+      "code": "PLC"
+    },
+    {
+      "name": "Future Sight",
+      "code": "FUT"
+    },
+    {
+      "name": "Lorwyn",
+      "code": "LRW"
+    },
+    {
+      "name": "Morningtide",
+      "code": "MOR"
+    },
+    {
+      "name": "Shadowmoor",
+      "code": "SMH"
+    },
+    {
+      "name": "Eventide",
+      "code": "EVE"
+    },
+    {
+      "name": "Shards of Alara",
+      "code": "ALA"
+    },
+    {
+      "name": "Conflux",
+      "code": "CON"
+    },
+    {
+      "name": "Alara Reborn",
+      "code": "ARB"
+    },
+    {
+      "name": "Zendikar",
+      "code": "ZEN"
+    },
+    {
+      "name": "Worldwake",
+      "code": "WWK"
+    },
+    {
+      "name": "Rise of the Eldrazi",
+      "code": "ROE"
+    },
+    {
+      "name": "Scars of Mirrodin",
+      "code": "SOM"
+    },
+    {
+      "name": "Mirrodin Besieged",
+      "code": "MBS"
+    },
+    {
+      "name": "New Phyrexia",
+      "code": "NPH"
+    },
+    {
+      "name": "Innistrad",
+      "code": "ISD"
+    },
+    {
+      "name": "Dark Ascension",
+      "code": "DKA"
+    },
+    {
+      "name": "Avacyn Restored",
+      "code": "AVR"
+    },
+    {
+      "name": "Return to Ravnica",
+      "code": "RTR"
+    },
+    {
+      "name": "Gatecrash",
+      "code": "GTC"
+    },
+    {
+      "name": "Dragon's Maze",
+      "code": "DGM"
+    },
+    {
+      "name": "Theros",
+      "code": "THS"
+    },
+    {
+      "name": "Born of the Gods",
+      "code": "BNG"
+    },
+    {
+      "name": "Journey into Nyx",
+      "code": "JOU"
+    },
+    {
+      "name": "Khans of Tarkir",
+      "code": "KTK"
+    },
+    {
+      "name": "Fate Reforged",
+      "code": "FRF"
+    },
+    {
+      "name": "Dragons of Tarkir",
+      "code": "DTK"
+    },
+    {
+      "name": "Battle for Zendikar",
+      "code": "BFZ"
+    },
+    {
+      "name": "Oath of the Gatewatch",
+      "code": "OGW"
+    },
+    {
+      "name": "Shadows over Innistrad",
+      "code": "SOI"
+    },
+    {
+      "name": "Eldritch Moon",
+      "code": "EMN"
+    },
+    {
+      "name": "Kaladesh",
+      "code": "KLD"
+    },
+    {
+      "name": "Aether Revolt",
+      "code": "AER"
+    },
+    {
+      "name": "Amonkhet",
+      "code": "AKH"
+    },
+    {
+      "name": "Hour of Devastation",
+      "code": "HOU"
+    },
+    {
+      "name": "Ixalan",
+      "code": "XLN"
+    },
+    {
+      "name": "Rivals of Ixalan",
+      "code": "RIX"
+    },
+    {
+      "name": "Dominaria",
+      "code": "DOM"
+    },
+    {
+      "name": "Guilds of Ravnica",
+      "code": "GRN"
+    },
+    {
+      "name": "Ravnica Allegiance",
+      "code": "RNA"
+    },
+    {
+      "name": "War of the Spark",
+      "code": "WAR"
+    },
+    {
+      "name": "Throne of Eldraine",
+      "code": "ELD"
+    },
+    {
+      "name": "Theros Beyond Death",
+      "code": "THB"
+    },
+    {
+      "name": "Ikoria: Lair of Behemoths",
+      "code": "IKO"
+    },
+    {
+      "name": "Zendikar Rising",
+      "code": "ZNR"
+    },
+    {
+      "name": "Kaldheim",
+      "code": "KHM"
+    },
+    {
+      "name": "Strixhaven: School of Mages",
+      "code": "STX"
+    },
+    {
+      "name": "Dungeons & Dragons: Adventures in the Forgotten Realms",
+      "code": "AFR"
+    },
+    {
+      "name": "Innistrad: Midnight Hunt",
+      "code": "MID"
+    },
+    {
+      "name": "Innistrad: Crimson Vow",
+      "code": "VOW"
+    },
+    {
+      "name": "Kamigawa: Neon Dynasty",
+      "code": "NEO"
+    },
+    {
+      "name": "Streets of New Capenna",
+      "code": "SNC"
+    },
+    {
+      "name": "Dominaria: United",
+      "code": "nil"
+    },
+    {
+      "name": "The Brothers' War",
+      "code": "nil"
+    },
+    {
+      "name": "Modern Horizons",
+      "code": "MH1"
+    },
+    {
+      "name": "Modern Horizons 2",
+      "code": "MH2"
+    },
+    {
+      "name": "Portal",
+      "code": "POR"
+    },
+    {
+      "name": "Portal Second Age",
+      "code": "P02"
+    },
+    {
+      "name": "Portal Three Kingdoms",
+      "code": "P3K"
+    },
+    {
+      "name": "Starter 1999",
+      "code": "S99"
+    },
+    {
+      "name": "Starter 2000",
+      "code": "S00"
+    },
+    {
+      "name": "Global Series: Jiang Yanggu & Mu Yanling",
+      "code": "GS1"
+    },
+    {
+      "name": "Chronicles",
+      "code": "CHR"
+    },
+    {
+      "name": "Anthologies",
+      "code": "ATH"
+    },
+    {
+      "name": "Battle Royale Box Set",
+      "code": "BRB"
+    },
+    {
+      "name": "Beatdown Box Set",
+      "code": "BTD"
+    },
+    {
+      "name": "Deckmasters: Garfield vs Finkel",
+      "code": "DKM"
+    },
+    {
+      "name": "Duels of the Planeswalkers",
+      "code": "DPA"
+    },
+    {
+      "name": "Modern Event Deck",
+      "code": "MD1"
+    },
+    {
+      "name": "Time Spiral Remastered",
+      "code": "TSR"
+    },
+    {
+      "name": "Duel Decks: Elves vs. Goblins",
+      "code": "EVG"
+    },
+    {
+      "name": "Duel Decks: Jace vs. Chandra",
+      "code": "DD2"
+    },
+    {
+      "name": "Duel Decks: Divine vs. Demonic",
+      "code": "DDC"
+    },
+    {
+      "name": "Duel Decks: Garruk vs. Liliana",
+      "code": "DDD"
+    },
+    {
+      "name": "Duel Decks: Phyrexia vs. The Coalition",
+      "code": "DDE"
+    },
+    {
+      "name": "Duel Decks: Elspeth vs. Tezzeret",
+      "code": "DDF"
+    },
+    {
+      "name": "Duel Decks: Knights vs. Dragons",
+      "code": "DDG"
+    },
+    {
+      "name": "Duel Decks: Ajani vs. Nicol Bolas",
+      "code": "DDH"
+    },
+    {
+      "name": "Duel Decks: Venser vs. Koth",
+      "code": "DDI"
+    },
+    {
+      "name": "Duel Decks: Izzet vs. Golgari",
+      "code": "DDJ"
+    },
+    {
+      "name": "Duel Decks: Sorin vs. Tibalt",
+      "code": "DDK"
+    },
+    {
+      "name": "Duel Decks: Heroes vs. Monsters",
+      "code": "DDL"
+    },
+    {
+      "name": "Duel Decks: Jace vs. Vraska",
+      "code": "DDM"
+    },
+    {
+      "name": "Duel Decks: Speed vs. Cunning",
+      "code": "DDN"
+    },
+    {
+      "name": "Duel Decks Anthology",
+      "code": "DD3"
+    },
+    {
+      "name": "Duel Decks: Elspeth vs. Kiora",
+      "code": "DDO"
+    },
+    {
+      "name": "Duel Decks: Zendikar vs. Eldrazi",
+      "code": "DDP"
+    },
+    {
+      "name": "Duel Decks: Blessed vs. Cursed",
+      "code": "DDQ"
+    },
+    {
+      "name": "Duel Decks: Nissa vs. Ob Nixilis",
+      "code": "DDR"
+    },
+    {
+      "name": "Duel Decks: Mind vs. Might",
+      "code": "DDS"
+    },
+    {
+      "name": "Duel Decks: Merfolk vs. Goblins",
+      "code": "DDT"
+    },
+    {
+      "name": "Duel Decks: Elves vs. Inventors",
+      "code": "DDU"
     },
     {
       "name": "",
