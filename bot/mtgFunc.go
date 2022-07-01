@@ -5,9 +5,30 @@ import (
 	"fmt"
 	"github.com/MagicTheGathering/mtg-sdk-go"
 	"github.com/bwmarrin/discordgo"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 )
+
+type setStruct struct {
+	Name string
+	Code string
+}
+
+var setCodes []setStruct
+
+func initialize() {
+	//Initializing our setcode analyzer for MTG purposes
+	byteValue, _ := ioutil.ReadFile("bot/setcodes.json")
+	var setTemp []setStruct
+	err := json.Unmarshal(byteValue, &setTemp)
+	if err != nil {
+		log.Fatal("Error during Unmarshal():", err)
+	}
+	setCodes = setTemp
+
+}
 
 func getCard(cardName string, channelId string, s *discordgo.Session) (string, string) {
 	type Card struct {
@@ -96,7 +117,7 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 		Card  *Card   `json:"card"`
 		Cards []*Card `json:"cards"`
 	}
-	//setMap := make(map[string]string)
+	fmt.Println(cardName)
 	res, err := http.Get("https://api.magicthegathering.io/v1/cards?name=" + cardName)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
@@ -119,8 +140,13 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 	}
 	res, err = http.Get(data.Cards[0].ImageUrl)
 	if err != nil {
-		_, err = s.ChannelMessageSend(channelId, "Crush can't GET that card image :(")
-		return "Error", "Error"
+		res, err = http.Get(data.Cards[1].ImageUrl)
+		if err != nil {
+			_, err = s.ChannelMessageSend(channelId, "Crush can't GET that card image :(")
+			fmt.Println(err)
+			return "Error", "Error"
+		}
+
 	}
 	if res.StatusCode == 200 {
 		_, err = s.ChannelFileSend(channelId, data.Cards[0].Name+".png", res.Body)
@@ -135,10 +161,12 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 	}
 	rulings += "\n```"
 	setList := ""
-	for i := 0; i < len(data.Cards[0].Printings); i++ {
-		setListTemp, _ := data.Cards[0].Printings[i].Fetch()
-		setList += "\n " + setListTemp.Name
+	for _, v := range data.Cards[0].Printings {
+		for _, i := range setCodes {
+			if string(v) == i.Code {
+				setList += "\n  " + i.Name
+			}
+		}
 	}
-	fmt.Println(data.Cards[0].Printings[0].Fetch())
 	return rulings, setList
 }
