@@ -271,6 +271,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		cachedCardTimer := time.NewTimer(20 * time.Second)
 		<-cachedCardTimer.C
 		cachedCardRulingTimer = false
+
 		mtgRulesMessageFlag = false
 		mtgSetMessageFlag = false
 	}

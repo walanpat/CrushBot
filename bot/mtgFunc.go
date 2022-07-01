@@ -117,7 +117,6 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 		Card  *Card   `json:"card"`
 		Cards []*Card `json:"cards"`
 	}
-	fmt.Println(cardName)
 	res, err := http.Get("https://api.magicthegathering.io/v1/cards?name=" + cardName)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
@@ -146,7 +145,6 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 			fmt.Println(err)
 			return "Error", "Error"
 		}
-
 	}
 	if res.StatusCode == 200 {
 		_, err = s.ChannelFileSend(channelId, data.Cards[0].Name+".png", res.Body)

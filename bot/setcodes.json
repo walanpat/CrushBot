@@ -953,6 +953,14 @@
       "code": "TPR"
     },
     {
+      "name": "Guilds of Ravnica Guild Kits",
+      "code": "GK1"
+    },
+    {
+      "name": "Ravnica Allegiance Guild Kits",
+      "code": "GK2"
+    },
+    {
       "name": "",
       "code": ""
     }
