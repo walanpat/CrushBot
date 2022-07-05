@@ -164,22 +164,22 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 		return "Error", "Error"
 	}
 	if res.StatusCode == 200 {
+		if len(data.RulingsUri) > 1 {
+			RulingUri = data.RulingsUri
+		}
 		_, err = s.ChannelFileSend(channelId, data.Name+".png", res.Body)
 		if err != nil {
 			fmt.Println(err)
 		}
 	}
 	fmt.Println(data.RulingsUri)
-	if len(data.RulingsUri) > 1 {
-		RulingUri = data.RulingsUri
-	}
-	fmt.Println(data.SetUri)
+
 	return "h", "ho"
 
 }
 
 func getRuling(channelId string, s *discordgo.Session) {
-	fmt.Println(RulingUri)
+	fmt.Println("Rulings Get " + RulingUri)
 	res, err := http.Get(RulingUri)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
@@ -199,8 +199,8 @@ func getRuling(channelId string, s *discordgo.Session) {
 	}
 	for i := 0; i < len(data.Data); i++ {
 		_, err = s.ChannelMessageSend(channelId, "```ansi\n"+strconv.Itoa(i+1)+". "+data.Data[i].Comment+"\n```")
-
 	}
+	fmt.Println(data)
 }
 
 //func getCard(cardName string, channelId string, s *discordgo.Session) (string, string) {
