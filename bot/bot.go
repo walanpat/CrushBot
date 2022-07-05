@@ -59,7 +59,11 @@ func Start() {
 //Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == Id && len(m.Reactions) == 0 && m.Content == "" {
+		cachedCardTimer := time.NewTimer(50 * time.Millisecond)
+		<-cachedCardTimer.C
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4DA")
+		cachedCardTimer.Reset(50 * time.Millisecond)
+		<-cachedCardTimer.C
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4C5")
 	}
 	//Bot mustn't reply to its own messages , to confirm it we perform this check.
@@ -266,10 +270,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if len(cachedCardRuling) > 1 {
 			cachedCardRulingTimer = true
 		}
-		cachedCardTimer := time.NewTimer(20 * time.Second)
-		<-cachedCardTimer.C
-		cachedCardRulingTimer = false
-
 		mtgRulesMessageFlag = false
 		mtgSetMessageFlag = false
 	}
@@ -280,6 +280,7 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 	//Code for getting the ruling
 	if decode == 128218 && length == 4 && cachedCardRuling != "" && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
+		fmt.Println(mtgRulesMessageFlag)
 		getRuling(m.ChannelID, s)
 		//if len(cachedCardRuling) > 2000 {
 		//	iterationsNeeded := int(math.Ceil(float64(len(cachedCardRuling)) / 2000))
@@ -311,7 +312,7 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 		mtgRulesMessageFlag = true
 	}
 	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id && mtgSetMessageFlag == false {
-		_, _ = s.ChannelMessageSend(m.ChannelID, "```ansi\nCard Sets: "+cachedCardSet+"```")
+		getSets(m.ChannelID, s)
 		mtgSetMessageFlag = true
 	}
 }

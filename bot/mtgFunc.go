@@ -116,6 +116,7 @@ type CardResponse struct {
 	PurchaseUris    purchaseUrisObj `json:"purchase_uris"`
 	Details         string          `json:"details"`
 	RulingsUri      string          `json:"rulings_uri"`
+	PrintsSearchUri string          `json:"prints_search_uri"`
 }
 type RulingData struct {
 	Object        string `json:"object"`
@@ -131,8 +132,29 @@ type RulingResponse struct {
 	Source  string       `json:"source"`
 	Details string       `json:"details"`
 }
+type SetResponse struct {
+	Object      string `json:"object"`
+	Id          string `json:"id"`
+	Code        string `json:"code"`
+	MtgoCode    string `json:"mtg_code"`
+	ArenaCode   string `json:"arena_code"`
+	TcgplayerId string `json:"tcgplayer_id"`
+	Name        string `json:"name"`
+	Uri         string `json:"uri"`
+	ScryfallUri string `json:"scryfall_uri"`
+	SearchUri   string `json:"search_uri"`
+	ReleasedAt  string `json:"released_at"`
+	SetType     string `json:"set_type"`
+	CardCount   string `json:"card_count"`
+	PrintedSize int    `json:"printed_size"`
+	Digital     bool   `json:"digital"`
+	NonfoilOnly bool   `json:"nonfoil_only"`
+	FoilOnly    bool   `json:"foil_only"`
+	IconSvgUri  string `json:"icon_svg_uri"`
+}
 
 var RulingUri string
+var SetCodeUri string
 
 func getCard(cardName string, channelId string, s *discordgo.Session) (string, string) {
 	res, err := http.Get("https://api.scryfall.com/cards/named?fuzzy=" + cardName)
@@ -166,13 +188,19 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 	if res.StatusCode == 200 {
 		if len(data.RulingsUri) > 1 {
 			RulingUri = data.RulingsUri
+		} else {
+			RulingUri = "No Rulings Found"
+		}
+		if len(data.SetUri) > 0 {
+			SetCodeUri = data.PrintsSearchUri
+			fmt.Println(SetCodeUri)
 		}
 		_, err = s.ChannelFileSend(channelId, data.Name+".png", res.Body)
 		if err != nil {
 			fmt.Println(err)
 		}
 	}
-	fmt.Println(data.RulingsUri)
+	fmt.Println(data.ScryfallSetUri)
 
 	return "h", "ho"
 
@@ -180,6 +208,10 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 
 func getRuling(channelId string, s *discordgo.Session) {
 	fmt.Println("Rulings Get " + RulingUri)
+	if RulingUri == "No Rulings Found" {
+		_, _ = s.ChannelMessageSend(channelId, RulingUri)
+		return
+	}
 	res, err := http.Get(RulingUri)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
@@ -200,6 +232,33 @@ func getRuling(channelId string, s *discordgo.Session) {
 	for i := 0; i < len(data.Data); i++ {
 		_, err = s.ChannelMessageSend(channelId, "```ansi\n"+strconv.Itoa(i+1)+". "+data.Data[i].Comment+"\n```")
 	}
+	fmt.Println(data)
+}
+
+func getSets(channelId string, s *discordgo.Session) {
+	if SetCodeUri == "No Sets Found" {
+		_, _ = s.ChannelMessageSend(channelId, RulingUri)
+		return
+	}
+	res, err := http.Get(SetCodeUri)
+	if err != nil {
+		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		_, err = s.ChannelMessageSend(channelId, "Card database said no to that :(")
+	}
+	var data SetResponse
+	if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+		fmt.Println(err)
+	}
+	if data.Object == "error" {
+		_, err = s.ChannelMessageSend(channelId, "Error in Json Object")
+	}
+	_, err = s.ChannelMessageSend(channelId, "```ansi\n"+data.Name+"\n```")
+
 	fmt.Println(data)
 }
 
