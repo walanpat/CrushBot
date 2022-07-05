@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"goland-discord-bot/config"
-	"math"
 	"math/rand"
 	"regexp"
 	"strconv"
@@ -53,7 +52,6 @@ func Start() {
 		fmt.Println(err.Error())
 		return
 	}
-	initialize()
 	//If every thing works fine we will be printing this.
 	fmt.Println("Bot is running !")
 }
@@ -263,7 +261,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	//Mtg Code
 	if strings.Contains(m.Content, "!c") {
-		cardName := strings.ReplaceAll(m.Content[3:len(m.Content)], " ", "%20")
+		cardName := strings.ReplaceAll(m.Content[3:len(m.Content)], " ", "+")
 		cachedCardRuling, cachedCardSet = getCard(cardName, m.ChannelID, s)
 		if len(cachedCardRuling) > 1 {
 			cachedCardRulingTimer = true
@@ -281,34 +279,35 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	//_, _ = s.ChannelMessageSend(m.ChannelID, m.MessageID)
 	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 	//Code for getting the ruling
-	if decode == 128218 && length == 4 && cachedCardRuling != "" && m.MessageReaction.UserID != Id && cachedCardRulingTimer && mtgRulesMessageFlag == false {
-		if len(cachedCardRuling) > 2000 {
-			iterationsNeeded := int(math.Ceil(float64(len(cachedCardRuling)) / 2000))
-			for i := 0; i < iterationsNeeded; i++ {
-				if i+1 != iterationsNeeded {
-					if i == 0 {
-						_, err := s.ChannelMessageSend(m.ChannelID, cachedCardRuling[i*2000:(i+1)*2000]+"```")
-						if err != nil {
-							fmt.Println(err)
-						}
-					} else {
-						_, err := s.ChannelMessageSend(m.ChannelID, "```ansi\n"+cachedCardRuling[i*2000:(i+1)*2000]+"```")
-						if err != nil {
-							fmt.Println(err)
-						}
-					}
-				} else {
-					var _, err = s.ChannelMessageSend(m.ChannelID, "```ansi\n"+cachedCardRuling[(i*2000):])
-					if err != nil {
-						fmt.Println(err)
-					}
-				}
-			}
-			cachedCardRulingTimer = false
-		} else {
-			_, _ = s.ChannelMessageSend(m.ChannelID, cachedCardRuling)
-			cachedCardRulingTimer = false
-		}
+	if decode == 128218 && length == 4 && cachedCardRuling != "" && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
+		getRuling(m.ChannelID, s)
+		//if len(cachedCardRuling) > 2000 {
+		//	iterationsNeeded := int(math.Ceil(float64(len(cachedCardRuling)) / 2000))
+		//	for i := 0; i < iterationsNeeded; i++ {
+		//		if i+1 != iterationsNeeded {
+		//			if i == 0 {
+		//				_, err := s.ChannelMessageSend(m.ChannelID, cachedCardRuling[i*2000:(i+1)*2000]+"```")
+		//				if err != nil {
+		//					fmt.Println(err)
+		//				}
+		//			} else {
+		//				_, err := s.ChannelMessageSend(m.ChannelID, "```ansi\n"+cachedCardRuling[i*2000:(i+1)*2000]+"```")
+		//				if err != nil {
+		//					fmt.Println(err)
+		//				}
+		//			}
+		//		} else {
+		//			var _, err = s.ChannelMessageSend(m.ChannelID, "```ansi\n"+cachedCardRuling[(i*2000):])
+		//			if err != nil {
+		//				fmt.Println(err)
+		//			}
+		//		}
+		//	}
+		//	cachedCardRulingTimer = false
+		//} else {
+		//	_, _ = s.ChannelMessageSend(m.ChannelID, cachedCardRuling)
+		//	cachedCardRulingTimer = false
+		//}
 		mtgRulesMessageFlag = true
 	}
 	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id && mtgSetMessageFlag == false {
