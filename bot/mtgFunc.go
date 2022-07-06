@@ -225,8 +225,8 @@ func getRuling(channelId string, s *discordgo.Session) {
 		fmt.Println("Can not unmarshal JSON")
 		fmt.Println(err)
 	}
-	if data.Object == "error" {
-		_, err = s.ChannelMessageSend(channelId, data.Details)
+	if data.Object == "error" || len(data.Data) == 0 {
+		_, err = s.ChannelMessageSend(channelId, "```ansi\nNo Rulings Found```")
 	}
 	for i := 0; i < len(data.Data); i++ {
 		_, err = s.ChannelMessageSend(channelId, "```ansi\n"+strconv.Itoa(i+1)+". "+data.Data[i].Comment+"\n```")
