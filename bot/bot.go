@@ -8,13 +8,20 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
+	"unicode/utf8"
 )
 
 var Id string
 
 //Not sure if this variable/nomenclature will be needed later.  Add to cleanup list.
 //var goBot *discordgo.Session
+var cachedCardSet = ""
 var cachedCardRuling = ""
+var cachedCardRulingTimer = false
+
+var mtgSetMessageFlag = false
+var mtgRulesMessageFlag = false
 
 func Start() {
 
@@ -28,7 +35,7 @@ func Start() {
 	}
 	// Making our bot a user using User function .
 	u, err := goBot.User("@me")
-	//Handlinf error
+	//Handling error
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -38,7 +45,7 @@ func Start() {
 
 	// Adding handler function to handle our messages using AddHandler from discordgo package. We will declare messageHandler function later.
 	goBot.AddHandler(messageHandler)
-
+	goBot.AddHandler(reactionHandler)
 	err = goBot.Open()
 	//Error handling
 	if err != nil {
@@ -51,13 +58,15 @@ func Start() {
 
 //Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Author.ID == Id && len(m.Reactions) > 0 {
-		//Cache the value or set a listener?
-		fmt.Println("Trigger Test")
-		_, _ = s.ChannelMessageSend(m.ChannelID, "test react")
+	if m.Author.ID == Id && len(m.Reactions) == 0 && m.Content == "" {
+		cachedCardTimer := time.NewTimer(50 * time.Millisecond)
+		<-cachedCardTimer.C
+		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4DA")
+		cachedCardTimer.Reset(50 * time.Millisecond)
+		<-cachedCardTimer.C
+		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4C5")
 	}
-
-	//Bot musn't reply to it's own messages , to confirm it we perform this check.
+	//Bot mustn't reply to its own messages , to confirm it we perform this check.
 	if m.Author.ID == Id {
 		return
 	}
@@ -251,22 +260,59 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//
 		//message += "\n```"
 		//
+		//message := setCodes
 		//_, _ = s.ChannelMessageSend(m.ChannelID, message)
 	}
 	//Mtg Code
 	if strings.Contains(m.Content, "!c") {
-		cardName := m.Content[3:len(m.Content)]
-		fmt.Println(cardName)
-		cachedCardRuling = getCard(cardName, m.ChannelID, s)
-	}
-	if strings.Contains(m.Content, "!rules") {
+		cardName := strings.ReplaceAll(m.Content[3:len(m.Content)], " ", "+")
+		cachedCardRuling, cachedCardSet = getCard(cardName, m.ChannelID, s)
 		if len(cachedCardRuling) > 1 {
-			_, _ = s.ChannelMessageSend(m.ChannelID, cachedCardRuling)
-		} else {
-			_, _ = s.ChannelMessageSend(m.ChannelID, "No card Selected :( ")
-
+			cachedCardRulingTimer = true
 		}
-
+		mtgRulesMessageFlag = false
+		mtgSetMessageFlag = false
 	}
+}
 
+func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
+	//_, _ = s.ChannelMessageSend(m.ChannelID, m.MessageID)
+	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
+	//Code for getting the ruling
+	if decode == 128218 && length == 4 && cachedCardRuling != "" && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
+		fmt.Println(mtgRulesMessageFlag)
+		getRuling(m.ChannelID, s)
+		//if len(cachedCardRuling) > 2000 {
+		//	iterationsNeeded := int(math.Ceil(float64(len(cachedCardRuling)) / 2000))
+		//	for i := 0; i < iterationsNeeded; i++ {
+		//		if i+1 != iterationsNeeded {
+		//			if i == 0 {
+		//				_, err := s.ChannelMessageSend(m.ChannelID, cachedCardRuling[i*2000:(i+1)*2000]+"```")
+		//				if err != nil {
+		//					fmt.Println(err)
+		//				}
+		//			} else {
+		//				_, err := s.ChannelMessageSend(m.ChannelID, "```ansi\n"+cachedCardRuling[i*2000:(i+1)*2000]+"```")
+		//				if err != nil {
+		//					fmt.Println(err)
+		//				}
+		//			}
+		//		} else {
+		//			var _, err = s.ChannelMessageSend(m.ChannelID, "```ansi\n"+cachedCardRuling[(i*2000):])
+		//			if err != nil {
+		//				fmt.Println(err)
+		//			}
+		//		}
+		//	}
+		//	cachedCardRulingTimer = false
+		//} else {
+		//	_, _ = s.ChannelMessageSend(m.ChannelID, cachedCardRuling)
+		//	cachedCardRulingTimer = false
+		//}
+		mtgRulesMessageFlag = true
+	}
+	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id && mtgSetMessageFlag == false {
+		getSets(m.ChannelID, s)
+		mtgSetMessageFlag = true
+	}
 }
