@@ -187,7 +187,6 @@ func getCard(cardName string, channelId string, s *discordgo.Session) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(data)
 	if res.StatusCode == 200 {
 		if len(data.RulingsUri) > 1 {
 			RulingUri = data.RulingsUri
