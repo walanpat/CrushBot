@@ -20,6 +20,7 @@ var cachedCardRulingTimer = false
 
 var mtgSetMessageFlag = false
 var mtgRulesMessageFlag = false
+var mtgPriceMessageFlag = false
 
 func Start() {
 
@@ -63,6 +64,10 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		cachedCardTimer.Reset(100 * time.Millisecond)
 		<-cachedCardTimer.C
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4C5")
+		cachedCardTimer.Reset(100 * time.Millisecond)
+		<-cachedCardTimer.C
+		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4B5")
+
 	}
 	//Bot mustn't reply to its own messages , to confirm it we perform this check.
 	if m.Author.ID == Id {
@@ -268,6 +273,8 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		mtgRulesMessageFlag = false
 		mtgSetMessageFlag = false
+		mtgPriceMessageFlag = false
+
 	}
 }
 
@@ -309,5 +316,9 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id && mtgSetMessageFlag == false {
 		getSets(m.ChannelID, s)
 		mtgSetMessageFlag = true
+	}
+	if decode == 128181 && length == 4 && m.MessageReaction.UserID != Id && mtgPriceMessageFlag == false {
+		getPrice(m.ChannelID, s)
+		mtgPriceMessageFlag = true
 	}
 }
