@@ -185,7 +185,9 @@ func getCard(cardName string, channelId string, s *discordgo.Session) {
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush can't GET that card image :(")
 		fmt.Println(err)
+		return
 	}
+	fmt.Println(data)
 	if res.StatusCode == 200 {
 		if len(data.RulingsUri) > 1 {
 			RulingUri = data.RulingsUri
