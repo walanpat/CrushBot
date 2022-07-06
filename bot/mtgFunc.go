@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type imageUris struct {
@@ -132,41 +133,42 @@ type RulingResponse struct {
 	Source  string       `json:"source"`
 	Details string       `json:"details"`
 }
-type SetResponse struct {
-	Object      string `json:"object"`
-	Id          string `json:"id"`
-	Code        string `json:"code"`
-	MtgoCode    string `json:"mtg_code"`
-	ArenaCode   string `json:"arena_code"`
-	TcgplayerId string `json:"tcgplayer_id"`
-	Name        string `json:"name"`
-	Uri         string `json:"uri"`
-	ScryfallUri string `json:"scryfall_uri"`
-	SearchUri   string `json:"search_uri"`
-	ReleasedAt  string `json:"released_at"`
-	SetType     string `json:"set_type"`
-	CardCount   string `json:"card_count"`
-	PrintedSize int    `json:"printed_size"`
-	Digital     bool   `json:"digital"`
-	NonfoilOnly bool   `json:"nonfoil_only"`
-	FoilOnly    bool   `json:"foil_only"`
-	IconSvgUri  string `json:"icon_svg_uri"`
+type SetListResponse struct {
+	Object      string         `json:"object"`
+	TotalCards  int            `json:"total_cards"`
+	HasMore     bool           `json:"has_more"`
+	Data        []CardResponse `json:"data"`
+	Id          string         `json:"id"`
+	Code        string         `json:"code"`
+	MtgoCode    string         `json:"mtg_code"`
+	ArenaCode   string         `json:"arena_code"`
+	TcgplayerId string         `json:"tcgplayer_id"`
+	Name        string         `json:"name"`
+	Uri         string         `json:"uri"`
+	ScryfallUri string         `json:"scryfall_uri"`
+	SearchUri   string         `json:"search_uri"`
+	ReleasedAt  string         `json:"released_at"`
+	SetType     string         `json:"set_type"`
+	CardCount   string         `json:"card_count"`
+	PrintedSize int            `json:"printed_size"`
+	Digital     bool           `json:"digital"`
+	NonfoilOnly bool           `json:"nonfoil_only"`
+	FoilOnly    bool           `json:"foil_only"`
+	IconSvgUri  string         `json:"icon_svg_uri"`
 }
 
 var RulingUri string
 var SetCodeUri string
 
-func getCard(cardName string, channelId string, s *discordgo.Session) (string, string) {
+func getCard(cardName string, channelId string, s *discordgo.Session) {
 	res, err := http.Get("https://api.scryfall.com/cards/named?fuzzy=" + cardName)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
-		return "Error", "Error"
 	}
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Card database said no to that :(")
-		return "Error", "Error"
 	}
 
 	var data CardResponse
@@ -176,14 +178,12 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 	}
 	if data.Object == "error" {
 		_, err = s.ChannelMessageSend(channelId, data.Details)
-		return "Card Error", "Card Error"
 	}
 
 	res, err = http.Get(data.ImageUris.Png)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush can't GET that card image :(")
 		fmt.Println(err)
-		return "Error", "Error"
 	}
 	if res.StatusCode == 200 {
 		if len(data.RulingsUri) > 1 {
@@ -193,23 +193,18 @@ func getCard(cardName string, channelId string, s *discordgo.Session) (string, s
 		}
 		if len(data.SetUri) > 0 {
 			SetCodeUri = data.PrintsSearchUri
-			fmt.Println(SetCodeUri)
 		}
 		_, err = s.ChannelFileSend(channelId, data.Name+".png", res.Body)
 		if err != nil {
 			fmt.Println(err)
 		}
 	}
-	fmt.Println(data.ScryfallSetUri)
-
-	return "h", "ho"
-
+	//fmt.Println(data)
 }
 
 func getRuling(channelId string, s *discordgo.Session) {
-	fmt.Println("Rulings Get " + RulingUri)
-	if RulingUri == "No Rulings Found" {
-		_, _ = s.ChannelMessageSend(channelId, RulingUri)
+	if RulingUri == "No Rulings Found" || RulingUri == "false" {
+		_, _ = s.ChannelMessageSend(channelId, "No Rulings Found")
 		return
 	}
 	res, err := http.Get(RulingUri)
@@ -232,12 +227,11 @@ func getRuling(channelId string, s *discordgo.Session) {
 	for i := 0; i < len(data.Data); i++ {
 		_, err = s.ChannelMessageSend(channelId, "```ansi\n"+strconv.Itoa(i+1)+". "+data.Data[i].Comment+"\n```")
 	}
-	fmt.Println(data)
 }
 
 func getSets(channelId string, s *discordgo.Session) {
 	if SetCodeUri == "No Sets Found" {
-		_, _ = s.ChannelMessageSend(channelId, RulingUri)
+		_, _ = s.ChannelMessageSend(channelId, SetCodeUri)
 		return
 	}
 	res, err := http.Get(SetCodeUri)
@@ -247,19 +241,32 @@ func getSets(channelId string, s *discordgo.Session) {
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		_, err = s.ChannelMessageSend(channelId, "Card database said no to that :(")
+		_, err = s.ChannelMessageSend(channelId, "Error Unmarshalling Json :(")
 	}
-	var data SetResponse
+	var data SetListResponse
 	if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
+		_, err = s.ChannelMessageSend(channelId, "Can't unmarshal JSON")
 		fmt.Println("Can not unmarshal JSON")
 		fmt.Println(err)
 	}
 	if data.Object == "error" {
 		_, err = s.ChannelMessageSend(channelId, "Error in Json Object")
 	}
-	_, err = s.ChannelMessageSend(channelId, "```ansi\n"+data.Name+"\n```")
+	x := "```ansi\nSets this card has been printed in: "
+	for i := 0; i < len(data.Data); i++ {
+		if strings.Contains(x, "\n   "+data.Data[i].SetName) {
+			if strings.Contains(x, "\n   "+data.Data[i].SetName+" Promos") && data.Data[i].SetName+" Promos" == data.Data[i-1].SetName {
+				x += "\n   " + data.Data[i].SetName
+			} else {
+				continue
+			}
+		} else {
+			x += "\n   " + data.Data[i].SetName
+		}
+	}
+	x += "\n```"
+	_, err = s.ChannelMessageSend(channelId, x)
 
-	fmt.Println(data)
 }
 
 //func getCard(cardName string, channelId string, s *discordgo.Session) (string, string) {

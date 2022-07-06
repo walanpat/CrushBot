@@ -16,8 +16,6 @@ var Id string
 
 //Not sure if this variable/nomenclature will be needed later.  Add to cleanup list.
 //var goBot *discordgo.Session
-var cachedCardSet = ""
-var cachedCardRuling = ""
 var cachedCardRulingTimer = false
 
 var mtgSetMessageFlag = false
@@ -59,10 +57,10 @@ func Start() {
 //Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == Id && len(m.Reactions) == 0 && m.Content == "" {
-		cachedCardTimer := time.NewTimer(50 * time.Millisecond)
+		cachedCardTimer := time.NewTimer(100 * time.Millisecond)
 		<-cachedCardTimer.C
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4DA")
-		cachedCardTimer.Reset(50 * time.Millisecond)
+		cachedCardTimer.Reset(100 * time.Millisecond)
 		<-cachedCardTimer.C
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4C5")
 	}
@@ -266,10 +264,8 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//Mtg Code
 	if strings.Contains(m.Content, "!c") {
 		cardName := strings.ReplaceAll(m.Content[3:len(m.Content)], " ", "+")
-		cachedCardRuling, cachedCardSet = getCard(cardName, m.ChannelID, s)
-		if len(cachedCardRuling) > 1 {
-			cachedCardRulingTimer = true
-		}
+		getCard(cardName, m.ChannelID, s)
+
 		mtgRulesMessageFlag = false
 		mtgSetMessageFlag = false
 	}
@@ -279,8 +275,7 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	//_, _ = s.ChannelMessageSend(m.ChannelID, m.MessageID)
 	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 	//Code for getting the ruling
-	if decode == 128218 && length == 4 && cachedCardRuling != "" && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
-		fmt.Println(mtgRulesMessageFlag)
+	if decode == 128218 && length == 4 && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
 		getRuling(m.ChannelID, s)
 		//if len(cachedCardRuling) > 2000 {
 		//	iterationsNeeded := int(math.Ceil(float64(len(cachedCardRuling)) / 2000))
