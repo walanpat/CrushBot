@@ -268,6 +268,9 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	//Mtg Code
 	if strings.Contains(m.Content, "!c") {
+		if m.Content[0:3] != "!c " {
+			return
+		}
 		cardName := strings.ReplaceAll(m.Content[3:len(m.Content)], " ", "+")
 		getCard(cardName, m.ChannelID, s)
 

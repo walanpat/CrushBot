@@ -137,6 +137,7 @@ type SetListResponse struct {
 	Object      string         `json:"object"`
 	TotalCards  int            `json:"total_cards"`
 	HasMore     bool           `json:"has_more"`
+	NextPage    string         `json:"next_page"`
 	Data        []CardResponse `json:"data"`
 	Id          string         `json:"id"`
 	Code        string         `json:"code"`
@@ -155,6 +156,13 @@ type SetListResponse struct {
 	NonfoilOnly bool           `json:"nonfoil_only"`
 	FoilOnly    bool           `json:"foil_only"`
 	IconSvgUri  string         `json:"icon_svg_uri"`
+}
+type QueryResponse struct {
+	Object     string         `json:"object"`
+	TotalCards int            `json:"total_cards"`
+	HasMore    bool           `json:"has_more"`
+	NextPage   string         `json:"next_page"`
+	Data       []CardResponse `json:"data"`
 }
 
 var RulingUri string
@@ -179,6 +187,7 @@ func getCard(cardName string, channelId string, s *discordgo.Session) {
 	}
 	if data.Object == "error" {
 		_, err = s.ChannelMessageSend(channelId, data.Details)
+		return
 	}
 
 	res, err = http.Get(data.ImageUris.Png)
@@ -193,7 +202,9 @@ func getCard(cardName string, channelId string, s *discordgo.Session) {
 		} else {
 			RulingUri = "No Rulings Found"
 		}
-		if len(data.SetUri) > 0 {
+		if data.Name == "Island" || data.Name == "Plains" || data.Name == "Mountain" || data.Name == "Forest" || data.Name == "Swamp" {
+			SetCodeUri = "Basic Lands are Printed in Every Set"
+		} else if len(data.SetUri) > 0 {
 			SetCodeUri = data.PrintsSearchUri
 		}
 		if len(data.PurchaseUris.Tcgplayer) > 0 {
@@ -235,6 +246,10 @@ func getRuling(channelId string, s *discordgo.Session) {
 }
 
 func getSets(channelId string, s *discordgo.Session) {
+	if SetCodeUri == "Basic Lands are Printed in Every Set" {
+		_, _ = s.ChannelMessageSend(channelId, "```ansi\n"+SetCodeUri+"```")
+		return
+	}
 	if SetCodeUri == "No Sets Found" {
 		_, _ = s.ChannelMessageSend(channelId, SetCodeUri)
 		return
@@ -258,6 +273,9 @@ func getSets(channelId string, s *discordgo.Session) {
 		_, err = s.ChannelMessageSend(channelId, "Error in Json Object")
 	}
 	x := "```ansi\nSets this card has been printed in: "
+	fmt.Println("Sets Total: " + strconv.Itoa(len(data.Data)))
+	if data.HasMore {
+	}
 	for i := 0; i < len(data.Data); i++ {
 		if strings.Contains(x, "\n   "+data.Data[i].SetName) {
 			if strings.Contains(x, "\n   "+data.Data[i].SetName+" Promos") && data.Data[i].SetName+" Promos" == data.Data[i-1].SetName {
@@ -275,5 +293,51 @@ func getSets(channelId string, s *discordgo.Session) {
 }
 
 func getPrice(channelId string, s *discordgo.Session) {
-	_, _ = s.ChannelMessageSend(channelId, "```ansi\n Scryfall Avg Price: $"+Price.Usd+"```")
+	_, _ = s.ChannelMessageSend(channelId, "```ansi\nScryfall Avg Price: $"+Price.Usd+"```")
+}
+
+func getQuery(userQuery string, channelId string, s *discordgo.Session) {
+	//notes
+	//Each portion of the query is separated by a +,
+
+	//CMC is 2 cmc%3D{2}
+	//CMC is 5 and card color is blue c%3Au+cmc%3D5
+	//Cards with one green and blue in their mana costs mana%3A%7BG%7D%7BU%7D
+	//Cards with two generic and ATLEAST two white in their mana cost m%3A2WW
+	//Cards that cost more than three generic, one white, and one blue mana  m>3WU
+	//Cards with one phyrexian red mana in their cost m%3A%7BR%2FP%7D
+	//Cards that produce blue and White Mana produces%3Dwu
+
+	//Card color is red and green c%3A{rg}
+	//Cards that are atleast white and blue, not red color>%3Duw+-c%3Ared
+	//Cards that are instants that you can play with an Esper commander id<%3Desper+t%3Ainstant
+	//Cards that are Colorless identity lands id%3Ac+t%3Aland
+
+	//Card Type is merfolk and legendary  t%3Amerfolk + t%3Alegend
+	//Card type is golbin and NOT creature t%3Agoblin+-t%3Acreature
+
+	//card text is draw, type of card is creature o%3Adraw+t%3Acreature
+	//Card text that is Enters the battlefield tapped o%3A"~+enters+the+battlefield+tapped"
+
+	//Cards with 8 or more power pow>%3D8
+	//White creatures that are power heavy pow>tou+c%3Aw+t%3Acreature
+	//Planeswalkers with loyalty 3 to start t%3Aplaneswalker+loy%3D3
+
+	//Card is a rare artifact r%3Acommon+t%3Aartifact
+	//Cards at rare or higher (rares and mythics) r>%3Dr
+	//Cards printed as commons for the first time in Iconic Masters rarity%3Acommon+e%3Aima+new%3Ararity
+	//Non-rare printings of cards that have been printed at rare in%3Arare+-rarity%3Arare
+
+	//Cards from War of the Spark    https://scryfall.com/sets/war?as=grid&order=set (note this will need to be edited
+	//Cards available inside War of the spark booster boxes e%3Awar+is%3Abooster
+	//Cards in Zendikar Block (but using the world wake code) https://scryfall.com/search?q=b%3Awwk
+	//Cards that were in both Alpha and Magic 2015 https://scryfall.com/search?q=in%3Alea+in%3Am15
+	//Cards that are legendary and have NEVER been printedin a booster set https://scryfall.com/search?q=t%3Alegendary+-in%3Abooster
+	//Prerelease promos with a date stamp cards is%3Adatestamped+is%3Aprerelease
+
+	//Cards that have art that contain a squirrel https://scryfall.com/search?q=art%3Asquirrel
+	//Cards that cause removal (oracle tag) https://scryfall.com/search?q=function%3Aremoval
+
+	//https://api.scryfall.com/cards/search?q=c%3Awhite+cmc%3D1
+	//res, _ := http.Get("https://api.scryfall.com/cards/search?q=" + userQuery)
 }
