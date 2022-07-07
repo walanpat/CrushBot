@@ -273,7 +273,6 @@ func getSets(channelId string, s *discordgo.Session) {
 		_, err = s.ChannelMessageSend(channelId, "Error in Json Object")
 	}
 	x := "```ansi\nSets this card has been printed in: "
-	fmt.Println("Sets Total: " + strconv.Itoa(len(data.Data)))
 	if data.HasMore {
 	}
 	for i := 0; i < len(data.Data); i++ {
