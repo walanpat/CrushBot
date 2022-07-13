@@ -295,6 +295,31 @@ func getPrice(channelId string, s *discordgo.Session) {
 	_, _ = s.ChannelMessageSend(channelId, "```ansi\nScryfall Avg Price: $"+Price.Usd+"```")
 }
 
+//Search by
+
+//Color
+//cmc
+//power
+//toughness
+//Types
+//Subtypes (legendary?)
+//keywords
+//Art content
+//oracletags
+
+//Query Format:
+//!q
+//color:r||g||r+g,
+//cmc:>=3,
+//type:instant,
+//subtype:goblin+soldier,
+//power:4,
+//toughness:4,
+//text:Enters the battlefield Tapped
+//rarity:r,
+//art:squirrel,
+//function:removal
+//is:etb (this is specific to certain shortcults.
 func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 	//notes
 	//Each portion of the query is separated by a +,
