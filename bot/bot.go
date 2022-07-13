@@ -293,7 +293,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			message += "function:removal, This works off of the oracle tag system used by scryfall.  You can query for specific user tags that people have tagged a car with."
 			message += "NOTE: if you want to query for Enter the Battlefield Effects, use \n\n"
 			message += "is:etb, \nThis is because of a misnomer goof on scryfalls parts of having a shortcut that's not included in the oracle tagging system\n\n"
-			message += "for an example type !example"
+			message += "for an example type !example \nfor a property/input key try !key"
 			message += "```"
 			_, _ = s.ChannelMessageSend(m.ChannelID, message)
 
@@ -304,7 +304,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		message += "I want a legendary, blue white, spirit,  card with ETB effect. \n\n"
 		message += "!q color:uw, cmc:<=6, type:legendary spirit creature, is:etb,\n\n"
 		message += "I want a goblin card that ISN't a creature \n\n"
-		message += "!q type:goblin -creature, color:b"
+		message += "!q type:goblin -creature, color:r"
 		message += "```"
 		_, _ = s.ChannelMessageSend(m.ChannelID, message)
 	}
@@ -313,9 +313,11 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		message += "- before a attribute negates it (-creature is NOT creatures, -r NOT red cards etc)\n\n"
 		message += "r = red, b = black, g = green, u = blue, w = white\n\n"
 		message += "function choices are listed here:https://scryfall.com/docs/tagger-tags \n (there's too many) and not all of them are useful\n\n"
-		message += ""
+		message += "type can be of any type, instant, creature, spell, legendary, vampire, goblin, merfolk, etc..."
 
 		message += "```"
+		_, _ = s.ChannelMessageSend(m.ChannelID, message)
+
 	}
 
 }
