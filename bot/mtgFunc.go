@@ -381,6 +381,11 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 
 	typeRe := regexp.MustCompile(`type:[a-z ]*`)
 	variablesArr := typeRe.FindStringSubmatch(userQuery)
+	if len(variablesArr) == 0 {
+		_, _ = s.ChannelMessageSend(channelId, "```ansi\n No Cards Found```")
+
+		return
+	}
 	cardTypeUri := "t%3A" + variablesArr[0][5:len(variablesArr[0])]
 	cardTypeUri = strings.ReplaceAll(cardTypeUri, " ", "+t%3A")
 	fmt.Println(cardTypeUri)
