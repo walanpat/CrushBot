@@ -297,6 +297,8 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			message += "```"
 			_, _ = s.ChannelMessageSend(m.ChannelID, message)
 
+		} else if len(m.Content) > 4 {
+			getQuery(m.Content, m.ChannelID, s)
 		}
 	}
 	if strings.Contains(m.Content, "!example") && m.Author.ID != Id {

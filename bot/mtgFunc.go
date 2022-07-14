@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"io/ioutil"
+	"math"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -163,6 +165,7 @@ type QueryResponse struct {
 	HasMore    bool           `json:"has_more"`
 	NextPage   string         `json:"next_page"`
 	Data       []CardResponse `json:"data"`
+	Details    string         `json:"details"`
 }
 
 var RulingUri string
@@ -320,6 +323,17 @@ func getPrice(channelId string, s *discordgo.Session) {
 //art:squirrel,
 //function:removal
 //is:etb (this is specific to certain shortcults.
+
+//typeRe := regexp.MustCompile(`type:[a-z ]*`)
+//colorRe := regexp.MustCompile(`color:[a-z ]*`)
+//cmcRe  := regexp.MustCompile(`cmc:[a-z ]*`)
+//powerRe :=  regexp.MustCompile(`power:[a-z ]*`)
+//toughnessRe  := regexp.MustCompile(`toughness:[a-z ]*`)
+//textRe  := regexp.MustCompile(`text:[a-z ]*`)
+//rarityRe  := regexp.MustCompile(`rarity:[a-z ]*`)
+//artRe  := regexp.MustCompile(`art:[a-z ]*`)
+//functionRe  := regexp.MustCompile(`function:[a-z ]*`)
+//isRe  := regexp.MustCompile(`is:[a-z ]*`)
 func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 	//notes
 	//Each portion of the query is separated by a +,
@@ -364,4 +378,71 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 
 	//https://api.scryfall.com/cards/search?q=c%3Awhite+cmc%3D1
 	//res, _ := http.Get("https://api.scryfall.com/cards/search?q=" + userQuery)
+
+	typeRe := regexp.MustCompile(`type:[a-z ]*`)
+	variablesArr := typeRe.FindStringSubmatch(userQuery)
+	cardTypeUri := "t%3A" + variablesArr[0][5:len(variablesArr[0])]
+	cardTypeUri = strings.ReplaceAll(cardTypeUri, " ", "+t%3A")
+	fmt.Println(cardTypeUri)
+
+	res, err := http.Get("https://api.scryfall.com/cards/search?q=" + cardTypeUri)
+	if err != nil {
+		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		_, err = s.ChannelMessageSend(channelId, "Card database said no to that :(")
+	}
+
+	var data QueryResponse
+	if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+		fmt.Println(err)
+	}
+	if data.Object == "error" {
+		_, err = s.ChannelMessageSend(channelId, data.Details)
+		return
+		//_, _ = s.ChannelMessageSend(channelId, "```ansi\n ```")
+	}
+
+	message := ""
+	for i := 0; i < len(data.Data); i++ {
+		message += data.Data[i].Name + " "
+	}
+	//fmt.Println(data)
+	fmt.Println(len(message))
+	if len(message) > 2000 {
+		iterationsNeeded := int(math.Ceil(float64(len(message)) / 2000))
+		fmt.Println(len(message[0*2000 : (0+1)*2000]))
+		for i := 0; i < iterationsNeeded; i++ {
+			if i+1 != iterationsNeeded {
+				if i == 0 {
+					_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000:(i+1)*2000]+"```")
+					if err != nil {
+						fmt.Println("Check1")
+						fmt.Println(err)
+					}
+				} else {
+					_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000:(i+1)*2000]+"```")
+					if err != nil {
+						fmt.Println("Check2")
+
+						fmt.Println(err)
+					}
+				}
+			} else {
+				var _, err = s.ChannelMessageSend(channelId, "```ansi\n"+message[(i*2000):])
+				if err != nil {
+					fmt.Println("Check3")
+
+					fmt.Println(err)
+				}
+			}
+		}
+	} else {
+		_, _ = s.ChannelMessageSend(channelId, message)
+	}
+	//_, _ = s.ChannelMessageSend(channelId, message+"```")
+
 }
