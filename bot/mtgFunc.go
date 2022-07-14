@@ -408,23 +408,24 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 
 	message := ""
 	for i := 0; i < len(data.Data); i++ {
-		message += data.Data[i].Name + " "
+		message += data.Data[i].Name + "\n"
 	}
+	fmt.Println(data.Data[len(data.Data)-1].Name)
 	//fmt.Println(data)
 	fmt.Println(len(message))
 	if len(message) > 2000 {
 		iterationsNeeded := int(math.Ceil(float64(len(message)) / 2000))
-		fmt.Println(len(message[0*2000 : (0+1)*2000]))
+		fmt.Println(len("```ansi\n" + message[0*2000:(0+1)*2000-11] + "```"))
 		for i := 0; i < iterationsNeeded; i++ {
 			if i+1 != iterationsNeeded {
 				if i == 0 {
-					_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000:(i+1)*2000]+"```")
+					_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000:(i+1)*2000-11]+"```")
 					if err != nil {
 						fmt.Println("Check1")
 						fmt.Println(err)
 					}
 				} else {
-					_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000:(i+1)*2000]+"```")
+					_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000-11:(i+1)*2000-11]+"```")
 					if err != nil {
 						fmt.Println("Check2")
 
@@ -432,7 +433,7 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 					}
 				}
 			} else {
-				var _, err = s.ChannelMessageSend(channelId, "```ansi\n"+message[(i*2000):])
+				var _, err = s.ChannelMessageSend(channelId, "```ansi\n"+message[(i*2000)-11:]+"```")
 				if err != nil {
 					fmt.Println("Check3")
 
@@ -441,7 +442,8 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 			}
 		}
 	} else {
-		_, _ = s.ChannelMessageSend(channelId, message)
+		_, _ = s.ChannelMessageSend(channelId, "```ansi\n"+message+"```")
+
 	}
 	//_, _ = s.ChannelMessageSend(channelId, message+"```")
 
