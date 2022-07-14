@@ -16,7 +16,6 @@ var Id string
 
 //Not sure if this variable/nomenclature will be needed later.  Add to cleanup list.
 //var goBot *discordgo.Session
-var cachedCardRulingTimer = false
 
 var mtgSetMessageFlag = false
 var mtgRulesMessageFlag = false
@@ -58,13 +57,13 @@ func Start() {
 //Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == Id && len(m.Reactions) == 0 && m.Content == "" {
-		cachedCardTimer := time.NewTimer(100 * time.Millisecond)
+		cachedCardTimer := time.NewTimer(5 * time.Millisecond)
 		<-cachedCardTimer.C
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4DA")
-		cachedCardTimer.Reset(100 * time.Millisecond)
+		cachedCardTimer.Reset(5 * time.Millisecond)
 		<-cachedCardTimer.C
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4C5")
-		cachedCardTimer.Reset(100 * time.Millisecond)
+		cachedCardTimer.Reset(5 * time.Millisecond)
 		<-cachedCardTimer.C
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4B5")
 

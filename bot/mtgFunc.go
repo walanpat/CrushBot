@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"io/ioutil"
-	"math"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -171,11 +170,22 @@ type QueryResponse struct {
 var RulingUri string
 var SetCodeUri string
 var Price priceObj
+var typeRe = regexp.MustCompile(`type:([a-z ]+)?`)
+var colorRe = regexp.MustCompile(`color:([rgbuw ]+)?`)
+var cmcRe = regexp.MustCompile(`cmc:([>=<\d ]+)?`)
+var powerRe = regexp.MustCompile(`power:([>=<\d ]+)?`)
+var toughnessRe = regexp.MustCompile(`toughness:([>=<\d ]+)?`)
+var textRe = regexp.MustCompile(`text:([a-z ]+)?`)
+var rarityRe = regexp.MustCompile(`rarity:([mruc ]+)?`)
+var artRe = regexp.MustCompile(`art:([a-z ]+)?`)
+var functionRe = regexp.MustCompile(`function:([a-z ]+)?`)
+var isRe = regexp.MustCompile(`is:([a-z ]+)?`)
 
 func getCard(cardName string, channelId string, s *discordgo.Session) {
 	res, err := http.Get("https://api.scryfall.com/cards/named?fuzzy=" + cardName)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
+		return
 	}
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
@@ -298,95 +308,56 @@ func getPrice(channelId string, s *discordgo.Session) {
 	_, _ = s.ChannelMessageSend(channelId, "```ansi\nScryfall Avg Price: $"+Price.Usd+"```")
 }
 
-//Search by
-
-//Color
-//cmc
-//power
-//toughness
-//Types
-//Subtypes (legendary?)
-//keywords
-//Art content
-//oracletags
-
-//Query Format:
-//!q
-//color:r||g||r+g,
-//cmc:>=3,
-//type:instant,
-//subtype:goblin+soldier,
-//power:4,
-//toughness:4,
-//text:Enters the battlefield Tapped
-//rarity:r,
-//art:squirrel,
-//function:removal
-//is:etb (this is specific to certain shortcults.
-
-//typeRe := regexp.MustCompile(`type:[a-z ]*`)
-//colorRe := regexp.MustCompile(`color:[a-z ]*`)
-//cmcRe  := regexp.MustCompile(`cmc:[a-z ]*`)
-//powerRe :=  regexp.MustCompile(`power:[a-z ]*`)
-//toughnessRe  := regexp.MustCompile(`toughness:[a-z ]*`)
-//textRe  := regexp.MustCompile(`text:[a-z ]*`)
-//rarityRe  := regexp.MustCompile(`rarity:[a-z ]*`)
-//artRe  := regexp.MustCompile(`art:[a-z ]*`)
-//functionRe  := regexp.MustCompile(`function:[a-z ]*`)
-//isRe  := regexp.MustCompile(`is:[a-z ]*`)
 func getQuery(userQuery string, channelId string, s *discordgo.Session) {
-	//notes
-	//Each portion of the query is separated by a +,
-
-	//CMC is 2 cmc%3D{2}
-	//CMC is 5 and card color is blue c%3Au+cmc%3D5
-	//Cards with one green and blue in their mana costs mana%3A%7BG%7D%7BU%7D
-	//Cards with two generic and ATLEAST two white in their mana cost m%3A2WW
-	//Cards that cost more than three generic, one white, and one blue mana  m>3WU
-	//Cards with one phyrexian red mana in their cost m%3A%7BR%2FP%7D
-	//Cards that produce blue and White Mana produces%3Dwu
-
-	//Card color is red and green c%3A{rg}
-	//Cards that are atleast white and blue, not red color>%3Duw+-c%3Ared
-	//Cards that are instants that you can play with an Esper commander id<%3Desper+t%3Ainstant
-	//Cards that are Colorless identity lands id%3Ac+t%3Aland
-
-	//Card Type is merfolk and legendary  t%3Amerfolk + t%3Alegend
-	//Card type is golbin and NOT creature t%3Agoblin+-t%3Acreature
-
-	//card text is draw, type of card is creature o%3Adraw+t%3Acreature
-	//Card text that is Enters the battlefield tapped o%3A"~+enters+the+battlefield+tapped"
-
-	//Cards with 8 or more power pow>%3D8
-	//White creatures that are power heavy pow>tou+c%3Aw+t%3Acreature
-	//Planeswalkers with loyalty 3 to start t%3Aplaneswalker+loy%3D3
-
-	//Card is a rare artifact r%3Acommon+t%3Aartifact
-	//Cards at rare or higher (rares and mythics) r>%3Dr
-	//Cards printed as commons for the first time in Iconic Masters rarity%3Acommon+e%3Aima+new%3Ararity
-	//Non-rare printings of cards that have been printed at rare in%3Arare+-rarity%3Arare
-
-	//Cards from War of the Spark    https://scryfall.com/sets/war?as=grid&order=set (note this will need to be edited
-	//Cards available inside War of the spark booster boxes e%3Awar+is%3Abooster
-	//Cards in Zendikar Block (but using the world wake code) https://scryfall.com/search?q=b%3Awwk
-	//Cards that were in both Alpha and Magic 2015 https://scryfall.com/search?q=in%3Alea+in%3Am15
-	//Cards that are legendary and have NEVER been printedin a booster set https://scryfall.com/search?q=t%3Alegendary+-in%3Abooster
-	//Prerelease promos with a date stamp cards is%3Adatestamped+is%3Aprerelease
-
-	//Cards that have art that contain a squirrel https://scryfall.com/search?q=art%3Asquirrel
-	//Cards that cause removal (oracle tag) https://scryfall.com/search?q=function%3Aremoval
 
 	//https://api.scryfall.com/cards/search?q=c%3Awhite+cmc%3D1
 	//res, _ := http.Get("https://api.scryfall.com/cards/search?q=" + userQuery)
-
-	typeRe := regexp.MustCompile(`type:[a-z ]*`)
-	variablesArr := typeRe.FindStringSubmatch(userQuery)
-	if len(variablesArr) == 0 {
+	//var typeRe = regexp.MustCompile(`type:([a-z ]+)?`)
+	//var colorRe = regexp.MustCompile(`color:([rgbuw ]+)?`)
+	//var cmcRe = regexp.MustCompile(`cmc:([>=<\d ]+)?`)
+	//var powerRe = regexp.MustCompile(`power:([>=<\d ]+)?`)
+	//var toughnessRe = regexp.MustCompile(`toughness:([>=<\d ]+)?`)
+	//var textRe = regexp.MustCompile(`text:([a-z ]+)?`)
+	//var rarityRe = regexp.MustCompile(`rarity:([mruc ]+)?`)
+	//var artRe = regexp.MustCompile(`art:(a-z ]+)?`)
+	//var functionRe = regexp.MustCompile(`function:([a-z ]+)?`)
+	//var isRe = regexp.MustCompile(`is:([a-z ]+)?`)
+	isArr := isRe.FindStringSubmatch(userQuery)
+	functionArr := functionRe.FindStringSubmatch(userQuery)
+	artArr := artRe.FindStringSubmatch(userQuery)
+	rarityArr := rarityRe.FindStringSubmatch(userQuery)
+	textArr := textRe.FindStringSubmatch(userQuery)
+	toughnessArr := toughnessRe.FindStringSubmatch(userQuery)
+	powerArr := powerRe.FindStringSubmatch(userQuery)
+	colorArr := colorRe.FindStringSubmatch(userQuery)
+	cmcArr := cmcRe.FindStringSubmatch(userQuery)
+	typeArr := typeRe.FindStringSubmatch(userQuery)
+	if len(typeArr) == 0 &&
+		len(functionArr) == 0 &&
+		len(isArr) == 0 &&
+		len(artArr) == 0 &&
+		len(rarityArr) == 0 &&
+		len(textArr) == 0 &&
+		len(toughnessArr) == 0 &&
+		len(powerArr) == 0 &&
+		len(colorArr) == 0 &&
+		len(cmcArr) == 0 {
 		_, _ = s.ChannelMessageSend(channelId, "```ansi\n No Cards Found```")
 
 		return
 	}
-	cardTypeUri := "t%3A" + variablesArr[0][5:len(variablesArr[0])]
+	//fmt.Println("typeArr : " + typeArr[0])
+	//fmt.Println("functionArr:" + functionArr[0])
+	//fmt.Println("isArr : " + isArr[0])
+	//fmt.Println("artArr : " + artArr[0])
+	//fmt.Println("rarityArr : " + rarityArr[0])
+	//fmt.Println("textArr : " + textArr[0])
+	//fmt.Println("tougnessArr : " + toughnessArr[0])
+	//fmt.Println("powerArr : " + powerArr[0])
+	//fmt.Println("colorArr : " + colorArr[0])
+	//fmt.Println("cmcArr : " + cmcArr[0])
+	//!q type:squirrel, art:squirrel, cmc:>=0, toughness:>0, power:>0, cmc:>=1 color:rgbuw, rarity:mr, function:removal, is:squirrel, text:test squirrel,
+	cardTypeUri := "t%3A" + typeArr[0][5:len(typeArr[0])]
 	cardTypeUri = strings.ReplaceAll(cardTypeUri, " ", "+t%3A")
 	fmt.Println(cardTypeUri)
 
@@ -410,46 +381,65 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 		return
 		//_, _ = s.ChannelMessageSend(channelId, "```ansi\n ```")
 	}
-
 	message := ""
 	for i := 0; i < len(data.Data); i++ {
-		message += data.Data[i].Name + "\n"
+		message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + "\n"
 	}
-	fmt.Println(data.Data[len(data.Data)-1].Name)
-	//fmt.Println(data)
-	fmt.Println(len(message))
-	if len(message) > 2000 {
-		iterationsNeeded := int(math.Ceil(float64(len(message)) / 2000))
-		fmt.Println(len("```ansi\n" + message[0*2000:(0+1)*2000-11] + "```"))
-		for i := 0; i < iterationsNeeded; i++ {
-			if i+1 != iterationsNeeded {
-				if i == 0 {
-					_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000:(i+1)*2000-11]+"```")
-					if err != nil {
-						fmt.Println("Check1")
-						fmt.Println(err)
-					}
-				} else {
-					_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000-11:(i+1)*2000-11]+"```")
-					if err != nil {
-						fmt.Println("Check2")
+	_, _ = s.ChannelMessageSend(channelId, message)
 
-						fmt.Println(err)
-					}
-				}
-			} else {
-				var _, err = s.ChannelMessageSend(channelId, "```ansi\n"+message[(i*2000)-11:]+"```")
-				if err != nil {
-					fmt.Println("Check3")
+	//message := ""
+	//timer1 := time.NewTimer(50 * time.Millisecond)
+	//for i := 0; i < len(data.Data); i++ {
+	//	fmt.Println(data.Data[i].Name)
+	//	<-timer1.C
+	//	res, err = http.Get(data.Data[i].ImageUris.Png)
+	//	if err != nil {
+	//		_, err = s.ChannelMessageSend(channelId, "Crush can't GET that card image :(")
+	//		fmt.Println(err)
+	//		return
+	//	}
+	//	_, err = s.ChannelFileSend(channelId, data.Data[i].Name+".png", res.Body)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//	}
+	//	timer1.Reset(100 * time.Millisecond)
+	//}
 
-					fmt.Println(err)
-				}
-			}
-		}
-	} else {
-		_, _ = s.ChannelMessageSend(channelId, "```ansi\n"+message+"```")
-
-	}
+	//fmt.Println(data.Data[len(data.Data)-1].Name)
+	////fmt.Println(data)
+	//fmt.Println(len(message))
+	//if len(message) > 2000 {
+	//	iterationsNeeded := int(math.Ceil(float64(len(message)) / 2000))
+	//	fmt.Println(len("```ansi\n" + message[0*2000:(0+1)*2000-11] + "```"))
+	//	for i := 0; i < iterationsNeeded; i++ {
+	//		if i+1 != iterationsNeeded {
+	//			if i == 0 {
+	//				_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000:(i+1)*2000-11]+"```")
+	//				if err != nil {
+	//					fmt.Println("Check1")
+	//					fmt.Println(err)
+	//				}
+	//			} else {
+	//				_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000-11:(i+1)*2000-11]+"```")
+	//				if err != nil {
+	//					fmt.Println("Check2")
+	//
+	//					fmt.Println(err)
+	//				}
+	//			}
+	//		} else {
+	//			var _, err = s.ChannelMessageSend(channelId, "```ansi\n"+message[(i*2000)-11:]+"```")
+	//			if err != nil {
+	//				fmt.Println("Check3")
+	//
+	//				fmt.Println(err)
+	//			}
+	//		}
+	//	}
+	//} else {
+	//	_, _ = s.ChannelMessageSend(channelId, "```ansi\n"+message+"```")
+	//
+	//}
 	//_, _ = s.ChannelMessageSend(channelId, message+"```")
 
 }
