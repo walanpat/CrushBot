@@ -25,7 +25,6 @@ func Start() {
 
 	//creating new bot session
 	goBot, err := discordgo.New("Bot " + config.Token)
-
 	//Handling error
 	if err != nil {
 		fmt.Println(err.Error())

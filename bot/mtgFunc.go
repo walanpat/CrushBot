@@ -170,16 +170,16 @@ type QueryResponse struct {
 var RulingUri string
 var SetCodeUri string
 var Price priceObj
-var typeRe = regexp.MustCompile(`type:([a-z ]+)?`)
+var typeRe = regexp.MustCompile(`type:([a-zA-Z ]+)?`)
 var colorRe = regexp.MustCompile(`color:([rgbuw ]+)?`)
 var cmcRe = regexp.MustCompile(`cmc:([>=<\d ]+)?`)
 var powerRe = regexp.MustCompile(`power:([>=<\d ]+)?`)
 var toughnessRe = regexp.MustCompile(`toughness:([>=<\d ]+)?`)
-var textRe = regexp.MustCompile(`text:([a-z ]+)?`)
+var textRe = regexp.MustCompile(`text:([a-zA-Z' ]+)?`)
 var rarityRe = regexp.MustCompile(`rarity:([mruc ]+)?`)
-var artRe = regexp.MustCompile(`art:([a-z ]+)?`)
-var functionRe = regexp.MustCompile(`function:([a-z ]+)?`)
-var isRe = regexp.MustCompile(`is:([a-z ]+)?`)
+var artRe = regexp.MustCompile(`art:([a-zA-Z ]+)?`)
+var functionRe = regexp.MustCompile(`function:([a-zA-Z ]+)?`)
+var isRe = regexp.MustCompile(`is:([a-zA-Z ]+)?`)
 
 func getCard(cardName string, channelId string, s *discordgo.Session) {
 	res, err := http.Get("https://api.scryfall.com/cards/named?fuzzy=" + cardName)
@@ -357,11 +357,32 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 	//fmt.Println("colorArr : " + colorArr[0])
 	//fmt.Println("cmcArr : " + cmcArr[0])
 	//!q type:squirrel, art:squirrel, cmc:>=0, toughness:>0, power:>0, cmc:>=1 color:rgbuw, rarity:mr, function:removal, is:squirrel, text:test squirrel,
-	cardTypeUri := "t%3A" + typeArr[0][5:len(typeArr[0])]
-	cardTypeUri = strings.ReplaceAll(cardTypeUri, " ", "+t%3A")
-	fmt.Println(cardTypeUri)
+	cardTypeUri := ""
+	functionUri := ""
+	textUri := ""
+	fmt.Println(textArr)
+	getUri := "https://api.scryfall.com/cards/search?q="
+	if len(typeArr) > 0 {
+		cardTypeUri += "t%3A" + typeArr[0][5:len(typeArr[0])]
+		cardTypeUri = strings.ReplaceAll(cardTypeUri, " ", "+t%3A")
+		getUri += cardTypeUri + "+"
 
-	res, err := http.Get("https://api.scryfall.com/cards/search?q=" + cardTypeUri)
+	}
+	if len(functionArr) > 0 {
+		functionUri += "function%3A" + functionArr[0][9:len(functionArr[0])]
+		functionUri = strings.ReplaceAll(functionUri, " ", "+function%3A")
+		getUri += functionUri + "+"
+	}
+	if len(textArr) > 0 {
+		textUri += "o%3A" + "\U00000022" + textArr[0][5:len(textArr[0])] + "\U00000022"
+		textUri = strings.ReplaceAll(textUri, " ", "+")
+		getUri += textUri + "+"
+
+	}
+	//cmcUri := "c%3A" + cmcArr[0][4:len(cmcArr[0])]
+
+	fmt.Println(getUri)
+	res, err := http.Get(getUri)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
 	}
