@@ -171,7 +171,7 @@ var RulingUri string
 var SetCodeUri string
 var Price priceObj
 var typeRe = regexp.MustCompile(`type:([a-zA-Z ]+)?`)
-var colorRe = regexp.MustCompile(`color:([rgbuw ]+)?`)
+var colorRe = regexp.MustCompile(`color:([rgbuw -]+)?`)
 var cmcRe = regexp.MustCompile(`cmc:([>=<\d ]+)?`)
 var powerRe = regexp.MustCompile(`power:([>=<\d ]+)?`)
 var toughnessRe = regexp.MustCompile(`toughness:([>=<\d ]+)?`)
@@ -346,8 +346,8 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 
 		return
 	}
-	//fmt.Println("typeArr : " + typeArr[0])
-	//fmt.Println("functionArr:" + functionArr[0])
+	//fmt.Println("typeArr : " + typeArr[0])     CHECK
+	//fmt.Println("functionArr:" + functionArr[0])    Check
 	//fmt.Println("isArr : " + isArr[0])
 	//fmt.Println("artArr : " + artArr[0])
 	//fmt.Println("rarityArr : " + rarityArr[0])
@@ -360,13 +360,12 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 	cardTypeUri := ""
 	functionUri := ""
 	textUri := ""
-	fmt.Println(textArr)
+	colorUri := ""
 	getUri := "https://api.scryfall.com/cards/search?q="
 	if len(typeArr) > 0 {
 		cardTypeUri += "t%3A" + typeArr[0][5:len(typeArr[0])]
 		cardTypeUri = strings.ReplaceAll(cardTypeUri, " ", "+t%3A")
 		getUri += cardTypeUri + "+"
-
 	}
 	if len(functionArr) > 0 {
 		functionUri += "function%3A" + functionArr[0][9:len(functionArr[0])]
@@ -374,10 +373,16 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 		getUri += functionUri + "+"
 	}
 	if len(textArr) > 0 {
-		textUri += "o%3A" + textArr[0][5:len(textArr[0])]
+		textUri += "o%3A%27" + textArr[0][5:len(textArr[0])] + "%27"
 		textUri = strings.ReplaceAll(textUri, " ", "+")
 		getUri += textUri
-
+	}
+	if len(colorArr) > 0 {
+		fmt.Println(colorArr[0])
+		colorUri += "c%3A" + colorArr[0][6:len(colorArr[0])]
+		colorUri = strings.ReplaceAll(colorUri, "-", "+-c%3A")
+		colorUri = strings.ReplaceAll(colorUri, " ", "+c%3A")
+		getUri += colorUri
 	}
 	//cmcUri := "c%3A" + cmcArr[0][4:len(cmcArr[0])]
 
