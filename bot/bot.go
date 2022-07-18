@@ -16,18 +16,15 @@ var Id string
 
 //Not sure if this variable/nomenclature will be needed later.  Add to cleanup list.
 //var goBot *discordgo.Session
-var cachedCardSet = ""
-var cachedCardRuling = ""
-var cachedCardRulingTimer = false
 
 var mtgSetMessageFlag = false
 var mtgRulesMessageFlag = false
+var mtgPriceMessageFlag = false
 
 func Start() {
 
 	//creating new bot session
 	goBot, err := discordgo.New("Bot " + config.Token)
-
 	//Handling error
 	if err != nil {
 		fmt.Println(err.Error())
@@ -59,12 +56,16 @@ func Start() {
 //Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == Id && len(m.Reactions) == 0 && m.Content == "" {
-		cachedCardTimer := time.NewTimer(50 * time.Millisecond)
+		cachedCardTimer := time.NewTimer(5 * time.Millisecond)
 		<-cachedCardTimer.C
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4DA")
-		cachedCardTimer.Reset(50 * time.Millisecond)
+		cachedCardTimer.Reset(5 * time.Millisecond)
 		<-cachedCardTimer.C
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4C5")
+		cachedCardTimer.Reset(5 * time.Millisecond)
+		<-cachedCardTimer.C
+		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4B5")
+
 	}
 	//Bot mustn't reply to its own messages , to confirm it we perform this check.
 	if m.Author.ID == Id {
@@ -265,22 +266,67 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	//Mtg Code
 	if strings.Contains(m.Content, "!c") {
-		cardName := strings.ReplaceAll(m.Content[3:len(m.Content)], " ", "+")
-		cachedCardRuling, cachedCardSet = getCard(cardName, m.ChannelID, s)
-		if len(cachedCardRuling) > 1 {
-			cachedCardRulingTimer = true
+		if m.Content[0:3] != "!c " {
+			return
 		}
+		cardName := strings.ReplaceAll(m.Content[3:len(m.Content)], " ", "+")
+		getCard(cardName, m.ChannelID, s)
+
 		mtgRulesMessageFlag = false
 		mtgSetMessageFlag = false
+		mtgPriceMessageFlag = false
+
 	}
+	if strings.Contains(m.Content, "!q") && m.Author.ID != Id {
+		if len(m.Content) == 2 {
+			message := "```ansi\nQuerying cards can be done multiple ways:\n"
+			message += "color:r/g/rg,  This is red or green or RedANDgreen. \n\n"
+			message += "cmc:>=3,  This is converted mana greater than or equal to 3 \n\n"
+			message += "type:instant,goblin, All card types are inserted here \n\n"
+			message += "power:>=4, here you can use greaterthan, lessthan, equal to whatever power \n\n"
+			message += "toughness:>=4, same thing as the rules for querying power but with toughness\n\n"
+			message += "text:Enters the battlefield tapped, Here you can query for specific keywords in the cards text \n\n"
+			message += "rarity:r, rarity is listed: mr, m, r, u, c (mythic rare, mythic, rare, uncommon, common)\n\n"
+			message += "art:squirrel, query by what is listed in the card art \n\n"
+			message += "function:removal, This works off of the oracle tag system used by scryfall.  You can query for specific user tags that people have tagged a car with."
+			message += "NOTE: if you want to query for Enter the Battlefield Effects, use \n\n"
+			message += "is:etb, \nThis is because of a misnomer goof on scryfalls parts of having a shortcut that's not included in the oracle tagging system\n\n"
+			message += "for an example type !example \nfor a property/input key try !key"
+			message += "```"
+			_, _ = s.ChannelMessageSend(m.ChannelID, message)
+
+		} else if len(m.Content) > 4 {
+			getQuery(m.Content, m.ChannelID, s)
+		}
+	}
+	if strings.Contains(m.Content, "!example") && m.Author.ID != Id {
+		message := "```ansi\nExample:\n"
+		message += "I want a legendary, blue white, spirit,  card with ETB effect. \n\n"
+		message += "!q color:uw, cmc:<=6, type:legendary spirit creature, is:etb,\n\n"
+		message += "I want a goblin card that ISN't a creature \n\n"
+		message += "!q type:goblin -creature, color:r"
+		message += "```"
+		_, _ = s.ChannelMessageSend(m.ChannelID, message)
+	}
+	if strings.Contains(m.Content, "!key") && m.Author.ID != Id {
+		message := "```ansi\n"
+		message += "- before a attribute negates it (-creature is NOT creatures, -r NOT red cards etc)\n\n"
+		message += "r = red, b = black, g = green, u = blue, w = white\n\n"
+		message += "function choices are listed here:https://scryfall.com/docs/tagger-tags \n (there's too many) and not all of them are useful\n\n"
+		message += "type can be of any type, instant, creature, spell, legendary, vampire, goblin, merfolk, etc..."
+
+		message += "```"
+		_, _ = s.ChannelMessageSend(m.ChannelID, message)
+
+	}
+
 }
 
 func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	//_, _ = s.ChannelMessageSend(m.ChannelID, m.MessageID)
 	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 	//Code for getting the ruling
-	if decode == 128218 && length == 4 && cachedCardRuling != "" && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
-		fmt.Println(mtgRulesMessageFlag)
+	if decode == 128218 && length == 4 && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
 		getRuling(m.ChannelID, s)
 		//if len(cachedCardRuling) > 2000 {
 		//	iterationsNeeded := int(math.Ceil(float64(len(cachedCardRuling)) / 2000))
@@ -314,5 +360,9 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id && mtgSetMessageFlag == false {
 		getSets(m.ChannelID, s)
 		mtgSetMessageFlag = true
+	}
+	if decode == 128181 && length == 4 && m.MessageReaction.UserID != Id && mtgPriceMessageFlag == false {
+		getPrice(m.ChannelID, s)
+		mtgPriceMessageFlag = true
 	}
 }
