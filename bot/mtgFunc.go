@@ -374,9 +374,9 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 		getUri += functionUri + "+"
 	}
 	if len(textArr) > 0 {
-		textUri += "o%3A" + "\U00000022" + textArr[0][5:len(textArr[0])] + "\U00000022"
+		textUri += "o%3A" + textArr[0][5:len(textArr[0])]
 		textUri = strings.ReplaceAll(textUri, " ", "+")
-		getUri += textUri + "+"
+		getUri += textUri
 
 	}
 	//cmcUri := "c%3A" + cmcArr[0][4:len(cmcArr[0])]
