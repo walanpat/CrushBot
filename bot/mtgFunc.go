@@ -358,33 +358,101 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 	//fmt.Println("cmcArr : " + cmcArr[0])
 	//!q type:squirrel, art:squirrel, cmc:>=0, toughness:>0, power:>0, cmc:>=1 color:rgbuw, rarity:mr, function:removal, is:squirrel, text:test squirrel,
 	cardTypeUri := ""
-	functionUri := ""
-	textUri := ""
 	colorUri := ""
+	cmcUri := ""
+	functionUri := ""
+	isUri := ""
+	textUri := ""
+	rarityUri := ""
+	artUri := ""
 	getUri := "https://api.scryfall.com/cards/search?q="
 	if len(typeArr) > 0 {
 		cardTypeUri += "t%3A" + typeArr[0][5:len(typeArr[0])]
 		cardTypeUri = strings.ReplaceAll(cardTypeUri, " ", "+t%3A")
 		getUri += cardTypeUri + "+"
 	}
+	if len(colorArr) > 0 {
+		//Revamp this, need to think through how to manipulate the NOT indicator with spaces....
+		fmt.Println(colorArr[0])
+		colorUri += "c%3A" + colorArr[0][6:len(colorArr[0])]
+		fmt.Println(colorUri)
+		colorUri = strings.ReplaceAll(colorUri, "-", "+-c%3A")
+		fmt.Println(colorUri)
+
+		colorUri = strings.ReplaceAll(colorUri, " ", "+c%3A")
+		fmt.Println(colorUri)
+
+		colorUri = strings.ReplaceAll(colorUri, "+c%3A+-", "")
+		fmt.Println(colorUri)
+
+		getUri += colorUri
+	}
 	if len(functionArr) > 0 {
 		functionUri += "function%3A" + functionArr[0][9:len(functionArr[0])]
 		functionUri = strings.ReplaceAll(functionUri, " ", "+function%3A")
 		getUri += functionUri + "+"
 	}
+	if len(isArr) > 0 {
+		if isArr[0][3] == ' ' {
+			isUri += "is%3A" + isArr[0][4:len(isArr[0])] + "%27"
+
+		} else {
+			isUri += "is%3A" + isArr[0][3:len(isArr[0])] + "%27"
+		}
+		isUri = strings.ReplaceAll(isUri, " ", "+")
+		getUri += isUri
+	}
 	if len(textArr) > 0 {
-		textUri += "o%3A%27" + textArr[0][5:len(textArr[0])] + "%27"
+		if textArr[0][5] == ' ' {
+			textUri += "o%3A%27" + textArr[0][6:len(textArr[0])] + "%27"
+
+		} else {
+			textUri += "o%3A%27" + textArr[0][5:len(textArr[0])] + "%27"
+		}
 		textUri = strings.ReplaceAll(textUri, " ", "+")
 		getUri += textUri
 	}
-	if len(colorArr) > 0 {
-		fmt.Println(colorArr[0])
-		colorUri += "c%3A" + colorArr[0][6:len(colorArr[0])]
-		colorUri = strings.ReplaceAll(colorUri, "-", "+-c%3A")
-		colorUri = strings.ReplaceAll(colorUri, " ", "+c%3A")
-		getUri += colorUri
+	if len(cmcArr) > 0 {
+		//You need different checks for
+		//>
+		//>=
+		//<
+		//<=
+		//just the number (=)
+		//Inequalities (2<cost<5)
+		if cmcArr[0][4] == ' ' {
+			cmcUri += "is%3A" + cmcArr[0][5:len(cmcArr[0])] + "%27"
+
+		} else {
+			cmcUri += "is%3A" + cmcArr[0][4:len(cmcArr[0])] + "%27"
+		}
+		cmcUri = strings.ReplaceAll(cmcUri, " ", "+")
+		getUri += cmcUri
 	}
-	//cmcUri := "c%3A" + cmcArr[0][4:len(cmcArr[0])]
+	if len(toughnessArr) > 0 {
+
+	}
+	if len(powerArr) > 0 {
+
+	}
+	if len(rarityArr) > 0 {
+		if rarityArr[0][7] == ' ' {
+			rarityUri += "r%3A" + rarityArr[0][8:len(rarityArr[0])] + "%27"
+		} else {
+			rarityUri += "r%3A" + rarityArr[0][7:len(rarityArr[0])] + "%27"
+		}
+		rarityUri = strings.ReplaceAll(rarityUri, " ", "+")
+		getUri += rarityUri
+	}
+	if len(artArr) > 0 {
+		if artArr[0][4] == ' ' {
+			artUri += "art%3A" + artArr[0][5:len(artArr[0])] + "%27"
+		} else {
+			artUri += "art%3A" + artArr[0][4:len(artArr[0])] + "%27"
+		}
+		artUri = strings.ReplaceAll(artUri, " ", "+")
+		getUri += artUri
+	}
 
 	fmt.Println(getUri)
 	res, err := http.Get(getUri)
