@@ -372,19 +372,10 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 		getUri += cardTypeUri + "+"
 	}
 	if len(colorArr) > 0 {
-		//Revamp this, need to think through how to manipulate the NOT indicator with spaces....
-		fmt.Println(colorArr[0])
 		colorUri += "c%3A" + colorArr[0][6:len(colorArr[0])]
-		fmt.Println(colorUri)
-		colorUri = strings.ReplaceAll(colorUri, "-", "+-c%3A")
-		fmt.Println(colorUri)
-
+		colorUri = strings.ReplaceAll(colorUri, " -", "+-c%3A")
 		colorUri = strings.ReplaceAll(colorUri, " ", "+c%3A")
-		fmt.Println(colorUri)
-
 		colorUri = strings.ReplaceAll(colorUri, "+c%3A+-", "")
-		fmt.Println(colorUri)
-
 		getUri += colorUri
 	}
 	if len(functionArr) > 0 {
@@ -477,7 +468,12 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 	}
 	message := ""
 	for i := 0; i < len(data.Data); i++ {
-		message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + "\n"
+		coloridentityprint := ""
+
+		for j := 0; j < len(data.Data[i].ColorIdentity); j++ {
+			coloridentityprint += data.Data[i].ColorIdentity[j]
+		}
+		message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + " " + coloridentityprint + "\n"
 	}
 	_, _ = s.ChannelMessageSend(channelId, message)
 
