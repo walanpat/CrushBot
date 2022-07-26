@@ -3,6 +3,7 @@ package bot
 import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"goland-discord-bot/bot/mtg"
 	"goland-discord-bot/config"
 	"math/rand"
 	"regexp"
@@ -75,6 +76,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Content == "ping" {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
 	}
+	//Dice Rolling Code
 	if strings.Contains(m.Content, "!roll") {
 		//Initializing our "base" regex expression
 		re := regexp.MustCompile(`([+\-]?\d+)*d(\d+)([+\-]?\d*[^\dd][^d]+)*`)
@@ -270,7 +272,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 		cardName := strings.ReplaceAll(m.Content[3:len(m.Content)], " ", "+")
-		getCard(cardName, m.ChannelID, s)
+		mtg.GetCard(cardName, m.ChannelID, s)
 
 		mtgRulesMessageFlag = false
 		mtgSetMessageFlag = false
@@ -296,7 +298,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			_, _ = s.ChannelMessageSend(m.ChannelID, message)
 
 		} else if len(m.Content) > 4 {
-			getQuery(m.Content, m.ChannelID, s)
+			mtg.GetQuery(m.Content, m.ChannelID, s)
 		}
 	}
 	if strings.Contains(m.Content, "!example") && m.Author.ID != Id {
@@ -327,7 +329,7 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 	//Code for getting the ruling
 	if decode == 128218 && length == 4 && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
-		getRuling(m.ChannelID, s)
+		mtg.GetRuling(m.ChannelID, s)
 		//if len(cachedCardRuling) > 2000 {
 		//	iterationsNeeded := int(math.Ceil(float64(len(cachedCardRuling)) / 2000))
 		//	for i := 0; i < iterationsNeeded; i++ {
@@ -358,11 +360,11 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 		mtgRulesMessageFlag = true
 	}
 	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id && mtgSetMessageFlag == false {
-		getSets(m.ChannelID, s)
+		mtg.GetSets(m.ChannelID, s)
 		mtgSetMessageFlag = true
 	}
 	if decode == 128181 && length == 4 && m.MessageReaction.UserID != Id && mtgPriceMessageFlag == false {
-		getPrice(m.ChannelID, s)
+		mtg.GetPrice(m.ChannelID, s)
 		mtgPriceMessageFlag = true
 	}
 }

@@ -1,4 +1,4 @@
-package bot
+package mtg
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"io/ioutil"
 	"net/http"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -170,18 +169,9 @@ type QueryResponse struct {
 var RulingUri string
 var SetCodeUri string
 var Price priceObj
-var typeRe = regexp.MustCompile(`type:([a-zA-Z ]+)?`)
-var colorRe = regexp.MustCompile(`color:([rgbuw -]+)?`)
-var cmcRe = regexp.MustCompile(`cmc:([>=<\d ]+)?`)
-var powerRe = regexp.MustCompile(`power:([>=<\d ]+)?`)
-var toughnessRe = regexp.MustCompile(`toughness:([>=<\d ]+)?`)
-var textRe = regexp.MustCompile(`text:([a-zA-Z' ]+)?`)
-var rarityRe = regexp.MustCompile(`rarity:([mruc ]+)?`)
-var artRe = regexp.MustCompile(`art:([a-zA-Z ]+)?`)
-var functionRe = regexp.MustCompile(`function:([a-zA-Z ]+)?`)
-var isRe = regexp.MustCompile(`is:([a-zA-Z ]+)?`)
 
-func getCard(cardName string, channelId string, s *discordgo.Session) {
+func GetCard(cardName string, channelId string, s *discordgo.Session) {
+	//Turn this into a service request
 	res, err := http.Get("https://api.scryfall.com/cards/named?fuzzy=" + cardName)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
@@ -231,7 +221,7 @@ func getCard(cardName string, channelId string, s *discordgo.Session) {
 	//fmt.Println(data)
 }
 
-func getRuling(channelId string, s *discordgo.Session) {
+func GetRuling(channelId string, s *discordgo.Session) {
 	if RulingUri == "No Rulings Found" || RulingUri == "false" {
 		_, _ = s.ChannelMessageSend(channelId, "No Rulings Found")
 		return
@@ -258,7 +248,7 @@ func getRuling(channelId string, s *discordgo.Session) {
 	}
 }
 
-func getSets(channelId string, s *discordgo.Session) {
+func GetSets(channelId string, s *discordgo.Session) {
 	if SetCodeUri == "Basic Lands are Printed in Every Set" {
 		_, _ = s.ChannelMessageSend(channelId, "```ansi\n"+SetCodeUri+"```")
 		return
@@ -304,24 +294,15 @@ func getSets(channelId string, s *discordgo.Session) {
 
 }
 
-func getPrice(channelId string, s *discordgo.Session) {
+func GetPrice(channelId string, s *discordgo.Session) {
 	_, _ = s.ChannelMessageSend(channelId, "```ansi\nScryfall Avg Price: $"+Price.Usd+"```")
 }
 
-func getQuery(userQuery string, channelId string, s *discordgo.Session) {
+func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 
 	//https://api.scryfall.com/cards/search?q=c%3Awhite+cmc%3D1
 	//res, _ := http.Get("https://api.scryfall.com/cards/search?q=" + userQuery)
-	//var typeRe = regexp.MustCompile(`type:([a-z ]+)?`)
-	//var colorRe = regexp.MustCompile(`color:([rgbuw ]+)?`)
-	//var cmcRe = regexp.MustCompile(`cmc:([>=<\d ]+)?`)
-	//var powerRe = regexp.MustCompile(`power:([>=<\d ]+)?`)
-	//var toughnessRe = regexp.MustCompile(`toughness:([>=<\d ]+)?`)
-	//var textRe = regexp.MustCompile(`text:([a-z ]+)?`)
-	//var rarityRe = regexp.MustCompile(`rarity:([mruc ]+)?`)
-	//var artRe = regexp.MustCompile(`art:(a-z ]+)?`)
-	//var functionRe = regexp.MustCompile(`function:([a-z ]+)?`)
-	//var isRe = regexp.MustCompile(`is:([a-z ]+)?`)
+
 	isArr := isRe.FindStringSubmatch(userQuery)
 	functionArr := functionRe.FindStringSubmatch(userQuery)
 	artArr := artRe.FindStringSubmatch(userQuery)
@@ -365,7 +346,8 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 	textUri := ""
 	rarityUri := ""
 	artUri := ""
-	getUri := "https://api.scryfall.com/cards/search?q="
+	getUri := QueryURL
+	//Write a helper function from here on out I think to "process/manipulate the request"
 	if len(typeArr) > 0 {
 		cardTypeUri += "t%3A" + typeArr[0][5:len(typeArr[0])]
 		cardTypeUri = strings.ReplaceAll(cardTypeUri, " ", "+t%3A")
@@ -445,6 +427,7 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 		getUri += artUri
 	}
 
+	//The ACTUAL GET REQUEST
 	fmt.Println(getUri)
 	res, err := http.Get(getUri)
 	if err != nil {
