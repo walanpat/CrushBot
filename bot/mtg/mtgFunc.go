@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"goland-discord-bot/bot/mtg/regex"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -303,16 +304,16 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 	//https://api.scryfall.com/cards/search?q=c%3Awhite+cmc%3D1
 	//res, _ := http.Get("https://api.scryfall.com/cards/search?q=" + userQuery)
 
-	isArr := isRe.FindStringSubmatch(userQuery)
-	functionArr := functionRe.FindStringSubmatch(userQuery)
-	artArr := artRe.FindStringSubmatch(userQuery)
-	rarityArr := rarityRe.FindStringSubmatch(userQuery)
-	textArr := textRe.FindStringSubmatch(userQuery)
-	toughnessArr := toughnessRe.FindStringSubmatch(userQuery)
-	powerArr := powerRe.FindStringSubmatch(userQuery)
-	colorArr := colorRe.FindStringSubmatch(userQuery)
-	cmcArr := cmcRe.FindStringSubmatch(userQuery)
-	typeArr := typeRe.FindStringSubmatch(userQuery)
+	isArr := regex.IsRe.FindStringSubmatch(userQuery)
+	functionArr := regex.FunctionRe.FindStringSubmatch(userQuery)
+	artArr := regex.ArtRe.FindStringSubmatch(userQuery)
+	rarityArr := regex.RarityRe.FindStringSubmatch(userQuery)
+	textArr := regex.TextRe.FindStringSubmatch(userQuery)
+	toughnessArr := regex.ToughnessRe.FindStringSubmatch(userQuery)
+	powerArr := regex.PowerRe.FindStringSubmatch(userQuery)
+	colorArr := regex.ColorRe.FindStringSubmatch(userQuery)
+	cmcArr := regex.CmcRe.FindStringSubmatch(userQuery)
+	typeArr := regex.TypeRe.FindStringSubmatch(userQuery)
 	if len(typeArr) == 0 &&
 		len(functionArr) == 0 &&
 		len(isArr) == 0 &&
@@ -346,7 +347,7 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 	textUri := ""
 	rarityUri := ""
 	artUri := ""
-	getUri := QueryURL
+	getUri := regex.QueryURL
 	//Write a helper function from here on out I think to "process/manipulate the request"
 	if len(typeArr) > 0 {
 		cardTypeUri += "t%3A" + typeArr[0][5:len(typeArr[0])]
