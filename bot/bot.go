@@ -242,6 +242,9 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			mtg.GetQuery(m.Content, m.ChannelID, s)
 		}
 	}
+	if strings.Contains(m.Content, "!encode") {
+
+	}
 
 }
 

@@ -8,7 +8,7 @@ import (
 
 var TypeRe = regexp.MustCompile(`type:([a-zA-Z ]+)?`)
 var ColorRe = regexp.MustCompile(`color:([rgbuw -]+)?`)
-var CmcRe = regexp.MustCompile(`cmc:([>=<\d ]+)?`)
+var CmcRe = regexp.MustCompile(`cmc:(\d?=?[><]?=?\d?)?m?(=?[><]?=?\d?)?`)
 var PowerRe = regexp.MustCompile(`power:([>=<\d ]+)?`)
 var ToughnessRe = regexp.MustCompile(`toughness:([>=<\d ]+)?`)
 var TextRe = regexp.MustCompile(`text:([a-zA-Z' ]+)?`)
@@ -44,6 +44,7 @@ func MtgQueryBuilder(query string) (string, error) {
 	powerArr := PowerRe.FindStringSubmatch(query)
 	colorArr := ColorRe.FindStringSubmatch(query)
 	cmcArr := CmcRe.FindStringSubmatch(query)
+
 	typeArr := TypeRe.FindStringSubmatch(query)
 
 	//If nothing found
@@ -111,35 +112,83 @@ func MtgQueryBuilder(query string) (string, error) {
 		QueryObject.finalValue += QueryObject.textValue
 	}
 	if len(cmcArr) > 0 {
+
 		//First check what operators are in the query
 		cmcUrlRe := regexp.MustCompile(`(\d?[><]?=?\d?)?m?(\d?[><]?=?\d?)?`)
+		fmt.Print("CmcArr Value:")
+		fmt.Println(cmcArr)
+		fmt.Print("cmc [0] trimming")
+		fmt.Println(cmcArr[0][4:len(cmcArr[0])])
 		cmcUrlArr := cmcUrlRe.FindStringSubmatch(cmcArr[0][4:len(cmcArr[0])])
 		//Second, act upon what operators are in the query
-		fmt.Println(cmcUrlArr)
 		fmt.Println(len(cmcUrlArr))
-		fmt.Println(len(cmcUrlArr[0]))
-		if len(cmcUrlArr) == 3 {
-			if len(cmcUrlArr[0]) <= 2 || cmcUrlArr[0][0] == '=' {
-				if cmcUrlArr[0][0] == '=' {
-
-					QueryObject.cmcValue = "cmc%3D" + cmcUrlArr[0][1:]
-
+		fmt.Println(cmcUrlArr)
+		if cmcUrlArr[0] == cmcUrlArr[1] {
+			if strings.Contains(cmcUrlArr[0], "=") {
+				if strings.Contains(cmcUrlArr[0], ">") {
+					QueryObject.cmcValue = "cmc%3E%3D" + string(cmcUrlArr[0][2:])
+				} else if strings.Contains(cmcUrlArr[0], "<") {
+					QueryObject.cmcValue = "cmc%3C%3D" + string(cmcUrlArr[0][2:])
 				} else {
-					QueryObject.cmcValue = "cmc%3D" + cmcUrlArr[0][0:]
+					QueryObject.cmcValue = "cmc%3D" + cmcUrlArr[0][1:]
+				}
+			}
+			if strings.Contains(cmcUrlArr[0], ">") {
+				QueryObject.cmcValue = "cmc%3E" + string(cmcUrlArr[0][1:])
+			} else if strings.Contains(cmcUrlArr[0], "<") {
+				QueryObject.cmcValue = "cmc%3C" + string(cmcUrlArr[0][1:])
+			} else {
+				QueryObject.cmcValue = "cmc%3D" + string(cmcUrlArr[0])
+			}
+		} else {
+			//This is for checking if there are 2 digits or 1
+			//(on the left hand side of our inequality)
+			digitRe := regexp.MustCompile(`(\d)+`)
+			//Left inequality side number value
+			leftSideNumberValue := digitRe.FindStringSubmatch(cmcUrlArr[1])[0]
+			fmt.Println(cmcUrlArr[2])
+			rightSideNumberValue := digitRe.FindStringSubmatch(cmcArr[2])[0]
+
+			if strings.Contains(cmcUrlArr[1], "=") {
+				if strings.Contains(cmcUrlArr[1], ">") {
+					QueryObject.cmcValue += "cmc%3C%3D" + leftSideNumberValue + "+"
+				} else if strings.Contains(cmcUrlArr[1], "<") {
+					QueryObject.cmcValue += "cmc%3E%3D" + leftSideNumberValue + "+"
 
 				}
+			} else
+			//if it's JUST >
+			if strings.Contains(cmcUrlArr[1], ">") {
+				QueryObject.cmcValue += "cmc%3C" + leftSideNumberValue + "+"
 
-				//QueryObject.cmcValue = "cmc%3D" + strconv.Itoa(int(cmcUrlArr[0][1]))
+			} else //if it's JUST <
+			if strings.Contains(cmcUrlArr[1], "<") {
+				QueryObject.cmcValue += "cmc%3E" + leftSideNumberValue + "+"
 
 			}
-			//QueryObject.cmcValue = "cmc%3D" + cmcUrlArr[0]
-
+			//RIGHT HAND SIDE NUMBER VALUES
+			if strings.Contains(cmcArr[2], "=") {
+				// if contains >=
+				if strings.Contains(cmcArr[2], ">") {
+					QueryObject.cmcValue += "cmc%3E%3D" + rightSideNumberValue + "+"
+				} else // if contains <=
+				if strings.Contains(cmcArr[2], "<") {
+					QueryObject.cmcValue += "cmc%3C%3D" + rightSideNumberValue + "+"
+				} else { //if it's just =
+					QueryObject.cmcValue += "cmc%3D" + rightSideNumberValue + "+"
+				}
+			}
+			//if it's JUST >
+			if strings.Contains(cmcArr[2], ">") {
+				QueryObject.cmcValue += "cmc%3E" + rightSideNumberValue + "+"
+			} else //if it's JUST <
+			if strings.Contains(cmcArr[2], "<") {
+				QueryObject.cmcValue += "cmc%3C" + rightSideNumberValue + "+"
+			}
 		}
-		fmt.Println(cmcUrlArr)
-		//we have 8 variations
-		// >, >=, <, <=, =
-		//x<y<z, x<=y<z, x<y<=z, x<=y<=z,
+		//All that's left is inequalities
 
+		fmt.Println("QueryObjectCmcValue:")
 		fmt.Println(QueryObject.cmcValue)
 		QueryObject.finalValue += QueryObject.cmcValue
 		fmt.Println(QueryObject.finalValue)
