@@ -1,12 +1,12 @@
-package bot
+package mtg
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"goland-discord-bot/bot/mtg/query/builder"
 	"io/ioutil"
 	"net/http"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -170,18 +170,9 @@ type QueryResponse struct {
 var RulingUri string
 var SetCodeUri string
 var Price priceObj
-var typeRe = regexp.MustCompile(`type:([a-zA-Z ]+)?`)
-var colorRe = regexp.MustCompile(`color:([rgbuw -]+)?`)
-var cmcRe = regexp.MustCompile(`cmc:([>=<\d ]+)?`)
-var powerRe = regexp.MustCompile(`power:([>=<\d ]+)?`)
-var toughnessRe = regexp.MustCompile(`toughness:([>=<\d ]+)?`)
-var textRe = regexp.MustCompile(`text:([a-zA-Z' ]+)?`)
-var rarityRe = regexp.MustCompile(`rarity:([mruc ]+)?`)
-var artRe = regexp.MustCompile(`art:([a-zA-Z ]+)?`)
-var functionRe = regexp.MustCompile(`function:([a-zA-Z ]+)?`)
-var isRe = regexp.MustCompile(`is:([a-zA-Z ]+)?`)
 
-func getCard(cardName string, channelId string, s *discordgo.Session) {
+func GetCard(cardName string, channelId string, s *discordgo.Session) {
+	//Turn this into a service request
 	res, err := http.Get("https://api.scryfall.com/cards/named?fuzzy=" + cardName)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
@@ -231,7 +222,7 @@ func getCard(cardName string, channelId string, s *discordgo.Session) {
 	//fmt.Println(data)
 }
 
-func getRuling(channelId string, s *discordgo.Session) {
+func GetRuling(channelId string, s *discordgo.Session) {
 	if RulingUri == "No Rulings Found" || RulingUri == "false" {
 		_, _ = s.ChannelMessageSend(channelId, "No Rulings Found")
 		return
@@ -258,7 +249,7 @@ func getRuling(channelId string, s *discordgo.Session) {
 	}
 }
 
-func getSets(channelId string, s *discordgo.Session) {
+func GetSets(channelId string, s *discordgo.Session) {
 	if SetCodeUri == "Basic Lands are Printed in Every Set" {
 		_, _ = s.ChannelMessageSend(channelId, "```ansi\n"+SetCodeUri+"```")
 		return
@@ -304,89 +295,19 @@ func getSets(channelId string, s *discordgo.Session) {
 
 }
 
-func getPrice(channelId string, s *discordgo.Session) {
+func GetPrice(channelId string, s *discordgo.Session) {
 	_, _ = s.ChannelMessageSend(channelId, "```ansi\nScryfall Avg Price: $"+Price.Usd+"```")
 }
 
-func getQuery(userQuery string, channelId string, s *discordgo.Session) {
+func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 
-	//https://api.scryfall.com/cards/search?q=c%3Awhite+cmc%3D1
-	//res, _ := http.Get("https://api.scryfall.com/cards/search?q=" + userQuery)
-	//var typeRe = regexp.MustCompile(`type:([a-z ]+)?`)
-	//var colorRe = regexp.MustCompile(`color:([rgbuw ]+)?`)
-	//var cmcRe = regexp.MustCompile(`cmc:([>=<\d ]+)?`)
-	//var powerRe = regexp.MustCompile(`power:([>=<\d ]+)?`)
-	//var toughnessRe = regexp.MustCompile(`toughness:([>=<\d ]+)?`)
-	//var textRe = regexp.MustCompile(`text:([a-z ]+)?`)
-	//var rarityRe = regexp.MustCompile(`rarity:([mruc ]+)?`)
-	//var artRe = regexp.MustCompile(`art:(a-z ]+)?`)
-	//var functionRe = regexp.MustCompile(`function:([a-z ]+)?`)
-	//var isRe = regexp.MustCompile(`is:([a-z ]+)?`)
-	isArr := isRe.FindStringSubmatch(userQuery)
-	functionArr := functionRe.FindStringSubmatch(userQuery)
-	artArr := artRe.FindStringSubmatch(userQuery)
-	rarityArr := rarityRe.FindStringSubmatch(userQuery)
-	textArr := textRe.FindStringSubmatch(userQuery)
-	toughnessArr := toughnessRe.FindStringSubmatch(userQuery)
-	powerArr := powerRe.FindStringSubmatch(userQuery)
-	colorArr := colorRe.FindStringSubmatch(userQuery)
-	cmcArr := cmcRe.FindStringSubmatch(userQuery)
-	typeArr := typeRe.FindStringSubmatch(userQuery)
-	if len(typeArr) == 0 &&
-		len(functionArr) == 0 &&
-		len(isArr) == 0 &&
-		len(artArr) == 0 &&
-		len(rarityArr) == 0 &&
-		len(textArr) == 0 &&
-		len(toughnessArr) == 0 &&
-		len(powerArr) == 0 &&
-		len(colorArr) == 0 &&
-		len(cmcArr) == 0 {
-		_, _ = s.ChannelMessageSend(channelId, "```ansi\n No Cards Found```")
-
+	getUri, err := builder.MtgQueryBuilder(userQuery)
+	if err != nil {
 		return
 	}
-	//fmt.Println("typeArr : " + typeArr[0])     CHECK
-	//fmt.Println("functionArr:" + functionArr[0])    Check
-	//fmt.Println("isArr : " + isArr[0])
-	//fmt.Println("artArr : " + artArr[0])
-	//fmt.Println("rarityArr : " + rarityArr[0])
-	//fmt.Println("textArr : " + textArr[0])
-	//fmt.Println("tougnessArr : " + toughnessArr[0])
-	//fmt.Println("powerArr : " + powerArr[0])
-	//fmt.Println("colorArr : " + colorArr[0])
-	//fmt.Println("cmcArr : " + cmcArr[0])
-	//!q type:squirrel, art:squirrel, cmc:>=0, toughness:>0, power:>0, cmc:>=1 color:rgbuw, rarity:mr, function:removal, is:squirrel, text:test squirrel,
-	cardTypeUri := ""
-	functionUri := ""
-	textUri := ""
-	colorUri := ""
-	getUri := "https://api.scryfall.com/cards/search?q="
-	if len(typeArr) > 0 {
-		cardTypeUri += "t%3A" + typeArr[0][5:len(typeArr[0])]
-		cardTypeUri = strings.ReplaceAll(cardTypeUri, " ", "+t%3A")
-		getUri += cardTypeUri + "+"
-	}
-	if len(functionArr) > 0 {
-		functionUri += "function%3A" + functionArr[0][9:len(functionArr[0])]
-		functionUri = strings.ReplaceAll(functionUri, " ", "+function%3A")
-		getUri += functionUri + "+"
-	}
-	if len(textArr) > 0 {
-		textUri += "o%3A%27" + textArr[0][5:len(textArr[0])] + "%27"
-		textUri = strings.ReplaceAll(textUri, " ", "+")
-		getUri += textUri
-	}
-	if len(colorArr) > 0 {
-		fmt.Println(colorArr[0])
-		colorUri += "c%3A" + colorArr[0][6:len(colorArr[0])]
-		colorUri = strings.ReplaceAll(colorUri, "-", "+-c%3A")
-		colorUri = strings.ReplaceAll(colorUri, " ", "+c%3A")
-		getUri += colorUri
-	}
-	//cmcUri := "c%3A" + cmcArr[0][4:len(cmcArr[0])]
-
 	fmt.Println(getUri)
+
+	//The ACTUAL GET REQUEST
 	res, err := http.Get(getUri)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelId, "Crush tried. API said no  :(")
@@ -409,63 +330,13 @@ func getQuery(userQuery string, channelId string, s *discordgo.Session) {
 	}
 	message := ""
 	for i := 0; i < len(data.Data); i++ {
-		message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + "\n"
+		coloridentityprint := ""
+
+		for j := 0; j < len(data.Data[i].ColorIdentity); j++ {
+			coloridentityprint += data.Data[i].ColorIdentity[j]
+		}
+		message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + " " + coloridentityprint + "\n"
 	}
 	_, _ = s.ChannelMessageSend(channelId, message)
-
-	//message := ""
-	//timer1 := time.NewTimer(50 * time.Millisecond)
-	//for i := 0; i < len(data.Data); i++ {
-	//	fmt.Println(data.Data[i].Name)
-	//	<-timer1.C
-	//	res, err = http.Get(data.Data[i].ImageUris.Png)
-	//	if err != nil {
-	//		_, err = s.ChannelMessageSend(channelId, "Crush can't GET that card image :(")
-	//		fmt.Println(err)
-	//		return
-	//	}
-	//	_, err = s.ChannelFileSend(channelId, data.Data[i].Name+".png", res.Body)
-	//	if err != nil {
-	//		fmt.Println(err)
-	//	}
-	//	timer1.Reset(100 * time.Millisecond)
-	//}
-
-	//fmt.Println(data.Data[len(data.Data)-1].Name)
-	////fmt.Println(data)
-	//fmt.Println(len(message))
-	//if len(message) > 2000 {
-	//	iterationsNeeded := int(math.Ceil(float64(len(message)) / 2000))
-	//	fmt.Println(len("```ansi\n" + message[0*2000:(0+1)*2000-11] + "```"))
-	//	for i := 0; i < iterationsNeeded; i++ {
-	//		if i+1 != iterationsNeeded {
-	//			if i == 0 {
-	//				_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000:(i+1)*2000-11]+"```")
-	//				if err != nil {
-	//					fmt.Println("Check1")
-	//					fmt.Println(err)
-	//				}
-	//			} else {
-	//				_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000-11:(i+1)*2000-11]+"```")
-	//				if err != nil {
-	//					fmt.Println("Check2")
-	//
-	//					fmt.Println(err)
-	//				}
-	//			}
-	//		} else {
-	//			var _, err = s.ChannelMessageSend(channelId, "```ansi\n"+message[(i*2000)-11:]+"```")
-	//			if err != nil {
-	//				fmt.Println("Check3")
-	//
-	//				fmt.Println(err)
-	//			}
-	//		}
-	//	}
-	//} else {
-	//	_, _ = s.ChannelMessageSend(channelId, "```ansi\n"+message+"```")
-	//
-	//}
-	//_, _ = s.ChannelMessageSend(channelId, message+"```")
 
 }

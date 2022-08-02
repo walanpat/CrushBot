@@ -3,6 +3,7 @@ package bot
 import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"goland-discord-bot/bot/mtg"
 	"goland-discord-bot/config"
 	"math/rand"
 	"regexp"
@@ -55,6 +56,7 @@ func Start() {
 
 //Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+	//Allows us a "time buffer" so that we don't react too fast to our own card search
 	if m.Author.ID == Id && len(m.Reactions) == 0 && m.Content == "" {
 		cachedCardTimer := time.NewTimer(5 * time.Millisecond)
 		<-cachedCardTimer.C
@@ -75,8 +77,9 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Content == "ping" {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
 	}
+	//Dice Rolling Code
 	if strings.Contains(m.Content, "!roll") {
-		//Initializing our "base" regex expression
+		//Initializing our "base" query expression
 		re := regexp.MustCompile(`([+\-]?\d+)*d(\d+)([+\-]?\d*[^\dd][^d]+)*`)
 		variablesArr := re.FindAllStringSubmatch(m.Content, -1)
 		message := "```ansi\n \u001B[0m"
@@ -220,57 +223,15 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		message += "\n```"
 		_, _ = s.ChannelMessageSend(m.ChannelID, message)
 	}
-	///test code
-	if strings.Contains(m.Content, "ff") {
-		//message := "```ansi\n"
-		//message += "\u001B[4m bold \u001B[0m   "
-		////message += " *italics* "
-		////message += "__underlined text__ "
-		////message += "`Highlighted text` "
-		////message += "\n > quote text \n"
-		////message += "~~strikethrough text ~~ \n"
-		//message += " ```diff\n- Discord red text\n```"
-		//message += "```css\n[Discord orange-red text]\n```"
-		//message += "```fix\nDiscord yellow text\n```"
-		//message += "```apache\nDiscord_dark_yellow_text\n```"
-		//message += "```css\n.Discord_blue_text\n```"
-		//message += "```ini\n[Discord blue text]\n```"
-		//message += "```diff\n+ Discord light green text\n```"
-		//message += "```yaml\nCyan text in Discord\n```"
-		//message += "\n[](Red text in Discord)\n```"
 
-		//message += "\n- Red text in Discord\n+ Light green text in Discord\n```"
-
-		//ansi reading
-		//```ansi
-		//\u001b[{a};{b};{c}m
-		//```
-		//a is formatting
-		//b is background
-		//c is text color
-		//30: Gray
-		//31: Red
-		//32: Green
-		//33: Yellow
-		//34: Blue
-		//35: Pink
-		//36: Cyan
-		//37: White
-		//message += "\u001B[0;33m\u001B[0m.\u001B[31m(\u001B[36m[\u001B[34m\\w\u001B[0m.@\u001B[36m]\u001B[34m+\u001B[31m)\u001B[0m!\u001B[34m?\u001B[36m[\u001B[0m+-\u001B[36m]\u001B[34m?\u001B[0m\n\n"
-		//message += "\u001B[31m("
-		//
-		//message += "\n```"
-		//
-		//message := setCodes
-		//_, _ = s.ChannelMessageSend(m.ChannelID, message)
-	}
 	//Mtg Code
 	if strings.Contains(m.Content, "!c") {
 		if m.Content[0:3] != "!c " {
 			return
 		}
+
 		cardName := strings.ReplaceAll(m.Content[3:len(m.Content)], " ", "+")
-		getCard(cardName, m.ChannelID, s)
+		mtg.GetCard(cardName, m.ChannelID, s)
 
 		mtgRulesMessageFlag = false
 		mtgSetMessageFlag = false
@@ -296,7 +257,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			_, _ = s.ChannelMessageSend(m.ChannelID, message)
 
 		} else if len(m.Content) > 4 {
-			getQuery(m.Content, m.ChannelID, s)
+			mtg.GetQuery(m.Content, m.ChannelID, s)
 		}
 	}
 	if strings.Contains(m.Content, "!example") && m.Author.ID != Id {
@@ -323,46 +284,18 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
-	//_, _ = s.ChannelMessageSend(m.ChannelID, m.MessageID)
 	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 	//Code for getting the ruling
 	if decode == 128218 && length == 4 && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
-		getRuling(m.ChannelID, s)
-		//if len(cachedCardRuling) > 2000 {
-		//	iterationsNeeded := int(math.Ceil(float64(len(cachedCardRuling)) / 2000))
-		//	for i := 0; i < iterationsNeeded; i++ {
-		//		if i+1 != iterationsNeeded {
-		//			if i == 0 {
-		//				_, err := s.ChannelMessageSend(m.ChannelID, cachedCardRuling[i*2000:(i+1)*2000]+"```")
-		//				if err != nil {
-		//					fmt.Println(err)
-		//				}
-		//			} else {
-		//				_, err := s.ChannelMessageSend(m.ChannelID, "```ansi\n"+cachedCardRuling[i*2000:(i+1)*2000]+"```")
-		//				if err != nil {
-		//					fmt.Println(err)
-		//				}
-		//			}
-		//		} else {
-		//			var _, err = s.ChannelMessageSend(m.ChannelID, "```ansi\n"+cachedCardRuling[(i*2000):])
-		//			if err != nil {
-		//				fmt.Println(err)
-		//			}
-		//		}
-		//	}
-		//	cachedCardRulingTimer = false
-		//} else {
-		//	_, _ = s.ChannelMessageSend(m.ChannelID, cachedCardRuling)
-		//	cachedCardRulingTimer = false
-		//}
+		mtg.GetRuling(m.ChannelID, s)
 		mtgRulesMessageFlag = true
 	}
 	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id && mtgSetMessageFlag == false {
-		getSets(m.ChannelID, s)
+		mtg.GetSets(m.ChannelID, s)
 		mtgSetMessageFlag = true
 	}
 	if decode == 128181 && length == 4 && m.MessageReaction.UserID != Id && mtgPriceMessageFlag == false {
-		getPrice(m.ChannelID, s)
+		mtg.GetPrice(m.ChannelID, s)
 		mtgPriceMessageFlag = true
 	}
 }
