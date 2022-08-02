@@ -1,5 +1,13 @@
 package services
 
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
+)
+
 type imageUris struct {
 	Small      string `json:"small"`
 	Normal     string `json:"normal"`
@@ -29,7 +37,7 @@ type legalitiesObj struct {
 	OldCchool       string `json:"oldschool"`
 	PreModern       string `json:"premodern"`
 }
-type priceObj struct {
+type PriceObj struct {
 	Usd       string `json:"usd"`
 	UsdFoil   string `json:"usd_foil"`
 	UsdEtched string `json:"usd_etched"`
@@ -102,7 +110,7 @@ type CardResponse struct {
 	StorySpotlight  bool            `json:"story_spotlight"`
 	EdhrecRank      int             `json:"edhrec_rank"`
 	PennyRank       int             `json:"penny_rank"`
-	Prices          priceObj        `json:"prices"`
+	Prices          PriceObj        `json:"prices"`
 	RelatedUris     relatedUrisObj  `json:"related_uris"`
 	PurchaseUris    purchaseUrisObj `json:"purchase_uris"`
 	Details         string          `json:"details"`
@@ -156,11 +164,98 @@ type QueryResponse struct {
 	Details    string         `json:"details"`
 }
 
-type GetCardService interface {
+type MTGService interface {
+	GetSetsService(s string) (SetListResponse, error)
+	GetCardRulingService(s string) (RulingResponse, error)
+	GetQueryService(s string) (QueryResponse, error)
+	GetCardService(s string) (CardResponse, error)
 }
-type GetSetsService interface {
+
+func GetSetsService(s string) (SetListResponse, error) {
+	res, err := http.Get(s)
+	if err != nil {
+		return SetListResponse{}, err
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return SetListResponse{}, err
+	}
+	var data SetListResponse
+	if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+		fmt.Println(err)
+		return SetListResponse{}, err
+	}
+	if data.Object == "error" {
+		return SetListResponse{}, fmt.Errorf("get request resulted in returned error")
+	}
+	return data, nil
 }
-type GetCardRulingService interface {
+
+func GetCardRulingService(s string) (RulingResponse, error) {
+	res, err := http.Get(s)
+	if err != nil {
+		return RulingResponse{}, err
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return RulingResponse{}, err
+	}
+	var data RulingResponse
+	if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+		fmt.Println(err)
+	}
+	return data, nil
 }
-type GetQueryService interface {
+
+func GetCardService(s string) (CardResponse, error) {
+
+	res, err := http.Get("https://api.scryfall.com/cards/named?fuzzy=" + s)
+	if err != nil {
+		return CardResponse{}, err
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return CardResponse{}, err
+	}
+	var data CardResponse
+	if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+		fmt.Println(err)
+	}
+	return data, nil
+}
+
+func GetCardImageService(s string) (response io.ReadCloser, err error) {
+	res, err := http.Get(s)
+	if err != nil {
+		return nil, err
+	}
+	return res.Body, nil
+}
+
+func GetQueryService(s string) (QueryResponse, error) {
+	res, err := http.Get(s)
+	if err != nil {
+		return QueryResponse{}, fmt.Errorf("get query service error")
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return QueryResponse{}, fmt.Errorf("error reading response body")
+	}
+	var data QueryResponse
+	if err := json.Unmarshal(body, &data); err != nil { // Parse []byte to the go struct pointer
+		fmt.Println("Can not unmarshal JSON")
+		fmt.Println(err)
+	}
+	if data.Object == "error" {
+		return QueryResponse{}, fmt.Errorf("scryfall returned an error object")
+		//_, _ = s.ChannelMessageSend(channelId, "```ansi\n ```")
+	}
+	return data, nil
 }

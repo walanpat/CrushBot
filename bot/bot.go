@@ -236,64 +236,29 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		mtgRulesMessageFlag = false
 		mtgSetMessageFlag = false
 		mtgPriceMessageFlag = false
-
 	}
 	if strings.Contains(m.Content, "!q") && m.Author.ID != Id {
-		if len(m.Content) == 2 {
-			message := "```ansi\nQuerying cards can be done multiple ways:\n"
-			message += "color:r/g/rg,  This is red or green or RedANDgreen. \n\n"
-			message += "cmc:>=3,  This is converted mana greater than or equal to 3 \n\n"
-			message += "type:instant,goblin, All card types are inserted here \n\n"
-			message += "power:>=4, here you can use greaterthan, lessthan, equal to whatever power \n\n"
-			message += "toughness:>=4, same thing as the rules for querying power but with toughness\n\n"
-			message += "text:Enters the battlefield tapped, Here you can query for specific keywords in the cards text \n\n"
-			message += "rarity:r, rarity is listed: mr, m, r, u, c (mythic rare, mythic, rare, uncommon, common)\n\n"
-			message += "art:squirrel, query by what is listed in the card art \n\n"
-			message += "function:removal, This works off of the oracle tag system used by scryfall.  You can query for specific user tags that people have tagged a car with."
-			message += "NOTE: if you want to query for Enter the Battlefield Effects, use \n\n"
-			message += "is:etb, \nThis is because of a misnomer goof on scryfalls parts of having a shortcut that's not included in the oracle tagging system\n\n"
-			message += "for an example type !example \nfor a property/input key try !key"
-			message += "```"
-			_, _ = s.ChannelMessageSend(m.ChannelID, message)
-
-		} else if len(m.Content) > 4 {
+		if len(m.Content) > 4 {
 			mtg.GetQuery(m.Content, m.ChannelID, s)
 		}
-	}
-	if strings.Contains(m.Content, "!example") && m.Author.ID != Id {
-		message := "```ansi\nExample:\n"
-		message += "I want a legendary, blue white, spirit,  card with ETB effect. \n\n"
-		message += "!q color:uw, cmc:<=6, type:legendary spirit creature, is:etb,\n\n"
-		message += "I want a goblin card that ISN't a creature \n\n"
-		message += "!q type:goblin -creature, color:r"
-		message += "```"
-		_, _ = s.ChannelMessageSend(m.ChannelID, message)
-	}
-	if strings.Contains(m.Content, "!key") && m.Author.ID != Id {
-		message := "```ansi\n"
-		message += "- before a attribute negates it (-creature is NOT creatures, -r NOT red cards etc)\n\n"
-		message += "r = red, b = black, g = green, u = blue, w = white\n\n"
-		message += "function choices are listed here:https://scryfall.com/docs/tagger-tags \n (there's too many) and not all of them are useful\n\n"
-		message += "type can be of any type, instant, creature, spell, legendary, vampire, goblin, merfolk, etc..."
-
-		message += "```"
-		_, _ = s.ChannelMessageSend(m.ChannelID, message)
-
 	}
 
 }
 
 func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
+	//Deconstructs emojis into a 6 digit int
 	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 	//Code for getting the ruling
 	if decode == 128218 && length == 4 && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
 		mtg.GetRuling(m.ChannelID, s)
 		mtgRulesMessageFlag = true
 	}
+	//Code for getting sets
 	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id && mtgSetMessageFlag == false {
 		mtg.GetSets(m.ChannelID, s)
 		mtgSetMessageFlag = true
 	}
+	//Code for getting price
 	if decode == 128181 && length == 4 && m.MessageReaction.UserID != Id && mtgPriceMessageFlag == false {
 		mtg.GetPrice(m.ChannelID, s)
 		mtgPriceMessageFlag = true

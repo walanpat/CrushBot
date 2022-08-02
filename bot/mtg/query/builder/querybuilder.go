@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -33,7 +34,7 @@ type UrlBuilderObject struct {
 }
 
 func MtgQueryBuilder(query string) (string, error) {
-
+	//Start with REGEX
 	isArr := IsRe.FindStringSubmatch(query)
 	functionArr := FunctionRe.FindStringSubmatch(query)
 	artArr := ArtRe.FindStringSubmatch(query)
@@ -58,6 +59,7 @@ func MtgQueryBuilder(query string) (string, error) {
 		len(cmcArr) == 0 {
 		return "", nil
 	}
+	//Initialize response object
 	QueryObject := UrlBuilderObject{
 		isValue:        "",
 		functionValue:  "",
@@ -81,7 +83,7 @@ func MtgQueryBuilder(query string) (string, error) {
 		QueryObject.colorValue = strings.ReplaceAll(QueryObject.colorValue, " -", "+-c%3A")
 		QueryObject.colorValue = strings.ReplaceAll(QueryObject.colorValue, " ", "+c%3A")
 		QueryObject.colorValue = strings.ReplaceAll(QueryObject.colorValue, "+c%3A+-", "")
-		QueryObject.finalValue += QueryObject.colorValue
+		QueryObject.finalValue += QueryObject.colorValue + "+"
 	}
 	if len(functionArr) > 0 {
 		QueryObject.functionValue += "function%3A" + functionArr[0][9:len(functionArr[0])]
@@ -109,21 +111,39 @@ func MtgQueryBuilder(query string) (string, error) {
 		QueryObject.finalValue += QueryObject.textValue
 	}
 	if len(cmcArr) > 0 {
-		//You need different checks for
-		//>
-		//>=
-		//<
-		//<=
-		//just the number (=)
-		//Inequalities (2<cost<5)
-		if cmcArr[0][4] == ' ' {
-			QueryObject.cmcValue += "is%3A" + cmcArr[0][5:len(cmcArr[0])] + "%27"
+		//First check what operators are in the query
+		cmcUrlRe := regexp.MustCompile(`(\d?[><]?=?\d?)?m?(\d?[><]?=?\d?)?`)
+		cmcUrlArr := cmcUrlRe.FindStringSubmatch(cmcArr[0][4:len(cmcArr[0])])
+		//Second, act upon what operators are in the query
+		fmt.Println(cmcUrlArr)
+		fmt.Println(len(cmcUrlArr))
+		fmt.Println(len(cmcUrlArr[0]))
+		if len(cmcUrlArr) == 3 {
+			if len(cmcUrlArr[0]) <= 2 || cmcUrlArr[0][0] == '=' {
+				if cmcUrlArr[0][0] == '=' {
 
-		} else {
-			QueryObject.cmcValue += "is%3A" + cmcArr[0][4:len(cmcArr[0])] + "%27"
+					QueryObject.cmcValue = "cmc%3D" + cmcUrlArr[0][1:]
+
+				} else {
+					QueryObject.cmcValue = "cmc%3D" + cmcUrlArr[0][0:]
+
+				}
+
+				//QueryObject.cmcValue = "cmc%3D" + strconv.Itoa(int(cmcUrlArr[0][1]))
+
+			}
+			//QueryObject.cmcValue = "cmc%3D" + cmcUrlArr[0]
+
 		}
-		QueryObject.cmcValue = strings.ReplaceAll(QueryObject.cmcValue, " ", "+")
+		fmt.Println(cmcUrlArr)
+		//we have 8 variations
+		// >, >=, <, <=, =
+		//x<y<z, x<=y<z, x<y<=z, x<=y<=z,
+
+		fmt.Println(QueryObject.cmcValue)
 		QueryObject.finalValue += QueryObject.cmcValue
+		fmt.Println(QueryObject.finalValue)
+
 	}
 	if len(toughnessArr) > 0 {
 
