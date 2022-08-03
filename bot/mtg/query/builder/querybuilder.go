@@ -99,7 +99,6 @@ func MtgQueryBuilder(query string) (string, error) {
 			QueryObject.isValue += "is%3A" + isArr[0][3:len(isArr[0])]
 		}
 		QueryObject.isValue = strings.ReplaceAll(QueryObject.isValue, " ", "+")
-		fmt.Println(QueryObject.isValue)
 		QueryObject.finalValue += QueryObject.isValue + "+"
 	}
 	if len(textArr) > 0 {
@@ -110,23 +109,19 @@ func MtgQueryBuilder(query string) (string, error) {
 			QueryObject.textValue += "o%3A%27" + textArr[0][5:len(textArr[0])] + "%27"
 		}
 		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, " ", "+")
-		fmt.Println(QueryObject.textValue)
 		QueryObject.textValue += "+"
 		QueryObject.finalValue += QueryObject.textValue
 	}
 	if len(cmcArr) > 0 {
 		QueryObject.cmcValue = InequalityReader(cmcArr, "cmc")
-
 		QueryObject.finalValue += QueryObject.cmcValue + "+"
 	}
 	if len(toughnessArr) > 0 {
 		QueryObject.toughnessValue = InequalityReader(toughnessArr, "tou")
-
 		QueryObject.finalValue += QueryObject.toughnessValue + "+"
 	}
 	if len(powerArr) > 0 {
 		QueryObject.powerValue = InequalityReader(powerArr, "pow")
-
 		QueryObject.finalValue += QueryObject.powerValue + "+"
 	}
 	if len(rarityArr) > 0 {
