@@ -243,6 +243,43 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 	if strings.Contains(m.Content, "!encode") {
+		y := discordgo.MessageEmbed{
+			URL:         "https://www.youtube.com/",
+			Type:        "Youtube",
+			Title:       "title",
+			Description: "Youtube Embed description",
+			Timestamp:   "",
+			Color:       0,
+			Footer:      nil,
+			Image:       nil,
+			Thumbnail:   nil,
+			Video:       nil,
+			Provider:    nil,
+			Author:      nil,
+			Fields:      nil,
+		}
+		z := discordgo.MessageEmbed{
+			URL:         "https://www.google.com/",
+			Type:        "Google",
+			Title:       "title",
+			Description: "Google Embed description",
+			Timestamp:   "",
+			Color:       0,
+			Footer:      nil,
+			Image:       nil,
+			Thumbnail:   nil,
+			Video:       nil,
+			Provider:    nil,
+			Author:      nil,
+			Fields:      nil,
+		}
+		var temp [2]discordgo.MessageEmbed
+		temp[0] = y
+		temp[1] = z
+
+		x := []*discordgo.MessageEmbed{&temp[0], &temp[1]}
+
+		_, _ = s.ChannelMessageSendEmbeds(m.ChannelID, x)
 
 	}
 

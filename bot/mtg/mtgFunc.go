@@ -5,6 +5,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"goland-discord-bot/bot/mtg/query/builder"
 	"goland-discord-bot/bot/mtg/services"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -145,16 +146,123 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 		return
 	}
 
+	//EmbeddedCardSending(data, channelId, s)
+	ExtendedMessageSending(data, channelId, s)
+	return
 	//Handle our query
+	//message := ""
+	//for i := 0; i < len(data.Data); i++ {
+	//	coloridentityprint := ""
+	//
+	//	for j := 0; j < len(data.Data[i].ColorIdentity); j++ {
+	//		coloridentityprint += data.Data[i].ColorIdentity[j]
+	//	}
+	//	message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + " " + coloridentityprint + " " + data.Data[i].ImageUris.Png + "\n"
+	//}
+	//_, _ = s.ChannelMessageSend(channelId, message)
+
+}
+
+func ExtendedMessageSending(data services.QueryResponse, channelId string, s *discordgo.Session) {
 	message := ""
+	//timer1 := time.NewTimer(50 * time.Millisecond)
 	for i := 0; i < len(data.Data); i++ {
+		//fmt.Println(data.Data[i].Name)
+		//<-timer1.C
+		//
+		//res, err := http.Get(data.Data[i].ImageUris.Png)
+		//if err != nil {
+		//	_, err = s.ChannelMessageSend(channelId, "Crushcan'tGETthatcardimage:(")
+		//	fmt.Println(err)
+		//	return
+		//}
+		//_, err = s.ChannelFileSend(channelId, data.Data[i].Name+".png", res.Body)
+		//if err != nil {
+		//	fmt.Println(err)
+		//}
+		//timer1.Reset(100 * time.Millisecond)
 		coloridentityprint := ""
 
 		for j := 0; j < len(data.Data[i].ColorIdentity); j++ {
 			coloridentityprint += data.Data[i].ColorIdentity[j]
 		}
-		message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + " " + coloridentityprint + " " + data.Data[i].ImageUris.Png + "\n"
+		message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + " " + coloridentityprint + " " + "\n"
 	}
-	_, _ = s.ChannelMessageSend(channelId, message)
+
+	fmt.Println(data.Data[len(data.Data)-1].Name)
+	//fmt.Println(data)
+	fmt.Println(len(message))
+	if len(message) > 2000 {
+		iterationsNeeded := int(math.Ceil(float64(len(message)) / 2000))
+		fmt.Println(len("```ansi\n" + message[0*2000:(0+1)*2000-11] + "```"))
+		for i := 0; i < iterationsNeeded; i++ {
+			if i+1 != iterationsNeeded {
+				if i == 0 {
+					_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000:(i+1)*2000-11]+"```")
+					if err != nil {
+						fmt.Println("Check1")
+						fmt.Println(err)
+					}
+				} else {
+					_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000-11:(i+1)*2000-11]+"```")
+					if err != nil {
+						fmt.Println("Check2")
+
+						fmt.Println(err)
+					}
+				}
+			} else {
+				var _, err = s.ChannelMessageSend(channelId, "```ansi\n"+message[(i*2000)-11:]+"```")
+				if err != nil {
+					fmt.Println("Check3")
+
+					fmt.Println(err)
+				}
+			}
+		}
+	} else {
+		_, _ = s.ChannelMessageSend(channelId, "```ansi\n"+message+"```")
+
+	}
+	//_, _ = s.ChannelMessageSend(channelId, message+"```")
+
+}
+
+func EmbeddedCardSending(data services.QueryResponse, channelId string, s *discordgo.Session) {
+
+	////x := []*discordgo.MessageEmbed{&temp[0], &temp[1]}
+	//var temp [1]discordgo.MessageEmbed
+	////var z = 0
+	////if int(data.TotalCards) != 0 {
+	////	z = int(data.TotalCards)
+	////}
+	//var x [0]*discordgo.MessageEmbed
+	//
+	//for i := 0; i < data.TotalCards; i++ {
+	//	image := discordgo.MessageEmbedImage{
+	//		URL:      data.Data[i].ImageUris.Png,
+	//		ProxyURL: "",
+	//		Width:    10,
+	//		Height:   20,
+	//	}
+	//	temp[i] = discordgo.MessageEmbed{
+	//		URL:         data.Data[i].ImageUris.Png,
+	//		Type:        "",
+	//		Title:       data.Data[i].Name,
+	//		Description: data.Data[i].Name,
+	//		Timestamp:   "",
+	//		Color:       0,
+	//		Footer:      nil,
+	//		Image:       &image,
+	//		Thumbnail:   nil,
+	//		Video:       nil,
+	//		Provider:    nil,
+	//		Author:      nil,
+	//		Fields:      nil,
+	//	}
+	//	x[i] = &temp[i]
+	//}
+	//fmt.Println(len(x))
+	//_, _ = s.ChannelMessageSendEmbeds(channelId, x)
 
 }
