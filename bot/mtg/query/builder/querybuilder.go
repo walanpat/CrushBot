@@ -112,93 +112,19 @@ func MtgQueryBuilder(query string) (string, error) {
 		QueryObject.finalValue += QueryObject.textValue
 	}
 	if len(cmcArr) > 0 {
+		QueryObject.cmcValue = InequalityReader(cmcArr, "cmc")
 
-		//First check what operators are in the query
-		cmcUrlRe := regexp.MustCompile(`(\d?[><]?=?\d?)?m?(\d?[><]?=?\d?)?`)
-		fmt.Print("CmcArr Value:")
-		fmt.Println(cmcArr)
-		fmt.Print("cmc [0] trimming")
-		fmt.Println(cmcArr[0][4:len(cmcArr[0])])
-		cmcUrlArr := cmcUrlRe.FindStringSubmatch(cmcArr[0][4:len(cmcArr[0])])
-		//Second, act upon what operators are in the query
-		fmt.Println(len(cmcUrlArr))
-		fmt.Println(cmcUrlArr)
-		if cmcUrlArr[0] == cmcUrlArr[1] {
-			if strings.Contains(cmcUrlArr[0], "=") {
-				if strings.Contains(cmcUrlArr[0], ">") {
-					QueryObject.cmcValue = "cmc%3E%3D" + string(cmcUrlArr[0][2:])
-				} else if strings.Contains(cmcUrlArr[0], "<") {
-					QueryObject.cmcValue = "cmc%3C%3D" + string(cmcUrlArr[0][2:])
-				} else {
-					QueryObject.cmcValue = "cmc%3D" + cmcUrlArr[0][1:]
-				}
-			}
-			if strings.Contains(cmcUrlArr[0], ">") {
-				QueryObject.cmcValue = "cmc%3E" + string(cmcUrlArr[0][1:])
-			} else if strings.Contains(cmcUrlArr[0], "<") {
-				QueryObject.cmcValue = "cmc%3C" + string(cmcUrlArr[0][1:])
-			} else {
-				QueryObject.cmcValue = "cmc%3D" + string(cmcUrlArr[0])
-			}
-		} else {
-			//This is for checking if there are 2 digits or 1
-			//(on the left hand side of our inequality)
-			digitRe := regexp.MustCompile(`(\d)+`)
-			//Left inequality side number value
-			leftSideNumberValue := digitRe.FindStringSubmatch(cmcUrlArr[1])[0]
-			fmt.Println(cmcUrlArr[2])
-			rightSideNumberValue := digitRe.FindStringSubmatch(cmcArr[2])[0]
-
-			if strings.Contains(cmcUrlArr[1], "=") {
-				if strings.Contains(cmcUrlArr[1], ">") {
-					QueryObject.cmcValue += "cmc%3C%3D" + leftSideNumberValue + "+"
-				} else if strings.Contains(cmcUrlArr[1], "<") {
-					QueryObject.cmcValue += "cmc%3E%3D" + leftSideNumberValue + "+"
-
-				}
-			} else
-			//if it's JUST >
-			if strings.Contains(cmcUrlArr[1], ">") {
-				QueryObject.cmcValue += "cmc%3C" + leftSideNumberValue + "+"
-
-			} else //if it's JUST <
-			if strings.Contains(cmcUrlArr[1], "<") {
-				QueryObject.cmcValue += "cmc%3E" + leftSideNumberValue + "+"
-
-			}
-			//RIGHT HAND SIDE NUMBER VALUES
-			if strings.Contains(cmcArr[2], "=") {
-				// if contains >=
-				if strings.Contains(cmcArr[2], ">") {
-					QueryObject.cmcValue += "cmc%3E%3D" + rightSideNumberValue + "+"
-				} else // if contains <=
-				if strings.Contains(cmcArr[2], "<") {
-					QueryObject.cmcValue += "cmc%3C%3D" + rightSideNumberValue + "+"
-				} else { //if it's just =
-					QueryObject.cmcValue += "cmc%3D" + rightSideNumberValue + "+"
-				}
-			}
-			//if it's JUST >
-			if strings.Contains(cmcArr[2], ">") {
-				QueryObject.cmcValue += "cmc%3E" + rightSideNumberValue + "+"
-			} else //if it's JUST <
-			if strings.Contains(cmcArr[2], "<") {
-				QueryObject.cmcValue += "cmc%3C" + rightSideNumberValue + "+"
-			}
-		}
-		//All that's left is inequalities
-
-		fmt.Println("QueryObjectCmcValue:")
-		fmt.Println(QueryObject.cmcValue)
 		QueryObject.finalValue += QueryObject.cmcValue
-		fmt.Println(QueryObject.finalValue)
-
 	}
 	if len(toughnessArr) > 0 {
+		QueryObject.toughnessValue = InequalityReader(toughnessArr, "tou")
 
+		QueryObject.finalValue += QueryObject.toughnessValue
 	}
 	if len(powerArr) > 0 {
+		QueryObject.powerValue = InequalityReader(powerArr, "pow")
 
+		QueryObject.finalValue += QueryObject.powerValue
 	}
 	if len(rarityArr) > 0 {
 		if rarityArr[0][7] == ' ' {
@@ -221,4 +147,93 @@ func MtgQueryBuilder(query string) (string, error) {
 
 	return QueryObject.finalValue, nil
 
+}
+
+func InequalityReader(array []string, typeOfInequality string) string {
+	inequalityRe := regexp.MustCompile(`(\d?[><]?=?\d?)?m?(\d?[><]?=?\d?)?`)
+	slicingString := ""
+	//power = 4:
+	if typeOfInequality == "pow" {
+		fmt.Println(array[0][6:len(array[0])])
+		slicingString = array[0][6:len(array[0])]
+	}
+	//toughness = 8:
+	if typeOfInequality == "tou" {
+		slicingString = array[0][10:len(array[0])]
+	}
+	//cmc 2:
+	if typeOfInequality == "cmc" {
+		slicingString = array[0][4:len(array[0])]
+	}
+
+	inequalityArr := inequalityRe.FindStringSubmatch(slicingString)
+	slugQuery := typeOfInequality
+	finalQuery := ""
+
+	//First check what operators are in the query/ if it's a one-sided inequality
+	//Second, act upon what operators are in the query
+	if inequalityArr[0] == inequalityArr[1] {
+		if strings.Contains(inequalityArr[0], "=") {
+			if strings.Contains(inequalityArr[0], ">") {
+				finalQuery = slugQuery + "%3E%3D" + string(inequalityArr[0][2:])
+			} else if strings.Contains(inequalityArr[0], "<") {
+				finalQuery = slugQuery + "%3C%3D" + string(inequalityArr[0][2:])
+			} else {
+				finalQuery = slugQuery + "%3D" + inequalityArr[0][1:]
+			}
+		}
+		if strings.Contains(inequalityArr[0], ">") {
+			finalQuery = slugQuery + "%3E" + string(inequalityArr[0][1:])
+		} else if strings.Contains(inequalityArr[0], "<") {
+			finalQuery = slugQuery + "%3C" + string(inequalityArr[0][1:])
+		} else {
+			finalQuery = slugQuery + "%3D" + string(inequalityArr[0])
+		}
+	} else {
+		//This is for checking if there are 2 digits or 1
+		//(on the left hand side of our inequality)
+		digitRe := regexp.MustCompile(`(\d)+`)
+		//Left inequality side number value
+		leftSideNumberValue := digitRe.FindStringSubmatch(inequalityArr[1])[0]
+		fmt.Println(inequalityArr[2])
+		rightSideNumberValue := digitRe.FindStringSubmatch(inequalityArr[2])[0]
+
+		if strings.Contains(inequalityArr[1], "=") {
+			if strings.Contains(inequalityArr[1], ">") {
+				finalQuery += slugQuery + "%3C%3D" + leftSideNumberValue + "+"
+			} else if strings.Contains(inequalityArr[1], "<") {
+				finalQuery += slugQuery + "%3E%3D" + leftSideNumberValue + "+"
+
+			}
+		} else
+		//if it's JUST >
+		if strings.Contains(inequalityArr[1], ">") {
+			finalQuery += slugQuery + "%3C" + leftSideNumberValue + "+"
+
+		} else //if it's JUST <
+		if strings.Contains(inequalityArr[1], "<") {
+			finalQuery += slugQuery + "%3E" + leftSideNumberValue + "+"
+
+		}
+		//RIGHT HAND SIDE NUMBER VALUES
+		if strings.Contains(inequalityArr[2], "=") {
+			// if contains >=
+			if strings.Contains(inequalityArr[2], ">") {
+				finalQuery += slugQuery + "%3E%3D" + rightSideNumberValue + "+"
+			} else // if contains <=
+			if strings.Contains(inequalityArr[2], "<") {
+				finalQuery += slugQuery + "%3C%3D" + rightSideNumberValue + "+"
+			} else { //if it's just =
+				finalQuery += slugQuery + "%3D" + rightSideNumberValue + "+"
+			}
+		} else if strings.Contains(inequalityArr[2], ">") {
+			//if it's JUST >
+			finalQuery += slugQuery + "%3E" + rightSideNumberValue + "+"
+		} else if strings.Contains(inequalityArr[2], "<") {
+			//if it's JUST <
+			finalQuery += slugQuery + "%3C" + rightSideNumberValue + "+"
+		}
+	}
+
+	return finalQuery
 }
