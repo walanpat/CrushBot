@@ -93,13 +93,14 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(isArr) > 0 {
 		if isArr[0][3] == ' ' {
-			QueryObject.isValue += "is%3A" + isArr[0][4:len(isArr[0])] + "%27"
+			QueryObject.isValue += "is%3A" + isArr[0][4:len(isArr[0])]
 
 		} else {
-			QueryObject.isValue += "is%3A" + isArr[0][3:len(isArr[0])] + "%27"
+			QueryObject.isValue += "is%3A" + isArr[0][3:len(isArr[0])]
 		}
 		QueryObject.isValue = strings.ReplaceAll(QueryObject.isValue, " ", "+")
-		QueryObject.finalValue += QueryObject.isValue
+		fmt.Println(QueryObject.isValue)
+		QueryObject.finalValue += QueryObject.isValue + "+"
 	}
 	if len(textArr) > 0 {
 		if textArr[0][5] == ' ' {
@@ -109,40 +110,42 @@ func MtgQueryBuilder(query string) (string, error) {
 			QueryObject.textValue += "o%3A%27" + textArr[0][5:len(textArr[0])] + "%27"
 		}
 		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, " ", "+")
+		fmt.Println(QueryObject.textValue)
+		QueryObject.textValue += "+"
 		QueryObject.finalValue += QueryObject.textValue
 	}
 	if len(cmcArr) > 0 {
 		QueryObject.cmcValue = InequalityReader(cmcArr, "cmc")
 
-		QueryObject.finalValue += QueryObject.cmcValue
+		QueryObject.finalValue += QueryObject.cmcValue + "+"
 	}
 	if len(toughnessArr) > 0 {
 		QueryObject.toughnessValue = InequalityReader(toughnessArr, "tou")
 
-		QueryObject.finalValue += QueryObject.toughnessValue
+		QueryObject.finalValue += QueryObject.toughnessValue + "+"
 	}
 	if len(powerArr) > 0 {
 		QueryObject.powerValue = InequalityReader(powerArr, "pow")
 
-		QueryObject.finalValue += QueryObject.powerValue
+		QueryObject.finalValue += QueryObject.powerValue + "+"
 	}
 	if len(rarityArr) > 0 {
 		if rarityArr[0][7] == ' ' {
-			QueryObject.rarityValue += "r%3A" + rarityArr[0][8:len(rarityArr[0])] + "%27"
+			QueryObject.rarityValue += "r%3A" + rarityArr[0][8:len(rarityArr[0])]
 		} else {
-			QueryObject.rarityValue += "r%3A" + rarityArr[0][7:len(rarityArr[0])] + "%27"
+			QueryObject.rarityValue += "r%3A" + rarityArr[0][7:len(rarityArr[0])]
 		}
 		QueryObject.rarityValue = strings.ReplaceAll(QueryObject.rarityValue, " ", "+")
-		QueryObject.finalValue += QueryObject.rarityValue
+		QueryObject.finalValue += QueryObject.rarityValue + "+"
 	}
 	if len(artArr) > 0 {
 		if artArr[0][4] == ' ' {
-			QueryObject.artValue += "art%3A" + artArr[0][5:len(artArr[0])] + "%27"
+			QueryObject.artValue += "art%3A" + artArr[0][5:len(artArr[0])]
 		} else {
-			QueryObject.artValue += "art%3A" + artArr[0][4:len(artArr[0])] + "%27"
+			QueryObject.artValue += "art%3A" + artArr[0][4:len(artArr[0])]
 		}
 		QueryObject.artValue = strings.ReplaceAll(QueryObject.artValue, " ", "+")
-		QueryObject.finalValue += QueryObject.artValue
+		QueryObject.finalValue += QueryObject.artValue + "+"
 	}
 
 	return QueryObject.finalValue, nil

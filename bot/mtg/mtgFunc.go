@@ -153,7 +153,7 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 		for j := 0; j < len(data.Data[i].ColorIdentity); j++ {
 			coloridentityprint += data.Data[i].ColorIdentity[j]
 		}
-		message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + " " + coloridentityprint + "\n"
+		message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + " " + coloridentityprint + " " + data.Data[i].ImageUris.Png + "\n"
 	}
 	_, _ = s.ChannelMessageSend(channelId, message)
 
