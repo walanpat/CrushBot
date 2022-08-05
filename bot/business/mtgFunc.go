@@ -1,33 +1,21 @@
-package mtg
+package business
 
 import (
+	"errors"
 	"fmt"
 	"github.com/bwmarrin/discordgo"
-	"goland-discord-bot/bot/mtg/query/builder"
-	"goland-discord-bot/bot/mtg/services"
+	"goland-discord-bot/bot/business/query/builder"
+	response "goland-discord-bot/bot/services/responses"
+
+	"goland-discord-bot/bot/services"
 	"math"
 	"strconv"
 	"strings"
 )
 
-type RulingData struct {
-	Object        string `json:"object"`
-	OracleId      string `json:"oracle_id"`
-	Source        string `json:"source"`
-	PublishedDate string `json:"published_at"`
-	Comment       string `json:"comment"`
-}
-type RulingResponse struct {
-	Object  string       `json:"object"`
-	HasMore bool         `json:"has_more"`
-	Data    []RulingData `json:"data"`
-	Source  string       `json:"source"`
-	Details string       `json:"details"`
-}
-
 var RulingUri string
 var SetCodeUri string
-var Price services.PriceObj
+var Price response.PriceObj
 
 func GetCard(cardName string, channelId string, s *discordgo.Session) {
 	//Get card Service Request
@@ -70,25 +58,27 @@ func GetCard(cardName string, channelId string, s *discordgo.Session) {
 	}
 }
 
-func GetRuling(channelId string, s *discordgo.Session) {
+func GetRuling(channelId string, s *discordgo.Session) error {
 	//Checking Input
 	if RulingUri == "No Rulings Found" || RulingUri == "false" {
 		_, _ = s.ChannelMessageSend(channelId, "No Rulings Found")
-		return
+		return errors.New("no rulings found")
 	}
 	//Rules Service Request
 	data, err := services.GetCardRulingService(RulingUri)
 	if err != nil {
 		_, _ = s.ChannelMessageSend(channelId, "Error in Retrieving Rules")
-		return
+		return err
 	}
 	if data.Object == "error" || len(data.Data) == 0 {
 		_, err = s.ChannelMessageSend(channelId, "```ansi\nNo Rulings Found```")
+		return errors.New(data.Details)
 	}
 	//Print/Send out our rules
 	for i := 0; i < len(data.Data); i++ {
 		_, err = s.ChannelMessageSend(channelId, "```ansi\n"+strconv.Itoa(i+1)+". "+data.Data[i].Comment+"\n```")
 	}
+	return nil
 }
 
 func GetSets(channelId string, s *discordgo.Session) {
@@ -146,8 +136,8 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 		return
 	}
 
-	//EmbeddedCardSending(data, channelId, s)
-	ExtendedMessageSending(data, channelId, s)
+	//EmbeddedCardSending(&data, channelId, s)
+	ExtendedMessageSending(&data, channelId, s)
 	return
 	//Handle our query
 	//message := ""
@@ -163,7 +153,7 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 
 }
 
-func ExtendedMessageSending(data services.QueryResponse, channelId string, s *discordgo.Session) {
+func ExtendedMessageSending(data *response.QueryResponse, channelId string, s *discordgo.Session) {
 	message := ""
 	//timer1 := time.NewTimer(50 * time.Millisecond)
 	for i := 0; i < len(data.Data); i++ {
@@ -228,8 +218,8 @@ func ExtendedMessageSending(data services.QueryResponse, channelId string, s *di
 
 }
 
-func EmbeddedCardSending(data services.QueryResponse, channelId string, s *discordgo.Session) {
-
+func EmbeddedCardSending(data *response.QueryResponse, channelId string, s *discordgo.Session) {
+	//
 	////x := []*discordgo.MessageEmbed{&temp[0], &temp[1]}
 	//var temp [1]discordgo.MessageEmbed
 	////var z = 0

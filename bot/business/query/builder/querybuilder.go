@@ -44,7 +44,6 @@ func MtgQueryBuilder(query string) (string, error) {
 	powerArr := PowerRe.FindStringSubmatch(query)
 	colorArr := ColorRe.FindStringSubmatch(query)
 	cmcArr := CmcRe.FindStringSubmatch(query)
-
 	typeArr := TypeRe.FindStringSubmatch(query)
 
 	//If nothing found
@@ -114,7 +113,7 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(cmcArr) > 0 {
 		QueryObject.cmcValue = InequalityReader(cmcArr, "cmc")
-		QueryObject.finalValue += QueryObject.cmcValue + "+"
+		QueryObject.finalValue += QueryObject.cmcValue
 	}
 	if len(toughnessArr) > 0 {
 		QueryObject.toughnessValue = InequalityReader(toughnessArr, "tou")
@@ -125,12 +124,27 @@ func MtgQueryBuilder(query string) (string, error) {
 		QueryObject.finalValue += QueryObject.powerValue + "+"
 	}
 	if len(rarityArr) > 0 {
-		if rarityArr[0][7] == ' ' {
-			QueryObject.rarityValue += "r%3A" + rarityArr[0][8:len(rarityArr[0])]
-		} else {
-			QueryObject.rarityValue += "r%3A" + rarityArr[0][7:len(rarityArr[0])]
+		fmt.Println(rarityArr)
+
+		if strings.Contains(rarityArr[1], "c") {
+			QueryObject.rarityValue += "r%3Acommon+"
 		}
-		QueryObject.rarityValue = strings.ReplaceAll(QueryObject.rarityValue, " ", "+")
+		if strings.Contains(rarityArr[1], "u") {
+			QueryObject.rarityValue += "r%3Auncommon+"
+		}
+		if strings.Contains(rarityArr[1], "r") {
+			QueryObject.rarityValue += "r%3Arare+"
+		}
+		if strings.Contains(rarityArr[1], "m") {
+			QueryObject.rarityValue += "r%3Amythic+"
+		}
+
+		//if rarityArr[0][7] == ' ' {
+		//	QueryObject.rarityValue += "r%3A" + rarityArr[0][8:len(rarityArr[0])]
+		//} else {
+		//	QueryObject.rarityValue += "r%3A" + rarityArr[0][7:len(rarityArr[0])]
+		//}
+		//QueryObject.rarityValue = strings.ReplaceAll(QueryObject.rarityValue, " ", "+")
 		QueryObject.finalValue += QueryObject.rarityValue + "+"
 	}
 	if len(artArr) > 0 {

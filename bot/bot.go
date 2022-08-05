@@ -3,7 +3,7 @@ package bot
 import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
-	"goland-discord-bot/bot/mtg"
+	"goland-discord-bot/bot/business"
 	"goland-discord-bot/config"
 	"math/rand"
 	"regexp"
@@ -231,7 +231,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 		cardName := strings.ReplaceAll(m.Content[3:len(m.Content)], " ", "+")
-		mtg.GetCard(cardName, m.ChannelID, s)
+		business.GetCard(cardName, m.ChannelID, s)
 
 		mtgRulesMessageFlag = false
 		mtgSetMessageFlag = false
@@ -239,7 +239,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	if strings.Contains(m.Content, "!q") && m.Author.ID != Id {
 		if len(m.Content) > 4 {
-			mtg.GetQuery(m.Content, m.ChannelID, s)
+			business.GetQuery(m.Content, m.ChannelID, s)
 		}
 	}
 	if strings.Contains(m.Content, "!encode") {
@@ -290,17 +290,17 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 	//Code for getting the ruling
 	if decode == 128218 && length == 4 && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
-		mtg.GetRuling(m.ChannelID, s)
+		business.GetRuling(m.ChannelID, s)
 		mtgRulesMessageFlag = true
 	}
 	//Code for getting sets
 	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id && mtgSetMessageFlag == false {
-		mtg.GetSets(m.ChannelID, s)
+		business.GetSets(m.ChannelID, s)
 		mtgSetMessageFlag = true
 	}
 	//Code for getting price
 	if decode == 128181 && length == 4 && m.MessageReaction.UserID != Id && mtgPriceMessageFlag == false {
-		mtg.GetPrice(m.ChannelID, s)
+		business.GetPrice(m.ChannelID, s)
 		mtgPriceMessageFlag = true
 	}
 }
