@@ -237,11 +237,13 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		mtgSetMessageFlag = false
 		mtgPriceMessageFlag = false
 	}
+
 	if strings.Contains(m.Content, "!q") && m.Author.ID != Id {
 		if len(m.Content) > 4 {
 			business.GetQuery(m.Content, m.ChannelID, s)
 		}
 	}
+
 	if strings.Contains(m.Content, "!encode") {
 		y := discordgo.MessageEmbed{
 			URL:         "https://www.youtube.com/",
