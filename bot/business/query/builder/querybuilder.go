@@ -81,9 +81,9 @@ func MtgQueryBuilder(query string) (string, error) {
 	if len(colorArr) > 0 {
 		//Think
 		//we need OR
-		//AND
+		//AND (exclusive)
 		//NOT
-		//and can just be bguwr
+		//and can just be bguwr formatting
 		// or bg b g
 
 		//Analyze if there is space.  Then if there's multiple things grouped together,
@@ -91,18 +91,32 @@ func MtgQueryBuilder(query string) (string, error) {
 		//More regex lmao
 
 		innerColorRe := regexp.MustCompile(`([-wubrg]*)*`)
-		fmt.Println(strings.TrimSpace(colorArr[0][6:len(colorArr[0])]))
 
 		//Alan, you gotta work with this.
 		//This is the trick here.  Handle it within this innercolorArr, and you can do it.  just stick to what you got and handle it from there.
 		innerColorArr := innerColorRe.FindAllStringSubmatch(strings.TrimSpace(colorArr[0][6:len(colorArr[0])]), 5)
-		fmt.Println(innerColorArr)
-		QueryObject.colorValue += "c%3A" + strings.TrimSpace(colorArr[0][6:len(colorArr[0])])
-		QueryObject.colorValue = strings.ReplaceAll(QueryObject.colorValue, " -", "+-c%3A")
-		QueryObject.colorValue = strings.ReplaceAll(QueryObject.colorValue, " ", "+c%3A")
-		QueryObject.colorValue = strings.ReplaceAll(QueryObject.colorValue, "+c%3A+-", "")
-		fmt.Println(QueryObject.colorValue)
-		QueryObject.finalValue += QueryObject.colorValue + "+"
+
+		//checking to see if we have a OR statement (BU B U) stating I want
+		//Blue and Black, or Black, or Blue cards
+		if len(innerColorArr[0]) >= 3 {
+			for _, value := range innerColorArr {
+				if value[0] != innerColorArr[0][0] {
+					if strings.Contains(innerColorArr[0][0], value[0]) {
+						if value[0] == innerColorArr[0][len(innerColorArr[0])-1] {
+							QueryObject.colorValue += "c%3C%3D" + innerColorArr[0][0] + "+"
+						}
+					} else {
+						break
+					}
+				}
+			}
+		} else {
+			QueryObject.colorValue += "c%3A" + strings.TrimSpace(colorArr[0][6:len(colorArr[0])])
+			QueryObject.colorValue = strings.ReplaceAll(QueryObject.colorValue, " -", "+-c%3A")
+			QueryObject.colorValue = strings.ReplaceAll(QueryObject.colorValue, " ", "+c%3A")
+			QueryObject.colorValue = strings.ReplaceAll(QueryObject.colorValue, "+c%3A+-", "")
+			QueryObject.finalValue += QueryObject.colorValue + "+"
+		}
 	}
 	if len(functionArr) > 0 {
 		QueryObject.functionValue += "function%3A" + strings.TrimSpace(functionArr[0][9:len(functionArr[0])])
