@@ -179,9 +179,6 @@ func ExtendedMessageSending(data *response.QueryResponse, channelId string, s *d
 		message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + " " + coloridentityprint + " " + "\n"
 	}
 
-	fmt.Println(data.Data[len(data.Data)-1].Name)
-	//fmt.Println(data)
-	fmt.Println(len(message))
 	if len(message) > 2000 {
 		iterationsNeeded := int(math.Ceil(float64(len(message)) / 2000))
 		fmt.Println(len("```ansi\n" + message[0*2000:(0+1)*2000-11] + "```"))

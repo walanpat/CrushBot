@@ -74,39 +74,51 @@ func MtgQueryBuilder(query string) (string, error) {
 		finalValue:     QueryURL,
 	}
 	if len(typeArr) > 0 {
-		QueryObject.typeValue += "t%3A" + typeArr[0][5:len(typeArr[0])]
+		QueryObject.typeValue += "t%3A" + strings.TrimSpace(typeArr[0][5:len(typeArr[0])])
 		QueryObject.typeValue = strings.ReplaceAll(QueryObject.typeValue, " ", "+t%3A")
 		QueryObject.finalValue += QueryObject.typeValue + "+"
 	}
 	if len(colorArr) > 0 {
-		QueryObject.colorValue += "c%3A" + colorArr[0][6:len(colorArr[0])]
+		//Think
+		//we need OR
+		//AND
+		//NOT
+		//and can just be bguwr
+		// or bg b g
+
+		//Analyze if there is space.  Then if there's multiple things grouped together,
+		//put in the AND symbol (at most color<%3DWU for WHITE and BLUE)
+		//More regex lmao
+
+		innerColorRe := regexp.MustCompile(`([-wubrg]*)*`)
+		fmt.Println(strings.TrimSpace(colorArr[0][6:len(colorArr[0])]))
+
+		//Alan, you gotta work with this.
+		//This is the trick here.  Handle it within this innercolorArr, and you can do it.  just stick to what you got and handle it from there.
+		innerColorArr := innerColorRe.FindAllStringSubmatch(strings.TrimSpace(colorArr[0][6:len(colorArr[0])]), 5)
+		fmt.Println(innerColorArr)
+		QueryObject.colorValue += "c%3A" + strings.TrimSpace(colorArr[0][6:len(colorArr[0])])
 		QueryObject.colorValue = strings.ReplaceAll(QueryObject.colorValue, " -", "+-c%3A")
 		QueryObject.colorValue = strings.ReplaceAll(QueryObject.colorValue, " ", "+c%3A")
 		QueryObject.colorValue = strings.ReplaceAll(QueryObject.colorValue, "+c%3A+-", "")
+		fmt.Println(QueryObject.colorValue)
 		QueryObject.finalValue += QueryObject.colorValue + "+"
 	}
 	if len(functionArr) > 0 {
-		QueryObject.functionValue += "function%3A" + functionArr[0][9:len(functionArr[0])]
+		QueryObject.functionValue += "function%3A" + strings.TrimSpace(functionArr[0][9:len(functionArr[0])])
 		QueryObject.functionValue = strings.ReplaceAll(QueryObject.functionValue, " ", "+function%3A")
 		QueryObject.finalValue += QueryObject.functionValue + "+"
 	}
 	if len(isArr) > 0 {
-		if isArr[0][3] == ' ' {
-			QueryObject.isValue += "is%3A" + isArr[0][4:len(isArr[0])]
 
-		} else {
-			QueryObject.isValue += "is%3A" + isArr[0][3:len(isArr[0])]
-		}
+		QueryObject.isValue += "is%3A" + strings.TrimSpace(isArr[0][3:len(isArr[0])])
 		QueryObject.isValue = strings.ReplaceAll(QueryObject.isValue, " ", "+")
 		QueryObject.finalValue += QueryObject.isValue + "+"
 	}
 	if len(textArr) > 0 {
-		if textArr[0][5] == ' ' {
-			QueryObject.textValue += "o%3A%27" + textArr[0][6:len(textArr[0])] + "%27"
 
-		} else {
-			QueryObject.textValue += "o%3A%27" + textArr[0][5:len(textArr[0])] + "%27"
-		}
+		QueryObject.textValue += "o%3A%27" + strings.TrimSpace(textArr[0][5:len(textArr[0])]+"%27")
+
 		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, " ", "+")
 		QueryObject.textValue += "+"
 		QueryObject.finalValue += QueryObject.textValue
@@ -124,8 +136,6 @@ func MtgQueryBuilder(query string) (string, error) {
 		QueryObject.finalValue += QueryObject.powerValue + "+"
 	}
 	if len(rarityArr) > 0 {
-		fmt.Println(rarityArr)
-
 		if strings.Contains(rarityArr[1], "c") {
 			QueryObject.rarityValue += "r%3Acommon+"
 		}
@@ -138,24 +148,14 @@ func MtgQueryBuilder(query string) (string, error) {
 		if strings.Contains(rarityArr[1], "m") {
 			QueryObject.rarityValue += "r%3Amythic+"
 		}
-
-		//if rarityArr[0][7] == ' ' {
-		//	QueryObject.rarityValue += "r%3A" + rarityArr[0][8:len(rarityArr[0])]
-		//} else {
-		//	QueryObject.rarityValue += "r%3A" + rarityArr[0][7:len(rarityArr[0])]
-		//}
-		//QueryObject.rarityValue = strings.ReplaceAll(QueryObject.rarityValue, " ", "+")
 		QueryObject.finalValue += QueryObject.rarityValue + "+"
 	}
 	if len(artArr) > 0 {
-		if artArr[0][4] == ' ' {
-			QueryObject.artValue += "art%3A" + artArr[0][5:len(artArr[0])]
-		} else {
-			QueryObject.artValue += "art%3A" + artArr[0][4:len(artArr[0])]
-		}
+		QueryObject.artValue += "art%3A" + strings.TrimSpace(artArr[0][4:len(artArr[0])])
 		QueryObject.artValue = strings.ReplaceAll(QueryObject.artValue, " ", "+")
 		QueryObject.finalValue += QueryObject.artValue + "+"
 	}
+	fmt.Println("https://scryfall.com/search?q=" + QueryObject.finalValue[40:] + "\n")
 
 	return QueryObject.finalValue, nil
 
@@ -166,7 +166,6 @@ func InequalityReader(array []string, typeOfInequality string) string {
 	slicingString := ""
 	//power = 4:
 	if typeOfInequality == "pow" {
-		fmt.Println(array[0][6:len(array[0])])
 		slicingString = array[0][6:len(array[0])]
 	}
 	//toughness = 8:
@@ -187,19 +186,19 @@ func InequalityReader(array []string, typeOfInequality string) string {
 	if inequalityArr[0] == inequalityArr[1] {
 		if strings.Contains(inequalityArr[0], "=") {
 			if strings.Contains(inequalityArr[0], ">") {
-				finalQuery = slugQuery + "%3E%3D" + string(inequalityArr[0][2:])
+				finalQuery = slugQuery + "%3E%3D" + inequalityArr[0][2:]
 			} else if strings.Contains(inequalityArr[0], "<") {
-				finalQuery = slugQuery + "%3C%3D" + string(inequalityArr[0][2:])
+				finalQuery = slugQuery + "%3C%3D" + inequalityArr[0][2:]
 			} else {
 				finalQuery = slugQuery + "%3D" + inequalityArr[0][1:]
 			}
 		}
 		if strings.Contains(inequalityArr[0], ">") {
-			finalQuery = slugQuery + "%3E" + string(inequalityArr[0][1:])
+			finalQuery = slugQuery + "%3E" + inequalityArr[0][1:]
 		} else if strings.Contains(inequalityArr[0], "<") {
-			finalQuery = slugQuery + "%3C" + string(inequalityArr[0][1:])
+			finalQuery = slugQuery + "%3C" + inequalityArr[0][1:]
 		} else {
-			finalQuery = slugQuery + "%3D" + string(inequalityArr[0])
+			finalQuery = slugQuery + "%3D" + inequalityArr[0]
 		}
 	} else {
 		//This is for checking if there are 2 digits or 1
@@ -207,7 +206,6 @@ func InequalityReader(array []string, typeOfInequality string) string {
 		digitRe := regexp.MustCompile(`(\d)+`)
 		//Left inequality side number value
 		leftSideNumberValue := digitRe.FindStringSubmatch(inequalityArr[1])[0]
-		fmt.Println(inequalityArr[2])
 		rightSideNumberValue := digitRe.FindStringSubmatch(inequalityArr[2])[0]
 
 		if strings.Contains(inequalityArr[1], "=") {
@@ -246,6 +244,5 @@ func InequalityReader(array []string, typeOfInequality string) string {
 			finalQuery += slugQuery + "%3C" + rightSideNumberValue + "+"
 		}
 	}
-
 	return finalQuery
 }
