@@ -136,8 +136,8 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 		return
 	}
 
-	//EmbeddedCardSending(&data, channelId, s)
-	ExtendedMessageSending(&data, channelId, s)
+	EmbeddedCardSending(&data, channelId, s)
+	//ExtendedMessageSending(&data, channelId, s)
 	return
 	//Handle our query
 	//message := ""
@@ -179,9 +179,6 @@ func ExtendedMessageSending(data *response.QueryResponse, channelId string, s *d
 		message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + " " + coloridentityprint + " " + "\n"
 	}
 
-	fmt.Println(data.Data[len(data.Data)-1].Name)
-	//fmt.Println(data)
-	fmt.Println(len(message))
 	if len(message) > 2000 {
 		iterationsNeeded := int(math.Ceil(float64(len(message)) / 2000))
 		fmt.Println(len("```ansi\n" + message[0*2000:(0+1)*2000-11] + "```"))
@@ -219,40 +216,96 @@ func ExtendedMessageSending(data *response.QueryResponse, channelId string, s *d
 }
 
 func EmbeddedCardSending(data *response.QueryResponse, channelId string, s *discordgo.Session) {
-	//
-	////x := []*discordgo.MessageEmbed{&temp[0], &temp[1]}
-	//var temp [1]discordgo.MessageEmbed
-	////var z = 0
-	////if int(data.TotalCards) != 0 {
-	////	z = int(data.TotalCards)
-	////}
-	//var x [0]*discordgo.MessageEmbed
-	//
-	//for i := 0; i < data.TotalCards; i++ {
-	//	image := discordgo.MessageEmbedImage{
-	//		URL:      data.Data[i].ImageUris.Png,
-	//		ProxyURL: "",
-	//		Width:    10,
-	//		Height:   20,
-	//	}
-	//	temp[i] = discordgo.MessageEmbed{
-	//		URL:         data.Data[i].ImageUris.Png,
-	//		Type:        "",
-	//		Title:       data.Data[i].Name,
-	//		Description: data.Data[i].Name,
-	//		Timestamp:   "",
-	//		Color:       0,
-	//		Footer:      nil,
-	//		Image:       &image,
-	//		Thumbnail:   nil,
-	//		Video:       nil,
-	//		Provider:    nil,
-	//		Author:      nil,
-	//		Fields:      nil,
-	//	}
-	//	x[i] = &temp[i]
-	//}
-	//fmt.Println(len(x))
-	//_, _ = s.ChannelMessageSendEmbeds(channelId, x)
+	var temp []discordgo.MessageEmbed
+	var x []*discordgo.MessageEmbed
+	for i := 0; i < data.TotalCards; i++ {
+		if len(data.Data[i].CardFaces) > 0 {
+
+			fmt.Println("proc ", i)
+			image := discordgo.MessageEmbedImage{
+				URL:      data.Data[i].CardFaces[0].ImageUris.Png,
+				ProxyURL: "",
+				Width:    10,
+				Height:   20,
+			}
+			arrElement := discordgo.MessageEmbed{
+				URL:         data.Data[i].ScryfallUri,
+				Type:        "",
+				Title:       data.Data[i].CardFaces[0].Name,
+				Description: "",
+				Timestamp:   "",
+				Color:       0,
+				Footer:      nil,
+				Image:       &image,
+				Thumbnail:   nil,
+				Video:       nil,
+				Provider:    nil,
+				Author:      nil,
+				Fields:      nil,
+			}
+			temp = append(temp, arrElement)
+			x = append(x, &temp[len(temp)-1])
+
+			image2 := discordgo.MessageEmbedImage{
+				URL:      data.Data[i].CardFaces[1].ImageUris.Png,
+				ProxyURL: "",
+				Width:    10,
+				Height:   20,
+			}
+			arrElement2 := discordgo.MessageEmbed{
+				URL:         data.Data[i].ScryfallUri,
+				Type:        "",
+				Title:       data.Data[i].CardFaces[1].Name,
+				Description: "",
+				Timestamp:   "",
+				Color:       0,
+				Footer:      nil,
+				Image:       &image2,
+				Thumbnail:   nil,
+				Video:       nil,
+				Provider:    nil,
+				Author:      nil,
+				Fields:      nil,
+			}
+			temp = append(temp, arrElement2)
+			x = append(x, &temp[len(temp)-1])
+		} else {
+			image := discordgo.MessageEmbedImage{
+				URL:      data.Data[i].ImageUris.Png,
+				ProxyURL: "",
+				Width:    10,
+				Height:   20,
+			}
+			arrElement := discordgo.MessageEmbed{
+				URL:         data.Data[i].ScryfallUri,
+				Type:        "",
+				Title:       data.Data[i].Name,
+				Description: "",
+				Timestamp:   "",
+				Color:       0,
+				Footer:      nil,
+				Image:       &image,
+				Thumbnail:   nil,
+				Video:       nil,
+				Provider:    nil,
+				Author:      nil,
+				Fields:      nil,
+			}
+			temp = append(temp, arrElement)
+			x = append(x, &temp[len(temp)-1])
+		}
+		if len(x) == 10 {
+			_, err := s.ChannelMessageSendEmbeds(channelId, x)
+			if err != nil {
+				fmt.Printf("error sending embeds %q", err)
+			}
+			x = []*discordgo.MessageEmbed{}
+		}
+	}
+	fmt.Println(x)
+	_, err := s.ChannelMessageSendEmbeds(channelId, x)
+	if err != nil {
+		fmt.Printf("error sending embeds %q", err)
+	}
 
 }
