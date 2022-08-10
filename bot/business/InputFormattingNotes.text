@@ -2,40 +2,42 @@
 
 ifstrings.Contains(m.Content,"!q")&&m.Author.ID!=Id{
 iflen(m.Content)==2{
-message:="```ansi\nQueryingcardscanbedonemultipleways:\n"
-message+="color:r/g/rg,ThisisredorgreenorRedANDgreen.\n\n"
-message+="cmc:>=3,Thisisconvertedmanagreaterthanorequalto3\n\n"
-message+="type:instant,goblin,Allcardtypesareinsertedhere\n\n"
-message+="power:>=4,hereyoucanusegreaterthan,lessthan,equaltowhateverpower\n\n"
-message+="toughness:>=4,samethingastherulesforqueryingpowerbutwithtoughness\n\n"
-message+="text:Entersthebattlefieldtapped,Hereyoucanqueryforspecifickeywordsinthecardstext\n\n"
+message:="```ansi\n Querying cards can be done multipleways:\n"
+message+="color:r g rg,This is red or green or Red-AND-Green.\n\n"
+message+="cmc:>=3,This is converted mana greater than or equal to 3\n\n"
+message+="type:instant,goblin, All card types are insant AND goblin \n\n"
+message+="power:>=4,here you can use greater than,less than,equal to what ever power\n\n"
+message+="toughness:>=4,same thing as the rules for querying power but with toughness\n\n"
+message+="text:Enters the battle field tapped,Here you can query for specific keywords in the cards text\n\n"
 message+="rarity:r,rarityislisted:mr,m,r,u,c(mythicrare,mythic,rare,uncommon,common)\n\n"
-message+="art:squirrel,querybywhatislistedinthecardart\n\n"
-message+="function:removal,Thisworksoffoftheoracletagsystemusedbyscryfall.Youcanqueryforspecificusertagsthatpeoplehavetaggedacarwith."
-message+="NOTE:ifyouwanttoqueryforEntertheBattlefieldEffects,use\n\n"
-message+="is:etb,\nThisisbecauseofamisnomergoofonscryfallspartsofhavingashortcutthat'snotincludedintheoracletaggingsystem\n\n"
-message+="foranexampletype!example\nforaproperty/inputkeytry!key"
+message+="art:squirrel,query b what is listed in the card art\n\n"
+message+="function:removal,This works off of the oracle tag system used by scryfall.
+You can query for specific usertags that people have tagged a card with."
+message+="NOTE:if you want to query for Enter the Battlefield Effects, use\n\n"
+message+="is:etb,\n This is because of a misnomer goof ons cryfallspart
+so having a shortcut that is not included in the oracle tagging system\n\n"
+message+="for an example type !example \n for a property try !key"
 message+="```"
 _,_=s.ChannelMessageSend(m.ChannelID,message)
 
-}elseiflen(m.Content)>4{
+}else if len(m.Content)>4{
 mtg.GetQuery(m.Content,m.ChannelID,s)
 }
 }
-ifstrings.Contains(m.Content,"!example")&&m.Author.ID!=Id{
+if strings.Contains(m.Content,"!example")&&m.Author.ID!=Id{
 message:="```ansi\nExample:\n"
-message+="Iwantalegendary,bluewhite,spirit,cardwithETBeffect.\n\n"
-message+="!qcolor:uw,cmc:<=6,type:legendaryspiritcreature,is:etb,\n\n"
-message+="IwantagoblincardthatISN'tacreature\n\n"
-message+="!qtype:goblin-creature,color:r"
+message+="I want a legendary, both blue and or white,spirit,card with ETB effect.\n\n"
+message+="!q color:uw u w ,cmc:<=6,type:legendary spirit creature,is:etb,\n\n"
+message+="I want a goblin card that ISN't a creature\n\n"
+message+="!q type: goblin -creature,color:r"
 message+="```"
 _,_=s.ChannelMessageSend(m.ChannelID,message)
 }
-ifstrings.Contains(m.Content,"!key")&&m.Author.ID!=Id{
+if strings.Contains(m.Content,"!key")&&m.Author.ID!=Id{
 message:="```ansi\n"
-message+="-beforeaattributenegatesit(-creatureisNOTcreatures,-rNOTredcardsetc)\n\n"
+message+="-before a attribute negates it(-creature is NOT creatures,-r NOT red cards etc)\n\n"
 message+="r=red,b=black,g=green,u=blue,w=white\n\n"
-message+="functionchoicesarelistedhere:https://scryfall.com/docs/tagger-tags\n(there'stoomany)andnotallofthemareuseful\n\n"
+message+="functionchoicesarelistedhere: https://scryfall.com/docs/tagger-tags \n(there'stoomany)andnotallofthemareuseful\n\n"
 message+="typecanbeofanytype,instant,creature,spell,legendary,vampire,goblin,merfolk,etc..."
 
 message+="```"

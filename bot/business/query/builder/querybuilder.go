@@ -16,6 +16,7 @@ var RarityRe = regexp.MustCompile(`rarity:([mruc ]+)?`)
 var ArtRe = regexp.MustCompile(`art:([a-zA-Z ]+)?`)
 var FunctionRe = regexp.MustCompile(`function:([a-zA-Z ]+)?`)
 var IsRe = regexp.MustCompile(`is:([a-zA-Z ]+)?`)
+var loyaltyRe = regexp.MustCompile(`loyalty:([>=<\d ]+)?`)
 
 var QueryURL = "https://api.scryfall.com/cards/search?q="
 
@@ -27,6 +28,7 @@ type UrlBuilderObject struct {
 	textValue      string
 	toughnessValue string
 	powerValue     string
+	loyaltyValue   string
 	colorValue     string
 	cmcValue       string
 	typeValue      string
@@ -45,6 +47,7 @@ func MtgQueryBuilder(query string) (string, error) {
 	colorArr := ColorRe.FindStringSubmatch(query)
 	cmcArr := CmcRe.FindStringSubmatch(query)
 	typeArr := TypeRe.FindStringSubmatch(query)
+	loyaltyArr := loyaltyRe.FindStringSubmatch(query)
 
 	//If nothing found
 	if len(typeArr) == 0 &&
@@ -56,7 +59,8 @@ func MtgQueryBuilder(query string) (string, error) {
 		len(toughnessArr) == 0 &&
 		len(powerArr) == 0 &&
 		len(colorArr) == 0 &&
-		len(cmcArr) == 0 {
+		len(cmcArr) == 0 &&
+		len(loyaltyArr) == 0 {
 		return "", nil
 	}
 	//Initialize response object
@@ -145,6 +149,10 @@ func MtgQueryBuilder(query string) (string, error) {
 		QueryObject.toughnessValue = InequalityReader(toughnessArr, "tou")
 		QueryObject.finalValue += QueryObject.toughnessValue + "+"
 	}
+	if len(loyaltyArr) > 0 {
+		QueryObject.loyaltyValue = InequalityReader(loyaltyArr, "loy")
+		QueryObject.finalValue += QueryObject.loyaltyValue + "+"
+	}
 	if len(powerArr) > 0 {
 		QueryObject.powerValue = InequalityReader(powerArr, "pow")
 		QueryObject.finalValue += QueryObject.powerValue + "+"
@@ -175,6 +183,12 @@ func MtgQueryBuilder(query string) (string, error) {
 
 }
 
+//Rework Inequality Reader.
+//things are backwards,
+//implementation does not work.
+//You're on the right track, but you need to fix it.
+//regex needs to be fixed,
+//the number, if it's 2 digits throws an error
 func InequalityReader(array []string, typeOfInequality string) string {
 	inequalityRe := regexp.MustCompile(`(\d?[><]?=?\d?)?m?(\d?[><]?=?\d?)?`)
 	slicingString := ""
@@ -190,8 +204,14 @@ func InequalityReader(array []string, typeOfInequality string) string {
 	if typeOfInequality == "cmc" {
 		slicingString = array[0][4:len(array[0])]
 	}
+	if typeOfInequality == "loy" {
+		slicingString = array[0][8:len(array[0])]
+		fmt.Println(slicingString)
+		fmt.Println(array[0])
+	}
 
 	inequalityArr := inequalityRe.FindStringSubmatch(slicingString)
+
 	slugQuery := typeOfInequality
 	finalQuery := ""
 
@@ -258,5 +278,6 @@ func InequalityReader(array []string, typeOfInequality string) string {
 			finalQuery += slugQuery + "%3C" + rightSideNumberValue + "+"
 		}
 	}
+	fmt.Println(finalQuery)
 	return finalQuery
 }

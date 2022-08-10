@@ -16,8 +16,7 @@ type TestCase struct {
 }
 
 func TestQueryBuilder(t *testing.T) {
-	//Testing type and 1 color request
-	t.Run("Query Builder: type and basic color test", func(t *testing.T) {
+	t.Run("ype and basic color test", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:squirrel, color:b",
 			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+c%3Ab+",
@@ -47,5 +46,21 @@ func TestQueryBuilder(t *testing.T) {
 			t.Fail()
 		}
 	})
+
+	//t.Run("", func(t *testing.T) {
+	//	testCase := TestCase{
+	//		input:    "",
+	//		expected: "https://api.scryfall.com/cards/search?q=",
+	//	}
+	//	output, err := builder.MtgQueryBuilder(testCase.input)
+	//	if testCase.expected != output {
+	//		fmt.Println("Output:   ", output)
+	//		fmt.Println("Expected: ", testCase.expected)
+	//		t.Fail()
+	//	}
+	//	if err != nil {
+	//		t.Fail()
+	//	}
+	//})
 
 }

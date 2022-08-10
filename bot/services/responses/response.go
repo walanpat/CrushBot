@@ -113,6 +113,31 @@ type CardResponse struct {
 	Details         string          `json:"details"`
 	RulingsUri      string          `json:"rulings_uri"`
 	PrintsSearchUri string          `json:"prints_search_uri"`
+	CardFaces       []CardResponse  `json:"card_faces"`
+}
+
+type CardFace struct {
+	Object          string    `json:"object"`
+	Name            string    `json:"name"`
+	Uri             string    `json:"uri"`
+	ImageUris       imageUris `json:"image_uris"`
+	Cmc             float32   `json:"mana_cost"`
+	TypeLine        string    `json:"type_line"`
+	OracleText      string    `json:"oracle_text"`
+	Colors          []string  `json:"colors"`
+	Keywords        []string  `json:"keywords"`
+	Artist          string    `json:"artist"`
+	ArtistIds       []string  `json:"artist_ids"`
+	IllustrationId  string    `json:"illustration_id"`
+	SecurityStamp   string    `json:"security_stamp"`
+	FullArt         bool      `json:"full_art"`
+	Textless        bool      `json:"textless"`
+	Details         string    `json:"details"`
+	RulingsUri      string    `json:"rulings_uri"`
+	PrintsSearchUri string    `json:"prints_search_uri"`
+	Power           float32   `json:"power"`
+	Toughness       float32   `json:"toughness"`
+	Watermark       string    `json:"watermark"`
 }
 
 type RulingData struct {
