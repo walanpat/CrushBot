@@ -1,6 +1,6 @@
 package responses
 
-type imageUris struct {
+type ImageUris struct {
 	Small      string `json:"small"`
 	Normal     string `json:"normal"`
 	Large      string `json:"large"`
@@ -9,7 +9,7 @@ type imageUris struct {
 	BorderCrop string `json:"border_crop"`
 }
 
-type legalitiesObj struct {
+type LegalitiesObj struct {
 	Standard        string `json:"standard"`
 	Future          string `json:"future"`
 	Historic        string `json:"historic"`
@@ -40,14 +40,14 @@ type PriceObj struct {
 	Tix       string `json:"tix"`
 }
 
-type relatedUrisObj struct {
+type RelatedUrisObj struct {
 	Gatherer                  string `json:"gatherer"`
 	TcgplayerInfiniteArticles string `json:"tcgplayer_infinite_articles"`
 	TcgplayerInfiniteDecks    string `json:"tcgplayer_infinite_decks"`
 	Edhrec                    string `json:"edhrec"`
 }
 
-type purchaseUrisObj struct {
+type PurchaseUrisObj struct {
 	Tcgplayer   string `json:"tcgplayer"`
 	Cardmarket  string `json:"cardmarket"`
 	Cardhoarder string `json:"cardhoarder"`
@@ -67,7 +67,7 @@ type CardResponse struct {
 	Layout          string          `json:"layout"`
 	HighresImage    bool            `json:"highres_image"`
 	ImageStatus     string          `json:"image_status"`
-	ImageUris       imageUris       `json:"image_uris"`
+	ImageUris       ImageUris       `json:"image_uris"`
 	ManaCost        string          `json:"mana_cost"`
 	Cmc             float32         `json:"cmc"`
 	TypeLine        string          `json:"type_line"`
@@ -75,7 +75,7 @@ type CardResponse struct {
 	Colors          []string        `json:"colors"`
 	ColorIdentity   []string        `json:"color_identity"`
 	Keywords        []string        `json:"keywords"`
-	Legalities      legalitiesObj   `json:"legalities"`
+	Legalities      LegalitiesObj   `json:"legalities"`
 	Games           []string        `json:"games"`
 	Reserved        bool            `json:"reserved"`
 	Foil            bool            `json:"foil"`
@@ -108,8 +108,8 @@ type CardResponse struct {
 	EdhrecRank      int             `json:"edhrec_rank"`
 	PennyRank       int             `json:"penny_rank"`
 	Prices          PriceObj        `json:"prices"`
-	RelatedUris     relatedUrisObj  `json:"related_uris"`
-	PurchaseUris    purchaseUrisObj `json:"purchase_uris"`
+	RelatedUris     RelatedUrisObj  `json:"related_uris"`
+	PurchaseUris    PurchaseUrisObj `json:"purchase_uris"`
 	Details         string          `json:"details"`
 	RulingsUri      string          `json:"rulings_uri"`
 	PrintsSearchUri string          `json:"prints_search_uri"`
@@ -120,7 +120,7 @@ type CardFace struct {
 	Object          string    `json:"object"`
 	Name            string    `json:"name"`
 	Uri             string    `json:"uri"`
-	ImageUris       imageUris `json:"image_uris"`
+	ImageUris       ImageUris `json:"image_uris"`
 	Cmc             float32   `json:"mana_cost"`
 	TypeLine        string    `json:"type_line"`
 	OracleText      string    `json:"oracle_text"`
@@ -176,7 +176,7 @@ type SetListResponse struct {
 	CardCount   string         `json:"card_count"`
 	PrintedSize int            `json:"printed_size"`
 	Digital     bool           `json:"digital"`
-	NonfoilOnly bool           `json:"nonfoil_only"`
+	NonFoilOnly bool           `json:"nonfoil_only"`
 	FoilOnly    bool           `json:"foil_only"`
 	IconSvgUri  string         `json:"icon_svg_uri"`
 }

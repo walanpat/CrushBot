@@ -50,6 +50,7 @@ func TestColorsQueryBuilder(t *testing.T) {
 		}
 	})
 
+	//Tests for black and green and black&green
 	t.Run("type and 2 basic color test", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:squirrel, color:b g",
@@ -82,6 +83,7 @@ func TestColorsQueryBuilder(t *testing.T) {
 		}
 	})
 
+	//Tests for white and blue and white&blue
 	t.Run("test for multicolor query (ub || b || u)", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:vampire, color:ub b u",
