@@ -51,7 +51,10 @@ func GetCard(cardName string, channelId string, s *discordgo.Session) {
 		if len(data.PurchaseUris.Tcgplayer) > 0 {
 			Price = data.Prices
 		}
-		_, err = s.ChannelFileSend(channelId, data.Name+".png", res)
+
+		//_, err = s.ChannelFileSend(channelId, data.Name+".png", res)
+		EmbeddedCardSending(&data, channelId, s)
+
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -136,7 +139,7 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 		return
 	}
 
-	EmbeddedCardSending(&data, channelId, s)
+	EmbeddedCardQuerySending(&data, channelId, s)
 	//ExtendedMessageSending(&data, channelId, s)
 	return
 	//Handle our query
@@ -215,7 +218,7 @@ func ExtendedMessageSending(data *response.QueryResponse, channelId string, s *d
 
 }
 
-func EmbeddedCardSending(data *response.QueryResponse, channelId string, s *discordgo.Session) {
+func EmbeddedCardQuerySending(data *response.QueryResponse, channelId string, s *discordgo.Session) {
 	var temp []discordgo.MessageEmbed
 	var x []*discordgo.MessageEmbed
 	for i := 0; i < data.TotalCards; i++ {
@@ -308,4 +311,39 @@ func EmbeddedCardSending(data *response.QueryResponse, channelId string, s *disc
 		fmt.Printf("error sending embeds %q", err)
 	}
 
+}
+
+func EmbeddedCardSending(data *response.CardResponse, channelId string, s *discordgo.Session) {
+	var temp discordgo.MessageEmbed
+	var x *discordgo.MessageEmbed
+
+	image := discordgo.MessageEmbedImage{
+		URL:      data.ImageUris.Png,
+		ProxyURL: "",
+		Width:    10,
+		Height:   20,
+	}
+	arrElement := discordgo.MessageEmbed{
+		URL:         data.ScryfallUri,
+		Type:        "",
+		Title:       data.Name,
+		Description: "",
+		Timestamp:   "",
+		Color:       0,
+		Footer:      nil,
+		Image:       &image,
+		Thumbnail:   nil,
+		Video:       nil,
+		Provider:    nil,
+		Author:      nil,
+		Fields:      nil,
+	}
+
+	temp = arrElement
+	x = &temp
+
+	_, err := s.ChannelMessageSendEmbed(channelId, x)
+	if err != nil {
+		fmt.Printf("error sending embed %q", err)
+	}
 }
