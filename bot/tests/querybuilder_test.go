@@ -15,8 +15,9 @@ type TestCase struct {
 	actual   bool
 }
 
-func TestQueryBuilder(t *testing.T) {
+func TestColorsQueryBuilder(t *testing.T) {
 
+	//Color testing
 	t.Run("test query Type, Color, text contains rancor", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:enchantment, text:rancor, color:g",
@@ -129,4 +130,40 @@ func TestQueryBuilder(t *testing.T) {
 	//	}
 	//})
 
+}
+
+//Tests for Power, Toughness, Loyalty, and CMC
+func TestInequalitiesQueryBuilder(t *testing.T) {
+	//t.Run("", func(t *testing.T) {
+	//	testCase := TestCase{
+	//		input:    "",
+	//		expected: "https://api.scryfall.com/cards/search?q=",
+	//	}
+	//	output, err := builder.MtgQueryBuilder(testCase.input)
+	//	if testCase.expected != output {
+	//		fmt.Println("Output:   ", output)
+	//		fmt.Println("Expected: ", testCase.expected)
+	//		t.Fail()
+	//	}
+	//	if err != nil {
+	//		t.Fail()
+	//	}
+	//})
+}
+
+func TestTypesQueryBuilder(t *testing.T) {
+}
+
+func TestIsQueryBuilder(t *testing.T) {
+}
+func TestFunctionQueryBuilder(t *testing.T) {
+}
+func TestArtQueryBuilder(t *testing.T) {
+}
+func TestRarityQueryBuilder(t *testing.T) {
+}
+func TestTextQueryBuilder(t *testing.T) {
+}
+
+func TestQueryBuilder(t *testing.T) {
 }

@@ -74,6 +74,7 @@ func MtgQueryBuilder(query string) (string, error) {
 		powerValue:     "",
 		colorValue:     "",
 		cmcValue:       "",
+		loyaltyValue:   "",
 		typeValue:      "",
 		finalValue:     QueryURL,
 	}
