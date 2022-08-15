@@ -9,14 +9,14 @@ import (
 var TypeRe = regexp.MustCompile(`type:([a-zA-Z ]+)?`)
 var ColorRe = regexp.MustCompile(`color:([rgbuw -]+)?`)
 var CmcRe = regexp.MustCompile(`cmc:(\d?=?[><]?=?\d?)?m?(=?[><]?=?\d?)?`)
-var PowerRe = regexp.MustCompile(`power:([>=<\d ]+)?`)
-var ToughnessRe = regexp.MustCompile(`toughness:([>=<\d ]+)?`)
+var PowerRe = regexp.MustCompile(`power:(\d?=?[><]?=?\d?)?p?(=?[><]?=?\d?)?`)
+var ToughnessRe = regexp.MustCompile(`toughness:(\d?=?[><]?=?\d?)?t?(=?[><]?=?\d?)?`)
 var TextRe = regexp.MustCompile(`text:([a-zA-Z' ]+)?`)
 var RarityRe = regexp.MustCompile(`rarity:([mruc ]+)?`)
 var ArtRe = regexp.MustCompile(`art:([a-zA-Z ]+)?`)
 var FunctionRe = regexp.MustCompile(`function:([a-zA-Z ]+)?`)
 var IsRe = regexp.MustCompile(`is:([a-zA-Z ]+)?`)
-var loyaltyRe = regexp.MustCompile(`loyalty:([>=<\d ]+)?`)
+var loyaltyRe = regexp.MustCompile(`loyalty:(\d?=?[><]?=?\d?)?l?(=?[><]?=?\d?)?`)
 
 var QueryURL = "https://api.scryfall.com/cards/search?q="
 
@@ -136,16 +136,17 @@ func MtgQueryBuilder(query string) (string, error) {
 		QueryObject.finalValue += QueryObject.cmcValue
 	}
 	if len(toughnessArr) > 0 {
+		fmt.Println(toughnessArr)
 		QueryObject.toughnessValue = InequalityReader(toughnessArr, "tou")
-		QueryObject.finalValue += QueryObject.toughnessValue + "+"
+		QueryObject.finalValue += QueryObject.toughnessValue
 	}
 	if len(loyaltyArr) > 0 {
 		QueryObject.loyaltyValue = InequalityReader(loyaltyArr, "loy")
-		QueryObject.finalValue += QueryObject.loyaltyValue + "+"
+		QueryObject.finalValue += QueryObject.loyaltyValue
 	}
 	if len(powerArr) > 0 {
 		QueryObject.powerValue = InequalityReader(powerArr, "pow")
-		QueryObject.finalValue += QueryObject.powerValue + "+"
+		QueryObject.finalValue += QueryObject.powerValue
 	}
 	if len(rarityArr) > 0 {
 		if strings.Contains(rarityArr[1], "c") {
@@ -180,7 +181,7 @@ func MtgQueryBuilder(query string) (string, error) {
 //regex needs to be fixed,
 //the number, if it's 2 digits throws an error
 func InequalityReader(array []string, typeOfInequality string) string {
-	inequalityRe := regexp.MustCompile(`(\d?[><]?=?\d?)?m?(\d?[><]?=?\d?)?`)
+	inequalityRe := regexp.MustCompile(`(\d?[><]?=?\d?)?[mtpl]?(\d?[><]?=?\d?)?`)
 	slicingString := ""
 	//power = 4:
 	if typeOfInequality == "pow" {
@@ -199,10 +200,11 @@ func InequalityReader(array []string, typeOfInequality string) string {
 	}
 
 	inequalityArr := inequalityRe.FindStringSubmatch(slicingString)
-
+	fmt.Println(array[0])
 	slugQuery := typeOfInequality
 	finalQuery := ""
-
+	fmt.Println(inequalityArr[0])
+	fmt.Println(inequalityArr)
 	//First check what operators are in the query/ if it's a one-sided inequality
 	//Second, act upon what operators are in the query
 	if inequalityArr[0] == inequalityArr[1] {
@@ -229,7 +231,9 @@ func InequalityReader(array []string, typeOfInequality string) string {
 		//Left inequality side number value
 		leftSideNumberValue := digitRe.FindStringSubmatch(inequalityArr[1])[0]
 		rightSideNumberValue := digitRe.FindStringSubmatch(inequalityArr[2])[0]
-
+		fmt.Println(leftSideNumberValue)
+		fmt.Println(rightSideNumberValue)
+		fmt.Println(inequalityArr)
 		if strings.Contains(inequalityArr[1], "=") {
 			if strings.Contains(inequalityArr[1], ">") {
 				finalQuery += slugQuery + "%3C%3D" + leftSideNumberValue + "+"

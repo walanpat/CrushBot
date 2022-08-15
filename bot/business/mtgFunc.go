@@ -224,7 +224,6 @@ func EmbeddedCardQuerySending(data *response.QueryResponse, channelId string, s 
 	for i := 0; i < data.TotalCards; i++ {
 		if len(data.Data[i].CardFaces) > 0 {
 
-			fmt.Println("proc ", i)
 			image := discordgo.MessageEmbedImage{
 				URL:      data.Data[i].CardFaces[0].ImageUris.Png,
 				ProxyURL: "",

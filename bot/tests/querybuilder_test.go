@@ -136,26 +136,59 @@ func TestColorsQueryBuilder(t *testing.T) {
 
 //Tests for Power, Toughness, Loyalty, and CMC
 func TestInequalitiesQueryBuilder(t *testing.T) {
-	//t.Run("", func(t *testing.T) {
-	//	testCase := TestCase{
-	//		input:    "",
-	//		expected: "https://api.scryfall.com/cards/search?q=",
-	//	}
-	//	output, err := builder.MtgQueryBuilder(testCase.input)
-	//	if testCase.expected != output {
-	//		fmt.Println("Output:   ", output)
-	//		fmt.Println("Expected: ", testCase.expected)
-	//		t.Fail()
-	//	}
-	//	if err != nil {
-	//		t.Fail()
-	//	}
-	//})
+	t.Run("1 sided inequality test toughness", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "type:vampire, toughness:<4, color:bu",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+tou%3C4+",
+			//expected: "https://api.scryfall.com/cards/search?q=",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+	t.Run("2 sided inequality test cmc", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "cmc:3<=m<6",
+			expected: "https://api.scryfall.com/cards/search?q=cmc%3E%3D3+cmc%3C6+",
+			//expected: "https://api.scryfall.com/cards/search?q=",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+
+	t.Run("test 2 sided query toughness", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "type:vampire, toughness:4<=t<6, color:bu",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+tou%3E%3D4+tou%3C6+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+
 }
 
 func TestTypesQueryBuilder(t *testing.T) {
 }
-
 func TestIsQueryBuilder(t *testing.T) {
 }
 func TestFunctionQueryBuilder(t *testing.T) {
@@ -166,6 +199,5 @@ func TestRarityQueryBuilder(t *testing.T) {
 }
 func TestTextQueryBuilder(t *testing.T) {
 }
-
 func TestQueryBuilder(t *testing.T) {
 }
