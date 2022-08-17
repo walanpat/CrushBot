@@ -385,6 +385,129 @@ func TestFunctionQueryBuilder(t *testing.T) {
 
 //testing art tag inputs
 func TestArtQueryBuilder(t *testing.T) {
+	t.Run("", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "art:squirrel, type:squirrel",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+art%3Asquirrel+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+}
+
+//testing rarity inputs
+func TestRarityQueryBuilder(t *testing.T) {
+	t.Run("Common Test", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "art:squirrel, type:squirrel, rarity:c",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Acommon++art%3Asquirrel+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+	t.Run("unCommon Test", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "art:squirrel, type:squirrel, rarity:u",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Auncommon++art%3Asquirrel+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+	t.Run("rare Test", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "art:squirrel, type:squirrel, rarity:r",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Arare++art%3Asquirrel+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+	t.Run("Mythic test", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "art:squirrel, type:squirrel, rarity:m",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Amythic++art%3Asquirrel+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+}
+
+//testing text search input
+func TestTextQueryBuilder(t *testing.T) {
+	t.Run("test text rancor", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "text:rancor",
+			expected: "https://api.scryfall.com/cards/search?q=o%3A%27rancor%27+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+}
+
+//testing query builder return statement
+func TestQueryBuilder(t *testing.T) {
+}
+
+//Testing for edge case inputs/error handling
+func TestBadInputHandling(t *testing.T) {
+	t.Run("no comma but multiple input types handling", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "type:goblin sorcery instant is:etb function:removal",
+			expected: "error: more than 2 search modifiers entered, but no comma detected",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if err.Error() != testCase.expected {
+			fmt.Println("Output:   ", err.Error())
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if output != "" {
+			fmt.Println("a response that was not an error was given")
+			t.Fail()
+		}
+
+	})
 	//t.Run("", func(t *testing.T) {
 	//	testCase := TestCase{
 	//		input:    "",
@@ -400,16 +523,19 @@ func TestArtQueryBuilder(t *testing.T) {
 	//		t.Fail()
 	//	}
 	//})
-}
-
-//testing rarity inputs
-func TestRarityQueryBuilder(t *testing.T) {
-}
-
-//testing text search input
-func TestTextQueryBuilder(t *testing.T) {
-}
-
-//testing query builder return statement
-func TestQueryBuilder(t *testing.T) {
+	//t.Run("", func(t *testing.T) {
+	//	testCase := TestCase{
+	//		input:    "",
+	//		expected: "https://api.scryfall.com/cards/search?q=",
+	//	}
+	//	output, err := builder.MtgQueryBuilder(testCase.input)
+	//	if testCase.expected != output {
+	//		fmt.Println("Output:   ", output)
+	//		fmt.Println("Expected: ", testCase.expected)
+	//		t.Fail()
+	//	}
+	//	if err != nil {
+	//		t.Fail()
+	//	}
+	//})
 }

@@ -128,8 +128,10 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 	//Build our Query
 	getUri, err := builder.MtgQueryBuilder(userQuery)
 	if err != nil {
+		_, _ = s.ChannelMessageSend(channelId, "```ansi\n"+err.Error()+"```")
 		return
 	}
+	fmt.Println(err)
 	fmt.Println(getUri)
 
 	//Send our query

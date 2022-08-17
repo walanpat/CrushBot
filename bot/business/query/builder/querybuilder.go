@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -37,18 +38,60 @@ type UrlBuilderObject struct {
 
 func MtgQueryBuilder(query string) (string, error) {
 	//Start with REGEX
-	isArr := IsRe.FindStringSubmatch(query)
-	functionArr := FunctionRe.FindStringSubmatch(query)
-	artArr := ArtRe.FindStringSubmatch(query)
-	rarityArr := RarityRe.FindStringSubmatch(query)
-	textArr := TextRe.FindStringSubmatch(query)
-	toughnessArr := ToughnessRe.FindStringSubmatch(query)
-	powerArr := PowerRe.FindStringSubmatch(query)
-	colorArr := ColorRe.FindStringSubmatch(query)
-	cmcArr := CmcRe.FindStringSubmatch(query)
-	typeArr := TypeRe.FindStringSubmatch(query)
-	loyaltyArr := loyaltyRe.FindStringSubmatch(query)
+	if len(query) < 7 {
+		err := errors.New("input is less than 7 characters in length")
+		return "", err
+	}
 
+	commaCheck := 0
+	isArr := IsRe.FindStringSubmatch(query)
+	if len(isArr) > 0 {
+		commaCheck += 1
+	}
+	functionArr := FunctionRe.FindStringSubmatch(query)
+	if len(functionArr) > 0 {
+		commaCheck += 1
+	}
+	artArr := ArtRe.FindStringSubmatch(query)
+	if len(artArr) > 0 {
+		commaCheck += 1
+	}
+	rarityArr := RarityRe.FindStringSubmatch(query)
+	if len(rarityArr) > 0 {
+		commaCheck += 1
+	}
+	textArr := TextRe.FindStringSubmatch(query)
+	if len(textArr) > 0 {
+		commaCheck += 1
+	}
+	toughnessArr := ToughnessRe.FindStringSubmatch(query)
+	if len(toughnessArr) > 0 {
+		commaCheck += 1
+	}
+	powerArr := PowerRe.FindStringSubmatch(query)
+	if len(powerArr) > 0 {
+		commaCheck += 1
+	}
+	colorArr := ColorRe.FindStringSubmatch(query)
+	if len(colorArr) > 0 {
+		commaCheck += 1
+	}
+	cmcArr := CmcRe.FindStringSubmatch(query)
+	if len(cmcArr) > 0 {
+		commaCheck += 1
+	}
+	typeArr := TypeRe.FindStringSubmatch(query)
+	if len(typeArr) > 0 {
+		commaCheck += 1
+	}
+	loyaltyArr := loyaltyRe.FindStringSubmatch(query)
+	if len(loyaltyArr) > 0 {
+		commaCheck += 1
+	}
+	if commaCheck >= 2 && !strings.Contains(query, ",") {
+		err := errors.New("error: more than 2 search modifiers entered, but no comma detected")
+		return "", err
+	}
 	//If nothing found
 	if len(typeArr) == 0 &&
 		len(functionArr) == 0 &&
