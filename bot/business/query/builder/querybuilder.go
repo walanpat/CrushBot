@@ -174,14 +174,8 @@ func MtgQueryBuilder(query string) (string, error) {
 
 }
 
-//Rework Inequality Reader.
-//things are backwards,
-//implementation does not work.
-//You're on the right track, but you need to fix it.
-//regex needs to be fixed,
-//the number, if it's 2 digits throws an error
 func InequalityReader(array []string, typeOfInequality string) string {
-	inequalityRe := regexp.MustCompile(`(\d?[><]?=?\d?)?[mtpl]?(\d?[><]?=?\d?)?`)
+	inequalityRe := regexp.MustCompile(`(\d{0,2}[><]?=?\d{0,2})?[mtpl]?(\d{0,2}[><]?=?\d{0,2})?`)
 	slicingString := ""
 	//power = 4:
 	if typeOfInequality == "pow" {
@@ -200,11 +194,11 @@ func InequalityReader(array []string, typeOfInequality string) string {
 	}
 
 	inequalityArr := inequalityRe.FindStringSubmatch(slicingString)
-	fmt.Println(array[0])
+	//fmt.Println(array[0])
 	slugQuery := typeOfInequality
 	finalQuery := ""
-	fmt.Println(inequalityArr[0])
-	fmt.Println(inequalityArr)
+	//fmt.Println(inequalityArr[0])
+	//fmt.Println(inequalityArr)
 	//First check what operators are in the query/ if it's a one-sided inequality
 	//Second, act upon what operators are in the query
 	if inequalityArr[0] == inequalityArr[1] {
@@ -231,9 +225,9 @@ func InequalityReader(array []string, typeOfInequality string) string {
 		//Left inequality side number value
 		leftSideNumberValue := digitRe.FindStringSubmatch(inequalityArr[1])[0]
 		rightSideNumberValue := digitRe.FindStringSubmatch(inequalityArr[2])[0]
-		fmt.Println(leftSideNumberValue)
-		fmt.Println(rightSideNumberValue)
-		fmt.Println(inequalityArr)
+		//fmt.Println(leftSideNumberValue)
+		//fmt.Println(rightSideNumberValue)
+		//fmt.Println(inequalityArr)
 		if strings.Contains(inequalityArr[1], "=") {
 			if strings.Contains(inequalityArr[1], ">") {
 				finalQuery += slugQuery + "%3C%3D" + leftSideNumberValue + "+"
@@ -255,21 +249,22 @@ func InequalityReader(array []string, typeOfInequality string) string {
 		if strings.Contains(inequalityArr[2], "=") {
 			// if contains >=
 			if strings.Contains(inequalityArr[2], ">") {
-				finalQuery += slugQuery + "%3E%3D" + rightSideNumberValue + "+"
+				finalQuery += slugQuery + "%3E%3D" + rightSideNumberValue
 			} else // if contains <=
 			if strings.Contains(inequalityArr[2], "<") {
-				finalQuery += slugQuery + "%3C%3D" + rightSideNumberValue + "+"
+				finalQuery += slugQuery + "%3C%3D" + rightSideNumberValue
 			} else { //if it's just =
-				finalQuery += slugQuery + "%3D" + rightSideNumberValue + "+"
+				finalQuery += slugQuery + "%3D" + rightSideNumberValue
 			}
 		} else if strings.Contains(inequalityArr[2], ">") {
 			//if it's JUST >
-			finalQuery += slugQuery + "%3E" + rightSideNumberValue + "+"
+			finalQuery += slugQuery + "%3E" + rightSideNumberValue
 		} else if strings.Contains(inequalityArr[2], "<") {
 			//if it's JUST <
-			finalQuery += slugQuery + "%3C" + rightSideNumberValue + "+"
+			finalQuery += slugQuery + "%3C" + rightSideNumberValue
 		}
 	}
-	fmt.Println(finalQuery)
+	finalQuery += "+"
+	//fmt.Println(finalQuery)
 	return finalQuery
 }

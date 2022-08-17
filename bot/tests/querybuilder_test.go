@@ -188,7 +188,7 @@ func TestInequalitiesQueryBuilder(t *testing.T) {
 	t.Run("1 sided inequality cmc", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:vampire, cmc:<=4, color:bu",
-			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+cmc%3C=4\n",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+cmc%3C=4+",
 			//expected: "https://api.scryfall.com/cards/search?q=",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
@@ -203,8 +203,8 @@ func TestInequalitiesQueryBuilder(t *testing.T) {
 	})
 	t.Run("1 sided inequality cmc <=10", func(t *testing.T) {
 		testCase := TestCase{
-			input:    "type:vampire, cmc:<=4, color:bu",
-			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+cmc%3C=4\n",
+			input:    "type:vampire, cmc:<=10, color:bu",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+cmc%3C=10+",
 			//expected: "https://api.scryfall.com/cards/search?q=",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
@@ -236,7 +236,7 @@ func TestInequalitiesQueryBuilder(t *testing.T) {
 	t.Run("1 sided inequality power", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:vampire, power:<=2, cmc:<=4, color:bu",
-			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+cmc%3C=4pow%3C=2",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+cmc%3C=4+pow%3C=2+",
 			//expected: "https://api.scryfall.com/cards/search?q=",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
@@ -252,7 +252,7 @@ func TestInequalitiesQueryBuilder(t *testing.T) {
 	t.Run("2 sided inequality power", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:vampire, power:2<=p<=3, cmc:<=4, color:bu",
-			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+cmc%3C=4pow%3E%3D2+pow%3C%3D3+",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+cmc%3C=4+pow%3E%3D2+pow%3C%3D3+",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {
@@ -332,14 +332,74 @@ func TestTypesQueryBuilder(t *testing.T) {
 
 //testing is inputs
 func TestIsQueryBuilder(t *testing.T) {
+	t.Run("is etb ", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "is:etb",
+			expected: "https://api.scryfall.com/cards/search?q=is%3Aetb+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
 }
 
 //testing functional tag inputs
 func TestFunctionQueryBuilder(t *testing.T) {
+	t.Run("function removal ", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "function:removal",
+			expected: "https://api.scryfall.com/cards/search?q=function%3Aremoval+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+	t.Run("function flyer hate ", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "function:flyer hate",
+			expected: "https://api.scryfall.com/cards/search?q=function%3Aflyer+function%3Ahate+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
 }
 
 //testing art tag inputs
 func TestArtQueryBuilder(t *testing.T) {
+	//t.Run("", func(t *testing.T) {
+	//	testCase := TestCase{
+	//		input:    "",
+	//		expected: "https://api.scryfall.com/cards/search?q=",
+	//	}
+	//	output, err := builder.MtgQueryBuilder(testCase.input)
+	//	if testCase.expected != output {
+	//		fmt.Println("Output:   ", output)
+	//		fmt.Println("Expected: ", testCase.expected)
+	//		t.Fail()
+	//	}
+	//	if err != nil {
+	//		t.Fail()
+	//	}
+	//})
 }
 
 //testing rarity inputs
