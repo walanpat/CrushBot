@@ -9,12 +9,6 @@ import (
 	"testing"
 )
 
-type TestCase struct {
-	input    string
-	expected string
-	actual   bool
-}
-
 //t.Run("", func(t *testing.T) {
 //	testCase := TestCase{
 //		input:    "",
@@ -453,6 +447,21 @@ func TestRarityQueryBuilder(t *testing.T) {
 		testCase := TestCase{
 			input:    "art:squirrel, type:squirrel, rarity:m",
 			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Amythic++art%3Asquirrel+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+	t.Run("Uncommon or Common", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "rarity:uc",
+			expected: "https://api.scryfall.com/cards/search?q=r%3Acommon+OR+r%3Auncommon+",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {

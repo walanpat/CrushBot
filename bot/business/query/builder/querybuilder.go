@@ -192,18 +192,57 @@ func MtgQueryBuilder(query string) (string, error) {
 		QueryObject.finalValue += QueryObject.powerValue
 	}
 	if len(rarityArr) > 0 {
-		if strings.Contains(rarityArr[1], "c") {
-			QueryObject.rarityValue += "r%3Acommon+"
+		if len(rarityArr[1]) > 1 {
+			for i := 0; i <= len(rarityArr[1])-1; i++ {
+				if i == len(rarityArr[1])-1 {
+					fmt.Println("proc")
+					if strings.Contains(rarityArr[1], "c") && !strings.Contains(QueryObject.rarityValue, "common") {
+						QueryObject.rarityValue += "r%3Acommon"
+					}
+					if strings.Contains(rarityArr[1], "u") && !strings.Contains(QueryObject.rarityValue, "uncommon") {
+						QueryObject.rarityValue += "r%3Auncommon"
+					}
+					if strings.Contains(rarityArr[1], "r") && !strings.Contains(QueryObject.rarityValue, "rare") {
+						QueryObject.rarityValue += "r%3Arare"
+					}
+					if strings.Contains(rarityArr[1], "m") && !strings.Contains(QueryObject.rarityValue, "mythic") {
+						QueryObject.rarityValue += "r%3Amythic"
+					}
+				} else {
+					if strings.Contains(rarityArr[1], "c") && !strings.Contains(QueryObject.rarityValue, "common") {
+						fmt.Println(i)
+						QueryObject.rarityValue += "r%3Acommon+OR+"
+						continue
+					}
+					if strings.Contains(rarityArr[1], "u") && !strings.Contains(QueryObject.rarityValue, "uncommon") {
+						QueryObject.rarityValue += "r%3Auncommon+OR+"
+						continue
+					}
+					if strings.Contains(rarityArr[1], "r") && !strings.Contains(QueryObject.rarityValue, "rare") {
+						QueryObject.rarityValue += "r%3Arare+OR+"
+						continue
+					}
+					if strings.Contains(rarityArr[1], "m") && !strings.Contains(QueryObject.rarityValue, "mythic") {
+						QueryObject.rarityValue += "r%3Amythic+OR+"
+						continue
+					}
+				}
+			}
+		} else {
+			if strings.Contains(rarityArr[1], "c") {
+				QueryObject.rarityValue += "r%3Acommon"
+			}
+			if strings.Contains(rarityArr[1], "u") {
+				QueryObject.rarityValue += "r%3Auncommon"
+			}
+			if strings.Contains(rarityArr[1], "r") {
+				QueryObject.rarityValue += "r%3Arare"
+			}
+			if strings.Contains(rarityArr[1], "m") {
+				QueryObject.rarityValue += "r%3Amythic"
+			}
 		}
-		if strings.Contains(rarityArr[1], "u") {
-			QueryObject.rarityValue += "r%3Auncommon+"
-		}
-		if strings.Contains(rarityArr[1], "r") {
-			QueryObject.rarityValue += "r%3Arare+"
-		}
-		if strings.Contains(rarityArr[1], "m") {
-			QueryObject.rarityValue += "r%3Amythic+"
-		}
+
 		QueryObject.finalValue += QueryObject.rarityValue + "+"
 	}
 	if len(artArr) > 0 {
