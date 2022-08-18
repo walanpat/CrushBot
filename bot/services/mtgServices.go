@@ -100,8 +100,7 @@ func GetQueryService(s string) (response.QueryResponse, error) {
 		fmt.Println(err)
 	}
 	if data.Object == "error" {
-		return response.QueryResponse{}, fmt.Errorf("scryfall returned an error object")
-		//_, _ = s.ChannelMessageSend(channelId, "```ansi\n ```")
+		return response.QueryResponse{}, fmt.Errorf("scryfall returned an error object, either nothing was found or there is a bad input")
 	}
 	return data, nil
 }

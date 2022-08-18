@@ -508,21 +508,7 @@ func TestBadInputHandling(t *testing.T) {
 		}
 
 	})
-	//t.Run("", func(t *testing.T) {
-	//	testCase := TestCase{
-	//		input:    "",
-	//		expected: "https://api.scryfall.com/cards/search?q=",
-	//	}
-	//	output, err := builder.MtgQueryBuilder(testCase.input)
-	//	if testCase.expected != output {
-	//		fmt.Println("Output:   ", output)
-	//		fmt.Println("Expected: ", testCase.expected)
-	//		t.Fail()
-	//	}
-	//	if err != nil {
-	//		t.Fail()
-	//	}
-	//})
+
 	//t.Run("", func(t *testing.T) {
 	//	testCase := TestCase{
 	//		input:    "",
