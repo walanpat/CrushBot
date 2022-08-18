@@ -137,7 +137,7 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 	//Send our query
 	data, err := services.GetQueryService(getUri)
 	if err != nil {
-		_, _ = s.ChannelMessageSend(channelId, "Error with query service return")
+		_, _ = s.ChannelMessageSend(channelId, err.Error())
 		return
 	}
 
