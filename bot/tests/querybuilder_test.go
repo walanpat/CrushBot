@@ -64,8 +64,8 @@ func TestColorsQueryBuilder(t *testing.T) {
 	//Tests for black and green and black&green
 	t.Run("type and 2 basic color test", func(t *testing.T) {
 		testCase := TestCase{
-			input:    "type:squirrel, color:b g",
-			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+c%3C%3Dbg+",
+			input:    "type:squirrel, color:b or g",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+%28c%3Db+or+c%3Dg%29+",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {
@@ -97,8 +97,8 @@ func TestColorsQueryBuilder(t *testing.T) {
 	//Tests for white and blue and white&blue
 	t.Run("test for multicolor query (ub || b || u)", func(t *testing.T) {
 		testCase := TestCase{
-			input:    "type:vampire, color:ub b u",
-			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3C%3Dub+",
+			input:    "type:vampire, color:ub or b or u",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+%28c%3Dub+or+c%3Db+or+c%3Du%29+",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {
@@ -151,7 +151,6 @@ func TestInequalitiesQueryBuilder(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:vampire, toughness:<4, color:bu",
 			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+tou%3C4+",
-			//expected: "https://api.scryfall.com/cards/search?q=",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {
@@ -401,7 +400,7 @@ func TestRarityQueryBuilder(t *testing.T) {
 	t.Run("Common Test", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "art:squirrel, type:squirrel, rarity:c",
-			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Acommon++art%3Asquirrel+",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Acommon+art%3Asquirrel+",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {
@@ -416,7 +415,7 @@ func TestRarityQueryBuilder(t *testing.T) {
 	t.Run("unCommon Test", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "art:squirrel, type:squirrel, rarity:u",
-			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Auncommon++art%3Asquirrel+",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Auncommon+art%3Asquirrel+",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {
@@ -431,7 +430,7 @@ func TestRarityQueryBuilder(t *testing.T) {
 	t.Run("rare Test", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "art:squirrel, type:squirrel, rarity:r",
-			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Arare++art%3Asquirrel+",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Arare+art%3Asquirrel+",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {
@@ -446,7 +445,7 @@ func TestRarityQueryBuilder(t *testing.T) {
 	t.Run("Mythic test", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "art:squirrel, type:squirrel, rarity:m",
-			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Amythic++art%3Asquirrel+",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Asquirrel+r%3Amythic+art%3Asquirrel+",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {

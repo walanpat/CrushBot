@@ -8,7 +8,7 @@ import (
 )
 
 var TypeRe = regexp.MustCompile(`type:([a-zA-Z ]+)?`)
-var ColorRe = regexp.MustCompile(`color:([rgbuw -]+)?`)
+var ColorRe = regexp.MustCompile(`color:([rgbuw -]+)+((or)*([rgbuw -]*)*)*`)
 var CmcRe = regexp.MustCompile(`cmc:(\d?=?[><]?=?\d?)?m?(=?[><]?=?\d?)?`)
 var PowerRe = regexp.MustCompile(`power:(\d?=?[><]?=?\d?)?p?(=?[><]?=?\d?)?`)
 var ToughnessRe = regexp.MustCompile(`toughness:(\d?=?[><]?=?\d?)?t?(=?[><]?=?\d?)?`)
@@ -127,30 +127,30 @@ func MtgQueryBuilder(query string) (string, error) {
 		QueryObject.finalValue += QueryObject.typeValue + "+"
 	}
 	if len(colorArr) > 0 {
-		innerColorRe := regexp.MustCompile(`([-wubrg]*)*`)
+		innerColorRe := regexp.MustCompile(`([-wubrg]*)+(or)*([-wubrg]*)*`)
+		fmt.Println(colorArr)
 		innerColorArr := innerColorRe.FindAllStringSubmatch(strings.TrimSpace(colorArr[0][6:len(colorArr[0])]), -1)
+		fmt.Println(innerColorArr)
+
 		//Handles individual color
 		if len(innerColorArr) == 1 {
 			QueryObject.finalValue += "c%3D" + innerColorArr[0][0] + "+"
 		}
-		//Handles x O
+		//Handles 2 color
 		if len(innerColorArr) == 2 {
 			if !strings.Contains(innerColorArr[0][0], "-") || !strings.Contains(innerColorArr[0][0], innerColorArr[0][1]) {
 				QueryObject.finalValue += "c%3C%3D" + innerColorArr[0][0] + innerColorArr[1][0] + "+"
-
 			}
 		}
 		if len(innerColorArr) >= 3 {
-			lastIndex := len(innerColorArr) - 1
+			QueryObject.finalValue += "%28"
 			for i, value := range innerColorArr {
-				if value[0] != innerColorArr[0][0] {
-					if strings.Contains(innerColorArr[0][0], value[0]) {
-						if i == lastIndex {
-							QueryObject.finalValue += "c%3C%3D" + innerColorArr[0][0] + "+"
-						}
-					} else {
-						break
-					}
+				if value[0] == "or" {
+					QueryObject.finalValue += "or+"
+				} else if i != len(innerColorArr)-1 {
+					QueryObject.finalValue += "c%3D" + value[0] + "+"
+				} else {
+					QueryObject.finalValue += "c%3D" + value[0] + "%29+"
 				}
 			}
 		}
@@ -167,9 +167,7 @@ func MtgQueryBuilder(query string) (string, error) {
 		QueryObject.finalValue += QueryObject.isValue + "+"
 	}
 	if len(textArr) > 0 {
-
 		QueryObject.textValue += "o%3A%27" + strings.TrimSpace(textArr[0][5:len(textArr[0])]+"%27")
-
 		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, " ", "+")
 		QueryObject.textValue += "+"
 		QueryObject.finalValue += QueryObject.textValue
@@ -193,7 +191,11 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(rarityArr) > 0 {
 		if len(rarityArr[1]) > 1 {
+			fmt.Println(rarityArr)
 			for i := 0; i <= len(rarityArr[1])-1; i++ {
+				if i == 0 {
+					QueryObject.rarityValue += "%28"
+				}
 				if i == len(rarityArr[1])-1 {
 					fmt.Println("proc")
 					if strings.Contains(rarityArr[1], "c") && !strings.Contains(QueryObject.rarityValue, "common") {
@@ -226,6 +228,9 @@ func MtgQueryBuilder(query string) (string, error) {
 						QueryObject.rarityValue += "r%3Amythic+OR+"
 						continue
 					}
+				}
+				if i == len(rarityArr[1])-1 {
+					QueryObject.rarityValue += "%29"
 				}
 			}
 		} else {
