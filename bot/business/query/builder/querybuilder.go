@@ -127,7 +127,7 @@ func MtgQueryBuilder(query string) (string, error) {
 		QueryObject.finalValue += QueryObject.typeValue + "+"
 	}
 	if len(colorArr) > 0 {
-		innerColorRe := regexp.MustCompile(`([-wubrg]*)+(or)*([-wubrg]*)*`)
+		innerColorRe := regexp.MustCompile(`([-wubrgc]*)+(or)*([-wubrgc]*)*`)
 		fmt.Println(colorArr)
 		innerColorArr := innerColorRe.FindAllStringSubmatch(strings.TrimSpace(colorArr[0][6:len(colorArr[0])]), -1)
 		fmt.Println(innerColorArr)
@@ -142,6 +142,7 @@ func MtgQueryBuilder(query string) (string, error) {
 				QueryObject.finalValue += "c%3C%3D" + innerColorArr[0][0] + innerColorArr[1][0] + "+"
 			}
 		}
+		//Handles 3 or more
 		if len(innerColorArr) >= 3 {
 			QueryObject.finalValue += "%28"
 			for i, value := range innerColorArr {

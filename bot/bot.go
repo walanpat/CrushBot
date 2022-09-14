@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"goland-discord-bot/bot/business"
+	"goland-discord-bot/bot/business/dicerolling"
 	"goland-discord-bot/config"
 	"math/rand"
 	"regexp"
@@ -223,7 +224,16 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		message += "\n```"
 		_, _ = s.ChannelMessageSend(m.ChannelID, message)
 	}
+	if strings.Contains(m.Content, "!5e stats") {
+		message, err := dicerolling.FiveEStats()
+		if err != nil {
+			_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
 
+			return
+		}
+		_, _ = s.ChannelMessageSend(m.ChannelID, message)
+
+	}
 	//Mtg Code
 	if strings.Contains(m.Content, "!c") {
 		if m.Content[0:3] != "!c " {
