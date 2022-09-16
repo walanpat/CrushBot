@@ -6,12 +6,12 @@ import (
 	"testing"
 )
 
-//Number generation test
-func FiveECharacterCreation(t *testing.T) {
+//Testing random number generation
+func TestFiveEStatCreation(t *testing.T) {
 	t.Run("Returns sorted", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "",
-			expected: "eh",
+			expected: "",
 		}
 		output, err := dicerolling.FiveEStats()
 		fmt.Println(output)
