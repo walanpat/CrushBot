@@ -140,21 +140,35 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 		_, _ = s.ChannelMessageSend(channelId, err.Error())
 		return
 	}
+	if data.TotalCards > 30 {
+		arrElement := discordgo.MessageEmbed{
+			URL:         "https://scryfall.com/search?q=" + getUri[40:],
+			Type:        "",
+			Title:       "That's a lot of cards\n Here's the scryfall link instead:",
+			Description: "",
+			Timestamp:   "",
+			Color:       0,
+			Footer:      nil,
+			Image:       nil,
+			Thumbnail:   nil,
+			Video:       nil,
+			Provider:    nil,
+			Author:      nil,
+			Fields:      nil,
+		}
+		temp := arrElement
+		x := &temp
 
-	EmbeddedCardQuerySending(&data, channelId, s)
-	//ExtendedMessageSending(&data, channelId, s)
-	return
-	//Handle our query
-	//message := ""
-	//for i := 0; i < len(data.Data); i++ {
-	//	coloridentityprint := ""
-	//
-	//	for j := 0; j < len(data.Data[i].ColorIdentity); j++ {
-	//		coloridentityprint += data.Data[i].ColorIdentity[j]
-	//	}
-	//	message += data.Data[i].Name + " " + strconv.Itoa(int(data.Data[i].Cmc)) + " " + coloridentityprint + " " + data.Data[i].ImageUris.Png + "\n"
-	//}
-	//_, _ = s.ChannelMessageSend(channelId, message)
+		_, err := s.ChannelMessageSendEmbed(channelId, x)
+		if err != nil {
+			fmt.Printf("error sending embed %q", err)
+		}
+
+		return
+	} else {
+		EmbeddedCardQuerySending(&data, channelId, s)
+		return
+	}
 
 }
 

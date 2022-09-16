@@ -108,7 +108,7 @@ func DiceRollGeneric(m *discordgo.MessageCreate) (string, error) {
 			for j := 0; j < numbOfRoll; j++ {
 				//This has to be diceToBeRolled +1 because rand.intn uses [0,n) noninclusive n.
 				if diceToBeRolled == 0 {
-					return "Dice cannot be 0 sided.", nil
+					return "```ansi\nDice cannot be 0 sided.```", nil
 				}
 				rollValueInt := rand.Intn(diceToBeRolled) + 1
 				rollValueStr := strconv.Itoa(rollValueInt)

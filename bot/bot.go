@@ -54,6 +54,7 @@ func Start() {
 
 //Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+
 	//Allows us a "time buffer" so that we don't react too fast to our own card search
 	if m.Author.ID == Id && len(m.Reactions) == 0 && m.Content == "" {
 		cachedCardTimer := time.NewTimer(5 * time.Millisecond)
@@ -67,14 +68,17 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4B5")
 
 	}
+
 	//Bot mustn't reply to its own messages , to confirm it we perform this check.
 	if m.Author.ID == Id {
 		return
 	}
+
 	//If we message ping to our bot in our discord it will return us pong .
 	if m.Content == "ping" {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
 	}
+
 	//Dice Rolling Code
 	if strings.Contains(m.Content, "!roll") {
 		message, err := dicerolling.DiceRollGeneric(m)
@@ -85,6 +89,8 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			_, _ = s.ChannelMessageSend(m.ChannelID, message)
 		}
 	}
+
+	//Rolls 6 different 5e stats, drops the lowest.
 	if strings.Contains(m.Content, "!5e stats") {
 		message, err := dicerolling.FiveEStats()
 		if err != nil {
@@ -93,7 +99,8 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		_, _ = s.ChannelMessageSend(m.ChannelID, message)
 	}
-	//Mtg Code
+
+	//Mtg card request Code
 	if strings.Contains(m.Content, "!c") {
 		if m.Content[0:3] != "!c " {
 			return
@@ -107,12 +114,14 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		mtgPriceMessageFlag = false
 	}
 
+	//Mtg card query request code
 	if strings.Contains(m.Content, "!q") && m.Author.ID != Id {
 		if len(m.Content) > 4 {
 			business.GetQuery(m.Content, m.ChannelID, s)
 		}
 	}
 
+	//Encode testing code
 	if strings.Contains(m.Content, "!encode") {
 		y := discordgo.MessageEmbed{
 			URL:         "https://www.youtube.com/",
