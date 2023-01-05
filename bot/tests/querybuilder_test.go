@@ -457,10 +457,86 @@ func TestRarityQueryBuilder(t *testing.T) {
 			t.Fail()
 		}
 	})
-	t.Run("Uncommon or Common", func(t *testing.T) {
+	t.Run("Simplified uncommon or common Test", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "rarity:uc",
-			expected: "https://api.scryfall.com/cards/search?q=r%3Acommon+OR+r%3Auncommon+",
+			expected: "https://api.scryfall.com/cards/search?q=%28r%3Auncommon+OR+r%3Acommon%29+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+
+	t.Run("Simplified uncommon or common or rare Test", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "rarity:ucr",
+			expected: "https://api.scryfall.com/cards/search?q=%28r%3Auncommon+OR+r%3Acommon+OR+r%3Arare%29+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+	t.Run("Simplified uncommon or common or rare or mythic Test", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "rarity:ucrm",
+			expected: "https://api.scryfall.com/cards/search?q=%28r%3Auncommon+OR+r%3Acommon+OR+r%3Arare+OR+r%3Amythic%29+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+	t.Run("Uncommon or Common Test", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "rarity:u or c",
+			expected: "https://api.scryfall.com/cards/search?q=%28r%3Auncommon+OR+r%3Acommon%29+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+	t.Run("Uncommon or Common or Mythic Test", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "rarity:u or c or m",
+			expected: "https://api.scryfall.com/cards/search?q=%28r%3Auncommon+OR+r%3Acommon+OR+r%3Amythic%29+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+	t.Run("Uncommon or Common or Mythic or Rare Test", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "rarity:u or c or m or r",
+			expected: "https://api.scryfall.com/cards/search?q=%28r%3Auncommon+OR+r%3Acommon+OR+r%3Amythic+OR+r%3Arare%29+",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {

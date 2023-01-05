@@ -192,42 +192,39 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(rarityArr) > 0 {
 		if len(rarityArr[1]) > 1 {
-			fmt.Println(rarityArr[1])
+			rarityArr[1] = strings.TrimSpace(rarityArr[1])
+			//fmt.Println(rarityArr[1])
+			//fmt.Println(rarityArr)
+
 			for i := 0; i <= len(rarityArr[1])-1; i++ {
 				if i == 0 {
 					QueryObject.rarityValue += "%28"
 				}
-				if i == len(rarityArr[1]) {
-					fmt.Println("proc")
-					if strings.Contains(rarityArr[1], "c") && !strings.Contains(QueryObject.rarityValue, "common") {
+				if i == len(rarityArr[1])-1 {
+					if rarityArr[1][i] == 'c' && !strings.Contains(QueryObject.rarityValue, "r%3Acommon") {
 						QueryObject.rarityValue += "r%3Acommon"
 					}
-					if strings.Contains(rarityArr[1], "u") && !strings.Contains(QueryObject.rarityValue, "uncommon") {
+					if rarityArr[1][i] == 'u' && !strings.Contains(QueryObject.rarityValue, "uncommon") {
 						QueryObject.rarityValue += "r%3Auncommon"
 					}
-					if strings.Contains(rarityArr[1], "r") && !strings.Contains(QueryObject.rarityValue, "rare") {
+					if rarityArr[1][i] == 'r' && rarityArr[1][i-1] != 'o' && !strings.Contains(QueryObject.rarityValue, "rare") {
 						QueryObject.rarityValue += "r%3Arare"
 					}
-					if strings.Contains(rarityArr[1], "m") && !strings.Contains(QueryObject.rarityValue, "mythic") {
+					if rarityArr[1][i] == 'm' && !strings.Contains(QueryObject.rarityValue, "mythic") {
 						QueryObject.rarityValue += "r%3Amythic"
 					}
 				} else {
-					if strings.Contains(rarityArr[1], "c") && !strings.Contains(QueryObject.rarityValue, "common") {
-						fmt.Println(i)
+					if rarityArr[1][i] == 'c' {
 						QueryObject.rarityValue += "r%3Acommon+OR+"
-						continue
 					}
-					if strings.Contains(rarityArr[1], "u") && !strings.Contains(QueryObject.rarityValue, "uncommon") {
+					if rarityArr[1][i] == 'u' {
 						QueryObject.rarityValue += "r%3Auncommon+OR+"
-						continue
 					}
-					if strings.Contains(rarityArr[1], " r ") && !strings.Contains(QueryObject.rarityValue, "rare") {
+					if rarityArr[1][i] == 'r' && rarityArr[1][i-1] != 'o' {
 						QueryObject.rarityValue += "r%3Arare+OR+"
-						continue
 					}
-					if strings.Contains(rarityArr[1], "m") && !strings.Contains(QueryObject.rarityValue, "mythic") {
+					if rarityArr[1][i] == 'm' {
 						QueryObject.rarityValue += "r%3Amythic+OR+"
-						continue
 					}
 				}
 				if i == len(rarityArr[1])-1 {
