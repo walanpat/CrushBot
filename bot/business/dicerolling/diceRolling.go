@@ -19,11 +19,11 @@ func FiveEStats() (string, error) {
 
 	for i := 0; i <= 5; i++ {
 		extraMessage = ""
-		s1 := rand.NewSource(time.Now().UnixNano())
-		r1 := rand.New(s1)
 		for j := 0; j < 4; j++ {
 			cachedCardTimer := time.NewTimer(1 * time.Millisecond)
 			<-cachedCardTimer.C
+			s1 := rand.NewSource(time.Now().UnixNano())
+			r1 := rand.New(s1)
 			var bytes int
 			for z := 0; z < 10; z++ {
 				bytes = r1.Intn(6) + 1
@@ -67,7 +67,7 @@ func FiveEStats() (string, error) {
 		for j := 0; j < 6; j++ {
 			x, err := strconv.Atoi(messageHolder[j][len(messageHolder[j])-3 : len(messageHolder[j])-1])
 			if err != nil {
-				fmt.Errorf("error detected on str conversion: %e", err)
+				_ = fmt.Errorf("error detected on str conversion: %e", err)
 			}
 			if x == 0 {
 				x, err = strconv.Atoi(messageHolder[j][len(messageHolder[j])-2 : len(messageHolder[j])-1])
