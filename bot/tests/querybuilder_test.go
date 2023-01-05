@@ -318,6 +318,36 @@ func TestTypesQueryBuilder(t *testing.T) {
 			t.Fail()
 		}
 	})
+	t.Run("testing for egg or ooze mutant", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "type:egg or ooze mutant",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Aegg+OR+t%3Aooze+t%3Amutant+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+	t.Run("testing for egg artifact or ooze mutant or Phelddagrif", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "type:egg artifact or ooze mutant or Phelddagrif ",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Aegg+t%3Aartifact+OR+t%3Aooze+t%3Amutant+OR+t%3APhelddagrif+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
 }
 
 //testing is inputs

@@ -123,6 +123,7 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(typeArr) > 0 {
 		QueryObject.typeValue += "t%3A" + strings.TrimSpace(typeArr[0][5:len(typeArr[0])])
+		QueryObject.typeValue = strings.ReplaceAll(QueryObject.typeValue, " or ", "+OR ")
 		QueryObject.typeValue = strings.ReplaceAll(QueryObject.typeValue, " ", "+t%3A")
 		QueryObject.finalValue += QueryObject.typeValue + "+"
 	}
