@@ -13,7 +13,7 @@ var CmcRe = regexp.MustCompile(`cmc:(\d?=?[><]?=?\d?)?m?(=?[><]?=?\d?)?`)
 var PowerRe = regexp.MustCompile(`power:(\d?=?[><]?=?\d?)?p?(=?[><]?=?\d?)?`)
 var ToughnessRe = regexp.MustCompile(`toughness:(\d?=?[><]?=?\d?)?t?(=?[><]?=?\d?)?`)
 var TextRe = regexp.MustCompile(`text:([a-zA-Z' ]+)?`)
-var RarityRe = regexp.MustCompile(`rarity:([mruc ]+)?`)
+var RarityRe = regexp.MustCompile(`rarity:(([mruc ]+)?((or)*([mruc ]+)?)*)*`)
 var ArtRe = regexp.MustCompile(`art:([a-zA-Z ]+)?`)
 var FunctionRe = regexp.MustCompile(`function:([a-zA-Z ]+)?`)
 var IsRe = regexp.MustCompile(`is:([a-zA-Z ]+)?`)
@@ -192,12 +192,12 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(rarityArr) > 0 {
 		if len(rarityArr[1]) > 1 {
-			fmt.Println(rarityArr)
+			fmt.Println(rarityArr[1])
 			for i := 0; i <= len(rarityArr[1])-1; i++ {
 				if i == 0 {
 					QueryObject.rarityValue += "%28"
 				}
-				if i == len(rarityArr[1])-1 {
+				if i == len(rarityArr[1]) {
 					fmt.Println("proc")
 					if strings.Contains(rarityArr[1], "c") && !strings.Contains(QueryObject.rarityValue, "common") {
 						QueryObject.rarityValue += "r%3Acommon"
@@ -221,7 +221,7 @@ func MtgQueryBuilder(query string) (string, error) {
 						QueryObject.rarityValue += "r%3Auncommon+OR+"
 						continue
 					}
-					if strings.Contains(rarityArr[1], "r") && !strings.Contains(QueryObject.rarityValue, "rare") {
+					if strings.Contains(rarityArr[1], " r ") && !strings.Contains(QueryObject.rarityValue, "rare") {
 						QueryObject.rarityValue += "r%3Arare+OR+"
 						continue
 					}
