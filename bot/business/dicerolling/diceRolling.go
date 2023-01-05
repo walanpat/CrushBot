@@ -67,7 +67,8 @@ func FiveEStats() (string, error) {
 		for j := 0; j < 6; j++ {
 			x, err := strconv.Atoi(messageHolder[j][len(messageHolder[j])-3 : len(messageHolder[j])-1])
 			if err != nil {
-				_ = fmt.Errorf("error detected on str conversion: %e", err)
+				oof := fmt.Errorf("error detected on str conversion: %e", err)
+				return oof.Error(), oof
 			}
 			if x == 0 {
 				x, err = strconv.Atoi(messageHolder[j][len(messageHolder[j])-2 : len(messageHolder[j])-1])
