@@ -38,9 +38,9 @@ type UrlBuilderObject struct {
 
 func MtgQueryBuilder(query string) (string, error) {
 	//Start with REGEX
-	if len(query) < 7 {
+	if len(query) < 5 {
 		err := errors.New("input is less than 7 characters in length")
-		return "", err
+		return "Not a logn enough query", err
 	}
 
 	commaCheck := 0

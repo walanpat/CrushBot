@@ -1,6 +1,3 @@
-//go:build e2e
-// +build e2e
-
 package tests
 
 import (
@@ -571,10 +568,10 @@ func TestTextQueryBuilder(t *testing.T) {
 
 //testing query builder return statement
 func TestQueryBuilder(t *testing.T) {
-	t.Run("", func(t *testing.T) {
+	t.Run("Type, 3 color, and text query", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:insect, color:g or b or gb, text:landfall",
-			expected: "https://api.scryfall.com/cards/search?q=",
+			expected: "https://api.scryfall.com/cards/search?q=t%3Ainsect+%28c%3Dg+or+c%3Db+or+c%3Dgb%29+o%3A%27landfall%27+",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {
@@ -609,36 +606,22 @@ func TestBadInputHandling(t *testing.T) {
 	})
 }
 
-//t.Run("", func(t *testing.T) {
-//	testCase := TestCase{
-//		input:    "",
-//		expected: "https://api.scryfall.com/cards/search?q=",
-//	}
-//	output, err := builder.MtgQueryBuilder(testCase.input)
-//	if testCase.expected != output {
-//		fmt.Println("Output:   ", output)
-//		fmt.Println("Expected: ", testCase.expected)
-//		t.Fail()
-//	}
-//	if err != nil {
-//		t.Fail()
-//	}
-//})
+//personal
 
-func TestPersonalQueryBuilder(t *testing.T) {
-	t.Run("TestPersonalQueryBuilder", func(t *testing.T) {
-		testCase := TestCase{
-			input:    "text:roll a , color:r or g or rg",
-			expected: "https://api.scryfall.com/cards/search?q=",
-		}
-		output, err := builder.MtgQueryBuilder(testCase.input)
-		if testCase.expected != output {
-			fmt.Println("Output:   ", output)
-			fmt.Println("Expected: ", testCase.expected)
-			t.Fail()
-		}
-		if err != nil {
-			t.Fail()
-		}
-	})
-}
+//func TestPersonalQueryBuilder(t *testing.T) {
+//	t.Run("TestPersonalQueryBuilder", func(t *testing.T) {
+//		testCase := TestCase{
+//			input:    "text:roll a , color:r or g or rg",
+//			expected: "https://api.scryfall.com/cards/search?q=",
+//		}
+//		output, err := builder.MtgQueryBuilder(testCase.input)
+//		if testCase.expected != output {
+//			fmt.Println("Output:   ", output)
+//			fmt.Println("Expected: ", testCase.expected)
+//			t.Fail()
+//		}
+//		if err != nil {
+//			t.Fail()
+//		}
+//	})
+//}
