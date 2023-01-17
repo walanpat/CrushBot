@@ -636,6 +636,25 @@ func TestBadInputHandling(t *testing.T) {
 	})
 }
 
+//Testing for "OR" statement
+func TestORInput(t *testing.T) {
+	t.Run("Testing the || operator ", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "text:Sacrifice Rat in the ||Cosmos Serpent",
+			expected: "https://api.scryfall.com/cards/search?q=o%3A%27Sacrifice+Rat+in+the+%27+OR+o%3A%27Cosmos+Serpent%27+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+}
+
 //personal
 
 //func TestPersonalQueryBuilder(t *testing.T) {
