@@ -84,7 +84,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		message, err := dicerolling.DiceRollGeneric(m)
 		if err != nil {
 			_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
-
 		} else {
 			_, _ = s.ChannelMessageSend(m.ChannelID, message)
 		}
@@ -170,8 +169,13 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 	//Code for getting the ruling
 	if decode == 128218 && length == 4 && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
-		business.GetRuling(m.ChannelID, s)
-		mtgRulesMessageFlag = true
+		err := business.GetRuling(m.ChannelID, s)
+		if err != nil {
+			_, _ = s.ChannelMessageSend(m.ChannelID, "Error getting rulings.")
+			return
+		} else {
+			mtgRulesMessageFlag = true
+		}
 	}
 	//Code for getting sets
 	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id && mtgSetMessageFlag == false {
