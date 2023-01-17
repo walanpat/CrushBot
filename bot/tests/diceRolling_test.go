@@ -113,17 +113,12 @@ func TestDiceRollingWithMods(t *testing.T) {
 		testMessageCreate := discordgo.MessageCreate{Message: &testMessage}
 		//Function Call
 		output, err := dicerolling.DiceRollGeneric(&testMessageCreate)
-		fmt.Println(output)
 
 		if output[46:46+len(timesRolledString)] != timesRolledString {
 			t.Fail()
-		} else {
-			fmt.Println("Times Rolled is Correct")
 		}
 		if output[48:48+len(amountOfSidesString)] != amountOfSidesString {
 			t.Fail()
-		} else {
-			fmt.Println("Amount of Sides is Correct")
 		}
 
 		totalModOutput, err := strconv.Atoi(output[96:98])
@@ -132,11 +127,7 @@ func TestDiceRollingWithMods(t *testing.T) {
 		}
 		if totalModInt != totalModOutput {
 			t.Fail()
-		} else {
-			fmt.Println("Total modifier output is correct")
 		}
-
-		//fmt.Println(output[96:98])
 
 		//Check the value generated
 		for i := 1; i <= len(amountOfSidesString); i++ {
