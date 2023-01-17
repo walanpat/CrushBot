@@ -640,8 +640,8 @@ func TestBadInputHandling(t *testing.T) {
 func TestORInput(t *testing.T) {
 	t.Run("Testing the || operator ", func(t *testing.T) {
 		testCase := TestCase{
-			input:    "text:Sacrifice Rat in the ||Cosmos Serpent",
-			expected: "https://api.scryfall.com/cards/search?q=o%3A%27Sacrifice+Rat+in+the+%27+OR+o%3A%27Cosmos+Serpent%27+",
+			input:    "text:Sacrifice Rat in the | Cosmos Serpent| You may cast Brokkos,",
+			expected: "https://api.scryfall.com/cards/search?q=o%3A%27Sacrifice+Rat+in+the%27+OR+o%3A%27Cosmos+Serpent%27+OR+o%3A%27You+may+cast+Brokkos%27+",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {

@@ -14,7 +14,7 @@ var PowerRe = regexp.MustCompile(`power:(\d?=?[><]?=?\d?)?p?(=?[><]?=?\d?)?`)
 var ToughnessRe = regexp.MustCompile(`toughness:(\d?=?[><]?=?\d?)?t?(=?[><]?=?\d?)?`)
 
 //var TextRe = regexp.MustCompile(`text:([a-zA-Z' ]+)?`)
-var TextRe = regexp.MustCompile(`text:([a-zA-Z' ]+)?([|][|]){0,2}([a-zA-Z' ]+)?`)
+var TextRe = regexp.MustCompile(`text:([a-zA-Z' ]+)?([|]([a-zA-Z' ]+)?)*`)
 
 var RarityRe = regexp.MustCompile(`rarity:(([mruc ]+)?((or)*([mruc ]+)?)*)*`)
 var ArtRe = regexp.MustCompile(`art:([a-zA-Z ]+)?`)
@@ -173,10 +173,14 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(textArr) > 0 {
 		QueryObject.textValue += "o%3A%27" + strings.TrimSpace(textArr[0][5:len(textArr[0])]+"%27")
+		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, " | ", "%27+OR+o%3A%27")
+		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, "| ", "%27+OR+o%3A%27")
+		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, " |", "%27+OR+o%3A%27")
+		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, "|", "%27+OR+o%3A%27")
 		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, " ", "+")
 		QueryObject.textValue += "+"
-		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, "||", "%27+OR+o%3A%27")
 		QueryObject.finalValue += QueryObject.textValue
+
 	}
 	if len(cmcArr) > 0 {
 		QueryObject.cmcValue = InequalityReader(cmcArr, "cmc")
