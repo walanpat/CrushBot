@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -65,9 +66,10 @@ func FiveEStats() (string, error) {
 
 	for i := 5; i >= 0; i-- {
 		for j := 0; j < 6; j++ {
-			x, err := strconv.Atoi(messageHolder[j][len(messageHolder[j])-3 : len(messageHolder[j])-1])
+			x, err := strconv.Atoi(strings.TrimSpace(messageHolder[j][len(messageHolder[j])-3 : len(messageHolder[j])-1]))
 			if err != nil {
 				oof := fmt.Errorf("error detected on str conversion: %e", err)
+				fmt.Println(oof)
 				return oof.Error(), oof
 			}
 			if x == 0 {

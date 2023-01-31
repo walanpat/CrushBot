@@ -162,6 +162,10 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	}
 
+	//if m.Content[0:6] == "!play " {
+	//
+	//}
+
 }
 
 func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
