@@ -113,6 +113,13 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		mtgPriceMessageFlag = false
 	}
 
+	if strings.Contains(m.Content, "[") || strings.Contains(m.Content, "]") {
+		cardName := strings.TrimLeft(strings.TrimRight(m.Content, "["), "]")
+		business.GetCard(cardName, m.ChannelID, s)
+		mtgRulesMessageFlag = false
+		mtgSetMessageFlag = false
+		mtgPriceMessageFlag = false
+	}
 	//Mtg card query request code
 	if strings.Contains(m.Content, "!q") && m.Author.ID != Id {
 		if len(m.Content) > 4 {
