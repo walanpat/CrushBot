@@ -114,7 +114,9 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if strings.Contains(m.Content, "[") || strings.Contains(m.Content, "]") {
-		cardName := strings.TrimLeft(strings.TrimRight(m.Content, "["), "]")
+		cardName := strings.TrimLeft(strings.TrimRight(m.Content, "]"), "[")
+		cardName = strings.ReplaceAll(cardName, " ", "+")
+
 		business.GetCard(cardName, m.ChannelID, s)
 		mtgRulesMessageFlag = false
 		mtgSetMessageFlag = false
