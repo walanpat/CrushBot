@@ -236,3 +236,22 @@ func DiceRollGeneric(m *discordgo.MessageCreate) (string, error) {
 	message += "\n```"
 	return message, nil
 }
+
+// DiceRollBasic returns arr of dice rolled in int, then string, then returns total in int and string
+func DiceRollBasic(sidedDice int, timesRolled int) ([]int, []string, int, string) {
+	var IntArr []int
+	var StrArr []string
+	var sum int
+	for j := 0; j < timesRolled; j++ {
+		//This has to be diceToBeRolled +1 because rand.intn uses [0,n) noninclusive n.
+		if sidedDice == 0 {
+			return nil, nil, 0, ""
+		}
+		x := rand.Intn(sidedDice) + 1
+		IntArr = append(IntArr, x)
+		StrArr = append(StrArr, strconv.Itoa(x))
+		sum += x
+	}
+
+	return nil, nil, 0, ""
+}

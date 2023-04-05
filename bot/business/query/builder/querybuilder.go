@@ -8,15 +8,15 @@ import (
 )
 
 var TypeRe = regexp.MustCompile(`type:([a-zA-Z ]+)?`)
-var ColorRe = regexp.MustCompile(`color:([rgbuw -]+)+((or)*([rgbuw -]*)*)*`)
+var ColorRe = regexp.MustCompile(`color:([rgbuw -]+)+(([|])*([rgbuw -]*)*)*`)
 var CmcRe = regexp.MustCompile(`cmc:(\d?=?[><]?=?\d?)?m?(=?[><]?=?\d?)?`)
 var PowerRe = regexp.MustCompile(`power:(\d?=?[><]?=?\d?)?p?(=?[><]?=?\d?)?`)
 var ToughnessRe = regexp.MustCompile(`toughness:(\d?=?[><]?=?\d?)?t?(=?[><]?=?\d?)?`)
 
 //var TextRe = regexp.MustCompile(`text:([a-zA-Z' ]+)?`)
-var TextRe = regexp.MustCompile(`text:([a-zA-Z' ]+)?([|]([a-zA-Z' ]+)?)*`)
+var TextRe = regexp.MustCompile(`text:([-\da-zA-Z' ]+)?([|]([-\da-zA-Z' ]+)?)*`)
 
-var RarityRe = regexp.MustCompile(`rarity:(([mruc ]+)?((or)*([mruc ]+)?)*)*`)
+var RarityRe = regexp.MustCompile(`rarity:(([mruc ]+)?(([|])*([mruc ]+)?)*)*`)
 var ArtRe = regexp.MustCompile(`art:([a-zA-Z ]+)?`)
 var FunctionRe = regexp.MustCompile(`function:([a-zA-Z ]+)?`)
 var IsRe = regexp.MustCompile(`is:([a-zA-Z ]+)?`)
@@ -126,12 +126,11 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(typeArr) > 0 {
 		QueryObject.typeValue += "t%3A" + strings.TrimSpace(typeArr[0][5:len(typeArr[0])])
-		QueryObject.typeValue = strings.ReplaceAll(QueryObject.typeValue, " or ", "+OR ")
-		QueryObject.typeValue = strings.ReplaceAll(QueryObject.typeValue, " ", "+t%3A")
+		QueryObject.typeValue = orSearchFormatting(QueryObject.typeValue)
 		QueryObject.finalValue += QueryObject.typeValue + "+"
 	}
 	if len(colorArr) > 0 {
-		innerColorRe := regexp.MustCompile(`([-wubrgc]*)+(or)*([-wubrgc]*)*`)
+		innerColorRe := regexp.MustCompile(`([-wubrgc]*)+([|])*([-wubrgc]*)*`)
 		fmt.Println(colorArr)
 		innerColorArr := innerColorRe.FindAllStringSubmatch(strings.TrimSpace(colorArr[0][6:len(colorArr[0])]), -1)
 		fmt.Println(innerColorArr)
@@ -150,7 +149,7 @@ func MtgQueryBuilder(query string) (string, error) {
 		if len(innerColorArr) >= 3 {
 			QueryObject.finalValue += "%28"
 			for i, value := range innerColorArr {
-				if value[0] == "or" {
+				if value[0] == "|" {
 					QueryObject.finalValue += "or+"
 				} else if i != len(innerColorArr)-1 {
 					QueryObject.finalValue += "c%3D" + value[0] + "+"
@@ -173,11 +172,7 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(textArr) > 0 {
 		QueryObject.textValue += "o%3A%27" + strings.TrimSpace(textArr[0][5:len(textArr[0])]+"%27")
-		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, " | ", "%27+OR+o%3A%27")
-		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, "| ", "%27+OR+o%3A%27")
-		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, " |", "%27+OR+o%3A%27")
-		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, "|", "%27+OR+o%3A%27")
-		QueryObject.textValue = strings.ReplaceAll(QueryObject.textValue, " ", "+")
+		QueryObject.textValue = orSearchFormatting(QueryObject.textValue)
 		QueryObject.textValue += "+"
 		QueryObject.finalValue += QueryObject.textValue
 
@@ -202,7 +197,7 @@ func MtgQueryBuilder(query string) (string, error) {
 	if len(rarityArr) > 0 {
 		if len(rarityArr[1]) > 1 {
 			rarityArr[1] = strings.TrimSpace(rarityArr[1])
-			//fmt.Println(rarityArr[1])
+			fmt.Println(rarityArr[1])
 			//fmt.Println(rarityArr)
 
 			for i := 0; i <= len(rarityArr[1])-1; i++ {
@@ -210,6 +205,7 @@ func MtgQueryBuilder(query string) (string, error) {
 					QueryObject.rarityValue += "%28"
 				}
 				if i == len(rarityArr[1])-1 {
+					fmt.Println(rarityArr)
 					if rarityArr[1][i] == 'c' && !strings.Contains(QueryObject.rarityValue, "r%3Acommon") {
 						QueryObject.rarityValue += "r%3Acommon"
 					}
@@ -229,7 +225,7 @@ func MtgQueryBuilder(query string) (string, error) {
 					if rarityArr[1][i] == 'u' {
 						QueryObject.rarityValue += "r%3Auncommon+OR+"
 					}
-					if rarityArr[1][i] == 'r' && rarityArr[1][i-1] != 'o' {
+					if rarityArr[1][i] == 'r' {
 						QueryObject.rarityValue += "r%3Arare+OR+"
 					}
 					if rarityArr[1][i] == 'm' {
@@ -361,4 +357,13 @@ func InequalityReader(array []string, typeOfInequality string) string {
 	finalQuery += "+"
 	//fmt.Println(finalQuery)
 	return finalQuery
+}
+
+func orSearchFormatting(str string) string {
+	str = strings.ReplaceAll(str, " | ", "%27+OR+o%3A%27")
+	str = strings.ReplaceAll(str, "| ", "%27+OR+o%3A%27")
+	str = strings.ReplaceAll(str, " |", "%27+OR+o%3A%27")
+	str = strings.ReplaceAll(str, "|", "%27+OR+o%3A%27")
+	str = strings.ReplaceAll(str, " ", "+")
+	return str
 }

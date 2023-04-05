@@ -17,6 +17,10 @@ var RulingUri string
 var SetCodeUri string
 var Price response.PriceObj
 
+const (
+	notFoundError = "Scryfall could not find what you searched for."
+)
+
 func GetCard(cardName string, channelId string, s *discordgo.Session) {
 	//Get card Service Request
 	data, err := services.GetCardService(cardName)
@@ -137,6 +141,10 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 	//Send our query
 	data, err := services.GetQueryService(getUri)
 	if err != nil {
+		if err.Error() == "scryfall returned an error object, either nothing was found or there is a bad input" {
+			_, _ = s.ChannelMessageSend(channelId, notFoundError)
+			return
+		}
 		_, _ = s.ChannelMessageSend(channelId, err.Error())
 		return
 	}
