@@ -8,7 +8,7 @@ import (
 )
 
 var TypeRe = regexp.MustCompile(`type:([a-zA-Z ]+)?`)
-var ColorRe = regexp.MustCompile(`color:([rgbuw -]+)+(([|])*([rgbuw -]*)*)*`)
+var ColorRe = regexp.MustCompile(`color:([rgbuwc -]+)+(([|])*([rgbuwc -]*)*)*`)
 var CmcRe = regexp.MustCompile(`cmc:(\d?=?[><]?=?\d?)?m?(=?[><]?=?\d?)?`)
 var PowerRe = regexp.MustCompile(`power:(\d?=?[><]?=?\d?)?p?(=?[><]?=?\d?)?`)
 var ToughnessRe = regexp.MustCompile(`toughness:(\d?=?[><]?=?\d?)?t?(=?[><]?=?\d?)?`)
@@ -131,20 +131,20 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(colorArr) > 0 {
 		innerColorRe := regexp.MustCompile(`([-wubrgc]*)+([|])*([-wubrgc]*)*`)
-		fmt.Println(colorArr)
 		innerColorArr := innerColorRe.FindAllStringSubmatch(strings.TrimSpace(colorArr[0][6:len(colorArr[0])]), -1)
-		fmt.Println(innerColorArr)
 
 		//Handles individual color
 		if len(innerColorArr) == 1 {
 			QueryObject.finalValue += "c%3D" + innerColorArr[0][0] + "+"
 		}
-		//Handles 2 color
+
+		//Handles 2 color inputs
 		if len(innerColorArr) == 2 {
 			if !strings.Contains(innerColorArr[0][0], "-") || !strings.Contains(innerColorArr[0][0], innerColorArr[0][1]) {
-				QueryObject.finalValue += "c%3C%3D" + innerColorArr[0][0] + innerColorArr[1][0] + "+"
+				QueryObject.finalValue += "c%3D" + strings.ReplaceAll(innerColorArr[0][0], "|", "+or+c%3D") + innerColorArr[1][1] + "+"
 			}
 		}
+
 		//Handles 3 or more
 		if len(innerColorArr) >= 3 {
 			QueryObject.finalValue += "%28"

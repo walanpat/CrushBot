@@ -13,7 +13,7 @@ import (
 
 var Id string
 
-//Not sure if this variable/nomenclature will be needed later.  Add to cleanup list.
+//Not sure if this variable/nomenclature will be needed later.  Add to clean up list.
 //var goBot *discordgo.Session
 
 var mtgSetMessageFlag = false
@@ -122,6 +122,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		mtgSetMessageFlag = false
 		mtgPriceMessageFlag = false
 	}
+
 	//Mtg card query request code
 	if strings.Contains(m.Content, "!q") && m.Author.ID != Id {
 		if len(m.Content) > 4 {
