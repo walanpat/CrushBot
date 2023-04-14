@@ -7,15 +7,13 @@ import (
 	"strings"
 )
 
-var TypeRe = regexp.MustCompile(`type:([a-zA-Z ]+)?`)
+var TypeRe = regexp.MustCompile(`type:([a-zA-Z |]+)?`)
 var ColorRe = regexp.MustCompile(`color:([rgbuwc -]+)+(([|])*([rgbuwc -]*)*)*`)
+var CommanderRe = regexp.MustCompile(`commander:([rgbuwc])*`)
 var CmcRe = regexp.MustCompile(`cmc:(\d?=?[><]?=?\d?)?m?(=?[><]?=?\d?)?`)
 var PowerRe = regexp.MustCompile(`power:(\d?=?[><]?=?\d?)?p?(=?[><]?=?\d?)?`)
 var ToughnessRe = regexp.MustCompile(`toughness:(\d?=?[><]?=?\d?)?t?(=?[><]?=?\d?)?`)
-
-//var TextRe = regexp.MustCompile(`text:([a-zA-Z' ]+)?`)
 var TextRe = regexp.MustCompile(`text:([-\da-zA-Z' ]+)?([|]([-\da-zA-Z' ]+)?)*`)
-
 var RarityRe = regexp.MustCompile(`rarity:(([mruc ]+)?(([|])*([mruc ]+)?)*)*`)
 var ArtRe = regexp.MustCompile(`art:([a-zA-Z ]+)?`)
 var FunctionRe = regexp.MustCompile(`function:([a-zA-Z ]+)?`)
@@ -43,7 +41,7 @@ func MtgQueryBuilder(query string) (string, error) {
 	//Start with REGEX
 	if len(query) < 5 {
 		err := errors.New("input is less than 7 characters in length")
-		return "Not a logn enough query", err
+		return "Not a long enough query", err
 	}
 
 	commaCheck := 0
@@ -79,6 +77,10 @@ func MtgQueryBuilder(query string) (string, error) {
 	if len(colorArr) > 0 {
 		commaCheck += 1
 	}
+	commanderArr := CommanderRe.FindStringSubmatch(query)
+	if len(commanderArr) > 0 {
+		commaCheck += 1
+	}
 	cmcArr := CmcRe.FindStringSubmatch(query)
 	if len(cmcArr) > 0 {
 		commaCheck += 1
@@ -105,6 +107,7 @@ func MtgQueryBuilder(query string) (string, error) {
 		len(toughnessArr) == 0 &&
 		len(powerArr) == 0 &&
 		len(colorArr) == 0 &&
+		len(commanderArr) == 0 &&
 		len(cmcArr) == 0 &&
 		len(loyaltyArr) == 0 {
 		return "", nil
@@ -125,11 +128,17 @@ func MtgQueryBuilder(query string) (string, error) {
 		finalValue:     QueryURL,
 	}
 	if len(typeArr) > 0 {
-		QueryObject.typeValue += "t%3A" + strings.TrimSpace(typeArr[0][5:len(typeArr[0])])
-		QueryObject.typeValue = orSearchFormatting(QueryObject.typeValue)
-		QueryObject.finalValue += QueryObject.typeValue + "+"
+		QueryObject.typeValue += "t%3A%27" + strings.TrimSpace(typeArr[0][5:len(typeArr[0])])
+		fmt.Println(QueryObject.typeValue)
+		QueryObject.typeValue = orFormatting(QueryObject.typeValue, TypeType)
+		QueryObject.finalValue += QueryObject.typeValue + "%27+"
 	}
-	if len(colorArr) > 0 {
+	if len(commanderArr) > 0 {
+		innerColorRe := regexp.MustCompile(`([-wubrgc]*)`)
+		innerColorArr := innerColorRe.FindAllStringSubmatch(strings.TrimSpace(commanderArr[0][8:len(commanderArr[0])]), -1)
+		QueryObject.finalValue += "commander%3A" + innerColorArr[1][0] + "+"
+
+	} else if len(colorArr) > 0 {
 		innerColorRe := regexp.MustCompile(`([-wubrgc]*)+([|])*([-wubrgc]*)*`)
 		innerColorArr := innerColorRe.FindAllStringSubmatch(strings.TrimSpace(colorArr[0][6:len(colorArr[0])]), -1)
 
@@ -141,7 +150,7 @@ func MtgQueryBuilder(query string) (string, error) {
 		//Handles 2 color inputs
 		if len(innerColorArr) == 2 {
 			if !strings.Contains(innerColorArr[0][0], "-") || !strings.Contains(innerColorArr[0][0], innerColorArr[0][1]) {
-				QueryObject.finalValue += "c%3D" + strings.ReplaceAll(innerColorArr[0][0], "|", "+or+c%3D") + innerColorArr[1][1] + "+"
+				QueryObject.finalValue += "c%3D" + orFormatting(innerColorArr[0][0], ColorType) + orFormatting(innerColorArr[1][1], ColorType)
 			}
 		}
 
@@ -172,7 +181,7 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(textArr) > 0 {
 		QueryObject.textValue += "o%3A%27" + strings.TrimSpace(textArr[0][5:len(textArr[0])]+"%27")
-		QueryObject.textValue = orSearchFormatting(QueryObject.textValue)
+		QueryObject.textValue = orFormatting(QueryObject.textValue, TextType)
 		QueryObject.textValue += "+"
 		QueryObject.finalValue += QueryObject.textValue
 
@@ -267,15 +276,12 @@ func MtgQueryBuilder(query string) (string, error) {
 func InequalityReader(array []string, typeOfInequality string) string {
 	inequalityRe := regexp.MustCompile(`(\d{0,2}[><]?=?\d{0,2})?[mtpl]?(\d{0,2}[><]?=?\d{0,2})?`)
 	slicingString := ""
-	//power = 4:
 	if typeOfInequality == "pow" {
 		slicingString = array[0][6:len(array[0])]
 	}
-	//toughness = 8:
 	if typeOfInequality == "tou" {
 		slicingString = array[0][10:len(array[0])]
 	}
-	//cmc 2:
 	if typeOfInequality == "cmc" {
 		slicingString = array[0][4:len(array[0])]
 	}
@@ -284,7 +290,6 @@ func InequalityReader(array []string, typeOfInequality string) string {
 	}
 
 	inequalityArr := inequalityRe.FindStringSubmatch(slicingString)
-	//fmt.Println(array[0])
 	slugQuery := typeOfInequality
 	finalQuery := ""
 	//fmt.Println(inequalityArr[0])
@@ -355,15 +360,25 @@ func InequalityReader(array []string, typeOfInequality string) string {
 		}
 	}
 	finalQuery += "+"
-	//fmt.Println(finalQuery)
 	return finalQuery
 }
 
-func orSearchFormatting(str string) string {
-	str = strings.ReplaceAll(str, " | ", "%27+OR+o%3A%27")
-	str = strings.ReplaceAll(str, "| ", "%27+OR+o%3A%27")
-	str = strings.ReplaceAll(str, " |", "%27+OR+o%3A%27")
-	str = strings.ReplaceAll(str, "|", "%27+OR+o%3A%27")
+//notes:
+// %27 is the end of a ' used for creating complex statements
+const (
+	TypeType  = "t%3A%27"
+	TextType  = "o%3A%27"
+	RarType   = "r%3A%27"
+	ColorType = "c%3D"
+)
+
+func orFormatting(str string, typeStr string) string {
+	uriSlug := "%27+OR+"
+
+	str = strings.ReplaceAll(str, " | ", uriSlug)
+	str = strings.ReplaceAll(str, "| ", uriSlug)
+	str = strings.ReplaceAll(str, " |", uriSlug)
+	str = strings.ReplaceAll(str, "|", uriSlug)
 	str = strings.ReplaceAll(str, " ", "+")
 	return str
 }

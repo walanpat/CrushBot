@@ -638,7 +638,7 @@ func TestBadInputHandling(t *testing.T) {
 
 //Testing for "OR" statement
 func TestORInput(t *testing.T) {
-	t.Run("Testing the || operator ", func(t *testing.T) {
+	t.Run("Testing the | operator ", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "text:Sacrifice Rat in the | Cosmos Serpent| You may cast Brokkos,",
 			expected: "https://api.scryfall.com/cards/search?q=o%3A%27Sacrifice+Rat+in+the%27+OR+o%3A%27Cosmos+Serpent%27+OR+o%3A%27You+may+cast+Brokkos%27+",
@@ -653,6 +653,22 @@ func TestORInput(t *testing.T) {
 			t.Fail()
 		}
 	})
+	t.Run("or operator type query ", func(t *testing.T) {
+		testCase := TestCase{
+			input:    "type: giant coward | goblin rigger,",
+			expected: "https://api.scryfall.com/cards/search?q=t%3A%27giant+coward%27+OR+t%3A%27goblin+rigger%27+",
+		}
+		output, err := builder.MtgQueryBuilder(testCase.input)
+		if testCase.expected != output {
+			fmt.Println("Output:   ", output)
+			fmt.Println("Expected: ", testCase.expected)
+			t.Fail()
+		}
+		if err != nil {
+			t.Fail()
+		}
+	})
+
 }
 
 //personal
