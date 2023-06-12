@@ -113,6 +113,16 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		mtgPriceMessageFlag = false
 	}
 
+	if strings.Contains(m.Content, "!initiative ") {
+		//!Initiative name, +4, name, +2, name, +4
+		//Take map[string][int]
+		if len(m.Content) > 12 {
+			_, _ = s.ChannelMessageSend(m.ChannelID, dicerolling.InitiativeRoller(m.Content))
+		} else {
+			_, _ = s.ChannelMessageSend(m.ChannelID, dicerolling.InitiativeRoller("Initiative roll needs 2 things.  a play"))
+
+		}
+	}
 	if strings.Contains(m.Content, "[") || strings.Contains(m.Content, "]") {
 		cardName := m.Content[strings.IndexRune(m.Content, '[')+1 : strings.IndexRune(m.Content, ']')]
 		cardName = strings.ReplaceAll(cardName, " ", "+")

@@ -130,7 +130,7 @@ func MtgQueryBuilder(query string) (string, error) {
 	if len(typeArr) > 0 {
 		QueryObject.typeValue += "t%3A%27" + strings.TrimSpace(typeArr[0][5:len(typeArr[0])])
 		fmt.Println(QueryObject.typeValue)
-		QueryObject.typeValue = orFormatting(QueryObject.typeValue, TypeType)
+		QueryObject.typeValue = orFormatting(QueryObject.typeValue)
 		QueryObject.finalValue += QueryObject.typeValue + "%27+"
 	}
 	if len(commanderArr) > 0 {
@@ -150,7 +150,7 @@ func MtgQueryBuilder(query string) (string, error) {
 		//Handles 2 color inputs
 		if len(innerColorArr) == 2 {
 			if !strings.Contains(innerColorArr[0][0], "-") || !strings.Contains(innerColorArr[0][0], innerColorArr[0][1]) {
-				QueryObject.finalValue += "c%3D" + orFormatting(innerColorArr[0][0], ColorType) + orFormatting(innerColorArr[1][1], ColorType)
+				QueryObject.finalValue += "c%3D" + orFormatting(innerColorArr[0][0]) + orFormatting(innerColorArr[1][1])
 			}
 		}
 
@@ -170,7 +170,8 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(functionArr) > 0 {
 		QueryObject.functionValue += "function%3A" + strings.TrimSpace(functionArr[0][9:len(functionArr[0])])
-		QueryObject.functionValue = strings.ReplaceAll(QueryObject.functionValue, " ", "+function%3A")
+		QueryObject.functionValue = strings.ReplaceAll(QueryObject.functionValue, " ", "+")
+		//QueryObject.functionValue = strings.ReplaceAll(QueryObject.functionValue, " ", "+function%3A")
 		QueryObject.finalValue += QueryObject.functionValue + "+"
 	}
 	if len(isArr) > 0 {
@@ -181,7 +182,7 @@ func MtgQueryBuilder(query string) (string, error) {
 	}
 	if len(textArr) > 0 {
 		QueryObject.textValue += "o%3A%27" + strings.TrimSpace(textArr[0][5:len(textArr[0])]+"%27")
-		QueryObject.textValue = orFormatting(QueryObject.textValue, TextType)
+		QueryObject.textValue = orFormatting(QueryObject.textValue)
 		QueryObject.textValue += "+"
 		QueryObject.finalValue += QueryObject.textValue
 
@@ -365,14 +366,8 @@ func InequalityReader(array []string, typeOfInequality string) string {
 
 //notes:
 // %27 is the end of a ' used for creating complex statements
-const (
-	TypeType  = "t%3A%27"
-	TextType  = "o%3A%27"
-	RarType   = "r%3A%27"
-	ColorType = "c%3D"
-)
 
-func orFormatting(str string, typeStr string) string {
+func orFormatting(str string) string {
 	uriSlug := "%27+OR+"
 
 	str = strings.ReplaceAll(str, " | ", uriSlug)

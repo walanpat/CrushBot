@@ -59,7 +59,6 @@ func FiveEStats() (string, error) {
 			}
 		}
 		statHolder[4] = 0
-		//message += messageHolder[i]
 
 	}
 	sort.Ints(totalHolder[:])
@@ -254,4 +253,13 @@ func DiceRollBasic(sidedDice int, timesRolled int) ([]int, []string, int, string
 	}
 
 	return nil, nil, 0, ""
+}
+
+func randomNumberGenerator(maxNumberPossible int) int {
+	cachedCardTimer := time.NewTimer(1 * time.Millisecond)
+	<-cachedCardTimer.C
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+	rollValue := r1.Intn(maxNumberPossible)
+	return rollValue
 }
