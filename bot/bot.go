@@ -66,7 +66,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		cachedCardTimer.Reset(5 * time.Millisecond)
 		<-cachedCardTimer.C
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4B5")
-
 	}
 
 	//Bot mustn't reply to its own messages , to confirm it we perform this check.
@@ -113,6 +112,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		mtgPriceMessageFlag = false
 	}
 
+	// initiative mass rolling
 	if strings.Contains(m.Content, "!initiative ") {
 		//!Initiative name, +4, name, +2, name, +4
 		//Take map[string][int]
@@ -123,6 +123,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		}
 	}
+
 	if strings.Contains(m.Content, "[") || strings.Contains(m.Content, "]") {
 		cardName := m.Content[strings.IndexRune(m.Content, '[')+1 : strings.IndexRune(m.Content, ']')]
 		cardName = strings.ReplaceAll(cardName, " ", "+")
@@ -141,6 +142,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	//Encode testing code
+	//todo - finish out youtube tomfoolery
 	if strings.Contains(m.Content, "!encode") {
 		y := discordgo.MessageEmbed{
 			URL:         "https://www.youtube.com/",
