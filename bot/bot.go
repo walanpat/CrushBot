@@ -52,7 +52,7 @@ func Start() {
 	fmt.Println("Bot is running !")
 }
 
-//Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
+// Definition of messageHandler function it takes two arguments first one is discordgo.Session which is s , second one is discordgo.MessageCreate which is m.
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	//Allows us a "time buffer" so that we don't react too fast to our own card search
@@ -90,7 +90,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	//Rolls 6 different 5e stats, drops the lowest.
-	if strings.Contains(m.Content, "!5e stats") {
+	if strings.Contains(m.Content, "!stats") {
 		message, err := dicerolling.FiveEStats()
 		if err != nil {
 			_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
