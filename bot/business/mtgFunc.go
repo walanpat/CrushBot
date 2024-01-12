@@ -24,7 +24,7 @@ const (
 )
 
 func GetCard(cardName string, channelID string, s *discordgo.Session) {
-	//Get card Service Request
+	// Get card Service Request
 	data, err := services.GetCardService(cardName)
 	if err != nil {
 		_, err := s.ChannelMessageSend(channelID, "Error in Card Retrieval Service")
@@ -43,7 +43,7 @@ func GetCard(cardName string, channelID string, s *discordgo.Session) {
 		}
 	}
 
-	//Get Card Image Service
+	// Get Card Image Service
 	res, err := services.GetCardImageService(data.ImageURIs.Png)
 	if err != nil {
 		_, err = s.ChannelMessageSend(channelID, "Crush can't GET that card image :(")
@@ -53,7 +53,7 @@ func GetCard(cardName string, channelID string, s *discordgo.Session) {
 		fmt.Println(err)
 		return
 	}
-	//Handling the rest of our attributes (Rulings, Prices, Sets)
+	// Handling the rest of our attributes (Rulings, Prices, Sets)
 	if res != nil {
 		if len(data.RulingsURI) > 1 {
 			RulingsURI = data.RulingsURI
@@ -79,7 +79,7 @@ func GetCard(cardName string, channelID string, s *discordgo.Session) {
 }
 
 func GetRuling(channelID string, s *discordgo.Session) error {
-	//Checking Input
+	// Checking Input
 	if RulingsURI == "No Rulings Found" || RulingsURI == "false" {
 		_, err := s.ChannelMessageSend(channelID, "No Rulings Found")
 		if err != nil {
@@ -87,7 +87,7 @@ func GetRuling(channelID string, s *discordgo.Session) error {
 		}
 		return errors.New("no rulings found")
 	}
-	//Rules Service Request
+	// Rules Service Request
 	data, err := services.GetCardRulingService(RulingsURI)
 	if err != nil {
 		_, _ = s.ChannelMessageSend(channelID, "Error in Retrieving Rules")
@@ -97,7 +97,7 @@ func GetRuling(channelID string, s *discordgo.Session) error {
 		_, err = s.ChannelMessageSend(channelID, "```ansi\nNo Rulings Found```")
 		return errors.New(data.Details)
 	}
-	//Print/Send out our rules
+	// Print/Send out our rules
 	for i := 0; i < len(data.Data); i++ {
 		_, err = s.ChannelMessageSend(channelID, beginningAnsiChars+strconv.Itoa(i+1)+". "+data.Data[i].Comment+"\n```")
 	}
@@ -114,14 +114,14 @@ func GetSets(channelID string, s *discordgo.Session) {
 		return
 	}
 
-	//Get Sets Service
+	// Get Sets Service
 	data, err := services.GetSetsService(SetCodeURI)
 	if err != nil {
 		return
 	}
 
-	//Formatting/Send Rules
-	x := "```ansi\nSets this card has been printed in: "
+	// Formatting/Send Rules
+	x := beginningAnsiChars + "Sets this card has been printed in: "
 
 	for i := 0; i < len(data.Data); i++ {
 		if strings.Contains(x, "\n   "+data.Data[i].SetName) {
@@ -140,21 +140,21 @@ func GetSets(channelID string, s *discordgo.Session) {
 }
 
 func GetPrice(channelID string, s *discordgo.Session) {
-	_, _ = s.ChannelMessageSend(channelID, "```ansi\nScryfall Avg Price: $"+Price.Usd+endAnsiChars)
+	_, _ = s.ChannelMessageSend(channelID, beginningAnsiChars+"Scryfall Avg Price: $"+Price.Usd+endAnsiChars)
 }
 
 func GetQuery(userQuery string, channelID string, s *discordgo.Session) {
-	//Build our Query
-	getUri, err := builder.MtgQueryBuilder(userQuery)
+	// Build our Query
+	getURI, err := builder.MtgQueryBuilder(userQuery)
 	if err != nil {
 		_, _ = s.ChannelMessageSend(channelID, beginningAnsiChars+err.Error()+endAnsiChars)
 		return
 	}
 	fmt.Println(err)
-	fmt.Println(getUri)
+	fmt.Println(getURI)
 
-	//Send our query
-	data, err := services.GetQueryService(getUri)
+	// Send our query
+	data, err := services.GetQueryService(getURI)
 	if err != nil {
 		if err.Error() == "scryfall returned an error object, either nothing was found or there is a bad input" {
 			_, _ = s.ChannelMessageSend(channelID, notFoundError)
@@ -165,7 +165,7 @@ func GetQuery(userQuery string, channelID string, s *discordgo.Session) {
 	}
 	if data.TotalCards > 30 {
 		arrElement := discordgo.MessageEmbed{
-			URL:         "https://scryfall.com/search?q=" + getUri[40:],
+			URL:         "https://scryfall.com/search?q=" + getURI[40:],
 			Type:        "",
 			Title:       "That's a lot of cards\n Here's the scryfall link instead:",
 			Description: "",
@@ -188,10 +188,9 @@ func GetQuery(userQuery string, channelID string, s *discordgo.Session) {
 		}
 
 		return
-	} else {
-		EmbeddedCardQuerySending(&data, channelID, s)
-		return
 	}
+	EmbeddedCardQuerySending(&data, channelID, s)
+	return
 
 }
 

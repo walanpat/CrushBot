@@ -13,15 +13,13 @@ import (
 
 var ID string
 
-//Not sure if this variable/nomenclature will be needed later.  Add to clean up list.
-//var goBot *discordgo.Session
+// Not sure if this variable/nomenclature will be needed later.  Add to clean up list.
+// var goBot *discordgo.Session
 
-var mtgSetMessageFlag = false
 var mtgRulesMessageFlag = false
 var mtgPriceMessageFlag = false
 
 func Start() {
-
 	//creating new bot session
 	goBot, err := discordgo.New("Bot " + config.Token)
 	//Handling error
@@ -108,7 +106,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		business.GetCard(cardName, m.ChannelID, s)
 
 		mtgRulesMessageFlag = false
-		mtgSetMessageFlag = false
 		mtgPriceMessageFlag = false
 	}
 
@@ -130,7 +127,6 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		business.GetCard(cardName, m.ChannelID, s)
 		mtgRulesMessageFlag = false
-		mtgSetMessageFlag = false
 		mtgPriceMessageFlag = false
 	}
 
@@ -205,7 +201,6 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	//Code for getting sets
 	if decode == 128197 && length == 4 && m.MessageReaction.UserID != ID && !mtgRulesMessageFlag {
 		business.GetSets(m.ChannelID, s)
-		mtgSetMessageFlag = true
 	}
 	//Code for getting price
 	if decode == 128181 && length == 4 && m.MessageReaction.UserID != ID && !mtgPriceMessageFlag {

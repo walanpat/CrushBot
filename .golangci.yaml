@@ -1,3 +1,9 @@
+issues:
+  exclude-rules:
+    - path: /
+      linters:
+        - typecheck
+
 linters:
   disable-all: true
   enable:
@@ -6,7 +12,7 @@ linters:
     - govet # Reports suspicious constructs
     - ineffassign # Detects unused variables
     - staticcheck # Go vet on steroids
-#    - typecheck # Standard go type checks
+    - typecheck # Standard go type checks
     - unused # Detect unused constants, variables, functions, and types.
 
     # suggest optional linters
@@ -35,18 +41,18 @@ output:
   #
   # Default: colored-line-number
   format: colored-line-number
-  # Print lines of code with issue.
-  # Default: true
+    # Print lines of code with issue.
+    # Default: true
   print-issued-lines: true
-  # Print linter name in the end of issue text.
-  # Default: true
+    # Print linter name in the end of issue text.
+    # Default: true
   print-linter-name: true
-  # Make issues output unique by line.
-  # Default: true
+    # Make issues output unique by line.
+    # Default: true
   uniq-by-line: true
-  # Add a prefix to the output file references.
-  # Default: ""
+    # Add a prefix to the output file references.
+    # Default: ""
   path-prefix: ""
-  # Sort results by: filepath, line and column.
-  # Default: false
+    # Sort results by: filepath, line and column.
+    # Default: false
   sort-results: true
