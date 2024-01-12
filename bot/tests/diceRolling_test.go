@@ -2,13 +2,14 @@ package tests
 
 import (
 	"fmt"
-	"github.com/bwmarrin/discordgo"
 	"goland-discord-bot/bot/business/dicerolling"
 	"strconv"
 	"testing"
+
+	"github.com/bwmarrin/discordgo"
 )
 
-//Testing random number generation
+// Testing random number generation
 func TestFiveEStatCreation(t *testing.T) {
 	t.Run("Returns sorted", func(t *testing.T) {
 		testCase := TestCase{
@@ -27,10 +28,10 @@ func TestFiveEStatCreation(t *testing.T) {
 	})
 }
 
-//Basic Dice Rolling Test
+// Basic Dice Rolling Test
 func TestDiceRolling(t *testing.T) {
 	t.Run("xdy any values (no modifiers) ", func(t *testing.T) {
-		//Here's the inputs.
+		// Here's the inputs.
 		timesRolledInt := 2
 		amountOfSidesInt := 100
 
@@ -41,11 +42,11 @@ func TestDiceRolling(t *testing.T) {
 			input:    "!roll " + timesRolledString + "d" + amountOfSidesString,
 			expected: "number between " + timesRolledString + " and " + amountOfSidesString,
 		}
-		//Setup
+		// Setup
 		testAuthor := discordgo.User{Username: "CrushTestUserName"}
 		testMessage := discordgo.Message{Content: testCase.input, Author: &testAuthor}
 		testMessageCreate := discordgo.MessageCreate{Message: &testMessage}
-		//Function Call
+		// Function Call
 		output, err := dicerolling.DiceRollGeneric(&testMessageCreate)
 
 		if output[46:46+len(timesRolledString)] != timesRolledString {
@@ -59,7 +60,7 @@ func TestDiceRolling(t *testing.T) {
 			fmt.Println("Amount of Sides is Correct")
 		}
 
-		//Check the value generated
+		// Check the value generated
 		for i := 1; i <= len(amountOfSidesString); i++ {
 			if output[70+i-1:70+i] != "\u001B" {
 				value, err := strconv.Atoi(output[70 : 70+i])
@@ -83,7 +84,7 @@ func TestDiceRolling(t *testing.T) {
 
 func TestDiceRollingWithMods(t *testing.T) {
 	t.Run("xdy any values (no modifiers) ", func(t *testing.T) {
-		//Here's the inputs.
+		// Here's the inputs.
 		timesRolledInt := 1
 		amountOfSidesInt := 10
 		modifierArray := []int{1, 2, 3, 4}
@@ -107,11 +108,11 @@ func TestDiceRollingWithMods(t *testing.T) {
 			expected: "number between " + timesRolledString + " and " + amountOfSidesString + "plus modifier of " + strconv.Itoa(totalModInt),
 		}
 		fmt.Println(testCase.input)
-		//Setup
+		// Setup
 		testAuthor := discordgo.User{Username: "CrushTestUserName"}
 		testMessage := discordgo.Message{Content: testCase.input, Author: &testAuthor}
 		testMessageCreate := discordgo.MessageCreate{Message: &testMessage}
-		//Function Call
+		// Function Call
 		output, err := dicerolling.DiceRollGeneric(&testMessageCreate)
 
 		if output[46:46+len(timesRolledString)] != timesRolledString {
@@ -129,10 +130,10 @@ func TestDiceRollingWithMods(t *testing.T) {
 			t.Fail()
 		}
 
-		//Check the value generated
+		// Check the value generated
 		for i := 1; i <= len(amountOfSidesString); i++ {
 			fmt.Println(output[125:127])
-			//Total Output starts at [125:127~]
+			// Total Output starts at [125:127~]
 			if output[125+i-1:125+i] != "\u001B" {
 				value, err := strconv.Atoi(output[125+i-1 : 125+i])
 				if err != nil {

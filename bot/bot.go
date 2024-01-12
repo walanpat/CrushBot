@@ -11,7 +11,7 @@ import (
 	"unicode/utf8"
 )
 
-var Id string
+var ID string
 
 //Not sure if this variable/nomenclature will be needed later.  Add to clean up list.
 //var goBot *discordgo.Session
@@ -37,7 +37,7 @@ func Start() {
 		return
 	}
 	// Storing our id from u to BotId .
-	Id = u.ID
+	ID = u.ID
 
 	// Adding handler function to handle our messages using AddHandler from discordgo package. We will declare messageHandler function later.
 	goBot.AddHandler(messageHandler)
@@ -56,7 +56,7 @@ func Start() {
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	//Allows us a "time buffer" so that we don't react too fast to our own card search
-	if m.Author.ID == Id && len(m.Reactions) == 0 && m.Content == "" {
+	if m.Author.ID == ID && len(m.Reactions) == 0 && m.Content == "" {
 		cachedCardTimer := time.NewTimer(5 * time.Millisecond)
 		<-cachedCardTimer.C
 		_ = s.MessageReactionAdd(m.ChannelID, m.Message.ID, "\U0001F4DA")
@@ -69,7 +69,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	//Bot mustn't reply to its own messages , to confirm it we perform this check.
-	if m.Author.ID == Id {
+	if m.Author.ID == ID {
 		return
 	}
 
@@ -135,7 +135,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	//Mtg card query request code
-	if strings.Contains(m.Content, "!q") && m.Author.ID != Id {
+	if strings.Contains(m.Content, "!q") && m.Author.ID != ID {
 		if len(m.Content) > 4 {
 			business.GetQuery(m.Content, m.ChannelID, s)
 		}
@@ -194,22 +194,21 @@ func reactionHandler(s *discordgo.Session, m *discordgo.MessageReactionAdd) {
 	//Deconstructs emojis into a 6 digit int
 	decode, length := utf8.DecodeRuneInString(m.Emoji.Name)
 	//Code for getting the ruling
-	if decode == 128218 && length == 4 && m.MessageReaction.UserID != Id && mtgRulesMessageFlag == false {
+	if decode == 128218 && length == 4 && m.MessageReaction.UserID != ID && !mtgRulesMessageFlag {
 		err := business.GetRuling(m.ChannelID, s)
 		if err != nil {
 			_, _ = s.ChannelMessageSend(m.ChannelID, "Error getting rulings.")
 			return
-		} else {
-			mtgRulesMessageFlag = true
 		}
+		mtgRulesMessageFlag = true
 	}
 	//Code for getting sets
-	if decode == 128197 && length == 4 && m.MessageReaction.UserID != Id && mtgSetMessageFlag == false {
+	if decode == 128197 && length == 4 && m.MessageReaction.UserID != ID && !mtgRulesMessageFlag {
 		business.GetSets(m.ChannelID, s)
 		mtgSetMessageFlag = true
 	}
 	//Code for getting price
-	if decode == 128181 && length == 4 && m.MessageReaction.UserID != Id && mtgPriceMessageFlag == false {
+	if decode == 128181 && length == 4 && m.MessageReaction.UserID != ID && !mtgPriceMessageFlag {
 		business.GetPrice(m.ChannelID, s)
 		mtgPriceMessageFlag = true
 	}

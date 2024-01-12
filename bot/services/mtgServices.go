@@ -57,7 +57,6 @@ func GetCardRulingService(s string) (response.RulingResponse, error) {
 }
 
 func GetCardService(s string) (response.CardResponse, error) {
-
 	res, err := http.Get("https://api.scryfall.com/cards/named?fuzzy=" + s)
 	fmt.Println("https://api.scryfall.com/cards/named?fuzzy=" + s)
 	if err != nil {

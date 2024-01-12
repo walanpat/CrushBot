@@ -1,6 +1,6 @@
 package responses
 
-type ImageUris struct {
+type ImageURIs struct {
 	Small      string `json:"small"`
 	Normal     string `json:"normal"`
 	Large      string `json:"large"`
@@ -55,19 +55,19 @@ type PurchaseUrisObj struct {
 
 type CardResponse struct {
 	Object          string          `json:"object"`
-	Id              string          `json:"id"`
-	OracleId        string          `json:"oracle_id"`
-	MultiverseIds   []int           `json:"multiverse_ids"`
-	TcgplayerId     int             `json:"tcgplayer_id"`
+	ID              string          `json:"id"`
+	OracleID        string          `json:"oracle_id"`
+	MultiverseIDs   []int           `json:"multiverse_ids"`
+	TcgplayerID     int             `json:"tcgplayer_id"`
 	Name            string          `json:"name"`
 	Lang            string          `json:"lang"`
 	ReleasedAt      string          `json:"released_at"`
-	Uri             string          `json:"uri"`
-	ScryfallUri     string          `json:"scryfall_uri"`
+	URI             string          `json:"uri"`
+	ScryfallURI     string          `json:"scryfall_uri"`
 	Layout          string          `json:"layout"`
 	HighresImage    bool            `json:"highres_image"`
 	ImageStatus     string          `json:"image_status"`
-	ImageUris       ImageUris       `json:"image_uris"`
+	ImageURIs       ImageURIs       `json:"image_uris"`
 	ManaCost        string          `json:"mana_cost"`
 	Cmc             float32         `json:"cmc"`
 	TypeLine        string          `json:"type_line"`
@@ -84,20 +84,20 @@ type CardResponse struct {
 	Promo           bool            `json:"promo"`
 	Reprint         bool            `json:"reprint"`
 	Variation       bool            `json:"variation"`
-	SetId           string          `json:"set_id"`
+	SetID           string          `json:"set_id"`
 	Set             string          `json:"set"`
 	SetName         string          `json:"set_name"`
 	SetType         string          `json:"set_type"`
-	SetUri          string          `json:"set_uri"`
-	SetSearchUri    string          `json:"set_search_uri"`
-	ScryfallSetUri  string          `json:"scryfall_set_uri"`
+	SetURI          string          `json:"set_uri"`
+	SetSearchURI    string          `json:"set_search_uri"`
+	ScryfallSetURI  string          `json:"scryfall_set_uri"`
 	CollectorNumber string          `json:"collector_number"`
 	Digital         bool            `json:"digital"`
 	Rarity          string          `json:"rarity"`
-	CardBackId      string          `json:"card_back_id"`
+	CardBackID      string          `json:"card_back_id"`
 	Artist          string          `json:"artist"`
 	ArtistIds       []string        `json:"artist_ids"`
-	IllustrationId  string          `json:"illustration_id"`
+	IllustrationID  string          `json:"illustration_id"`
 	BorderColor     string          `json:"border_color"`
 	Frame           string          `json:"frame"`
 	SecurityStamp   string          `json:"security_stamp"`
@@ -108,19 +108,19 @@ type CardResponse struct {
 	EdhrecRank      int             `json:"edhrec_rank"`
 	PennyRank       int             `json:"penny_rank"`
 	Prices          PriceObj        `json:"prices"`
-	RelatedUris     RelatedUrisObj  `json:"related_uris"`
-	PurchaseUris    PurchaseUrisObj `json:"purchase_uris"`
+	RelatedURIs     RelatedUrisObj  `json:"related_uris"`
+	PurchaseURIs    PurchaseUrisObj `json:"purchase_uris"`
 	Details         string          `json:"details"`
-	RulingsUri      string          `json:"rulings_uri"`
-	PrintsSearchUri string          `json:"prints_search_uri"`
+	RulingsURI      string          `json:"rulings_uri"`
+	PrintsSearchURI string          `json:"prints_search_uri"`
 	CardFaces       []CardResponse  `json:"card_faces"`
 }
 
 type CardFace struct {
 	Object          string    `json:"object"`
 	Name            string    `json:"name"`
-	Uri             string    `json:"uri"`
-	ImageUris       ImageUris `json:"image_uris"`
+	URI             string    `json:"uri"`
+	ImageURIs       ImageURIs `json:"image_uris"`
 	Cmc             float32   `json:"mana_cost"`
 	TypeLine        string    `json:"type_line"`
 	OracleText      string    `json:"oracle_text"`
@@ -128,13 +128,13 @@ type CardFace struct {
 	Keywords        []string  `json:"keywords"`
 	Artist          string    `json:"artist"`
 	ArtistIds       []string  `json:"artist_ids"`
-	IllustrationId  string    `json:"illustration_id"`
+	IllustrationID  string    `json:"illustration_id"`
 	SecurityStamp   string    `json:"security_stamp"`
 	FullArt         bool      `json:"full_art"`
 	Textless        bool      `json:"textless"`
 	Details         string    `json:"details"`
-	RulingsUri      string    `json:"rulings_uri"`
-	PrintsSearchUri string    `json:"prints_search_uri"`
+	RulingsURI      string    `json:"rulings_uri"`
+	PrintsSearchURI string    `json:"prints_search_uri"`
 	Power           float32   `json:"power"`
 	Toughness       float32   `json:"toughness"`
 	Watermark       string    `json:"watermark"`
@@ -142,7 +142,7 @@ type CardFace struct {
 
 type RulingData struct {
 	Object        string `json:"object"`
-	OracleId      string `json:"oracle_id"`
+	OracleID      string `json:"oracle_id"`
 	Source        string `json:"source"`
 	PublishedDate string `json:"published_at"`
 	Comment       string `json:"comment"`
@@ -162,15 +162,15 @@ type SetListResponse struct {
 	HasMore     bool           `json:"has_more"`
 	NextPage    string         `json:"next_page"`
 	Data        []CardResponse `json:"data"`
-	Id          string         `json:"id"`
+	ID          string         `json:"id"`
 	Code        string         `json:"code"`
 	MtgoCode    string         `json:"mtg_code"`
 	ArenaCode   string         `json:"arena_code"`
-	TcgplayerId string         `json:"tcgplayer_id"`
+	TcgplayerID string         `json:"tcgplayer_id"`
 	Name        string         `json:"name"`
-	Uri         string         `json:"uri"`
-	ScryfallUri string         `json:"scryfall_uri"`
-	SearchUri   string         `json:"search_uri"`
+	URI         string         `json:"uri"`
+	ScryfallURI string         `json:"scryfall_uri"`
+	SearchURI   string         `json:"search_uri"`
 	ReleasedAt  string         `json:"released_at"`
 	SetType     string         `json:"set_type"`
 	CardCount   string         `json:"card_count"`
@@ -178,7 +178,7 @@ type SetListResponse struct {
 	Digital     bool           `json:"digital"`
 	NonFoilOnly bool           `json:"nonfoil_only"`
 	FoilOnly    bool           `json:"foil_only"`
-	IconSvgUri  string         `json:"icon_svg_uri"`
+	IconSvgURI  string         `json:"icon_svg_uri"`
 }
 
 type QueryResponse struct {

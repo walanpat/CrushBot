@@ -22,9 +22,8 @@ import (
 //	}
 //})
 
-//Testing color inputs
+// Testing color inputs
 func TestColorsQueryBuilder(t *testing.T) {
-
 	//Color testing
 	t.Run("test query Type, Color, text contains rancor", func(t *testing.T) {
 		testCase := TestCase{
@@ -58,7 +57,7 @@ func TestColorsQueryBuilder(t *testing.T) {
 		}
 	})
 
-	//Tests for black and green and black&green
+	// Tests for black and green and black&green
 	t.Run("type and 2 basic color test", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:squirrel, color:b or g",
@@ -91,7 +90,7 @@ func TestColorsQueryBuilder(t *testing.T) {
 		}
 	})
 
-	//Tests for white and blue and white&blue
+	// Tests for white and blue and white&blue
 	t.Run("test for multicolor query (ub || b || u)", func(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:vampire, color:ub or b or u",
@@ -139,10 +138,9 @@ func TestColorsQueryBuilder(t *testing.T) {
 	//		t.Fail()
 	//	}
 	//})
-
 }
 
-//Tests for Power, Toughness, Loyalty, and CMC
+// Tests for Power, Toughness, Loyalty, and CMC
 func TestInequalitiesQueryBuilder(t *testing.T) {
 	t.Run("1 sided inequality toughness", func(t *testing.T) {
 		testCase := TestCase{
@@ -179,7 +177,7 @@ func TestInequalitiesQueryBuilder(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:vampire, cmc:<=4, color:bu",
 			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+cmc%3C=4+",
-			//expected: "https://api.scryfall.com/cards/search?q=",
+			// expected: "https://api.scryfall.com/cards/search?q=",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {
@@ -195,7 +193,7 @@ func TestInequalitiesQueryBuilder(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:vampire, cmc:<=10, color:bu",
 			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+cmc%3C=10+",
-			//expected: "https://api.scryfall.com/cards/search?q=",
+			// expected: "https://api.scryfall.com/cards/search?q=",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {
@@ -211,7 +209,7 @@ func TestInequalitiesQueryBuilder(t *testing.T) {
 		testCase := TestCase{
 			input:    "cmc:3<=m<6",
 			expected: "https://api.scryfall.com/cards/search?q=cmc%3E%3D3+cmc%3C6+",
-			//expected: "https://api.scryfall.com/cards/search?q=",
+			// expected: "https://api.scryfall.com/cards/search?q=",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {
@@ -227,7 +225,7 @@ func TestInequalitiesQueryBuilder(t *testing.T) {
 		testCase := TestCase{
 			input:    "type:vampire, power:<=2, cmc:<=4, color:bu",
 			expected: "https://api.scryfall.com/cards/search?q=t%3Avampire+c%3Dbu+cmc%3C=4+pow%3C=2+",
-			//expected: "https://api.scryfall.com/cards/search?q=",
+			// expected: "https://api.scryfall.com/cards/search?q=",
 		}
 		output, err := builder.MtgQueryBuilder(testCase.input)
 		if testCase.expected != output {
@@ -256,7 +254,7 @@ func TestInequalitiesQueryBuilder(t *testing.T) {
 	})
 }
 
-//testing type inputs
+// testing type inputs
 func TestTypesQueryBuilder(t *testing.T) {
 	t.Run("testing for  goblin sorcery", func(t *testing.T) {
 		testCase := TestCase{
@@ -350,7 +348,7 @@ func TestTypesQueryBuilder(t *testing.T) {
 	})
 }
 
-//testing is inputs
+// testing is inputs
 func TestIsQueryBuilder(t *testing.T) {
 	t.Run("is etb ", func(t *testing.T) {
 		testCase := TestCase{
@@ -369,7 +367,7 @@ func TestIsQueryBuilder(t *testing.T) {
 	})
 }
 
-//testing functional tag inputs
+// testing functional tag inputs
 func TestFunctionQueryBuilder(t *testing.T) {
 	t.Run("function removal ", func(t *testing.T) {
 		testCase := TestCase{
@@ -403,7 +401,7 @@ func TestFunctionQueryBuilder(t *testing.T) {
 	})
 }
 
-//testing art tag inputs
+// testing art tag inputs
 func TestArtQueryBuilder(t *testing.T) {
 	t.Run("", func(t *testing.T) {
 		testCase := TestCase{
@@ -422,7 +420,7 @@ func TestArtQueryBuilder(t *testing.T) {
 	})
 }
 
-//testing rarity inputs
+// testing rarity inputs
 func TestRarityQueryBuilder(t *testing.T) {
 	t.Run("Common Test", func(t *testing.T) {
 		testCase := TestCase{
@@ -577,7 +575,7 @@ func TestRarityQueryBuilder(t *testing.T) {
 	})
 }
 
-//testing text search input
+// testing text search input
 func TestTextQueryBuilder(t *testing.T) {
 	t.Run("test text rancor", func(t *testing.T) {
 		testCase := TestCase{
@@ -596,7 +594,7 @@ func TestTextQueryBuilder(t *testing.T) {
 	})
 }
 
-//testing query builder return statement
+// testing query builder return statement
 func TestQueryBuilder(t *testing.T) {
 	t.Run("Type, 3 color, and text query", func(t *testing.T) {
 		testCase := TestCase{
@@ -615,7 +613,7 @@ func TestQueryBuilder(t *testing.T) {
 	})
 }
 
-//Testing for edge case inputs/error handling
+// Testing for edge case inputs/error handling
 func TestBadInputHandling(t *testing.T) {
 	t.Run("no comma but multiple input types handling", func(t *testing.T) {
 		testCase := TestCase{
@@ -632,11 +630,10 @@ func TestBadInputHandling(t *testing.T) {
 			fmt.Println("a response that was not an error was given")
 			t.Fail()
 		}
-
 	})
 }
 
-//Testing for "OR" statement
+// Testing for "OR" statement
 func TestORInput(t *testing.T) {
 	t.Run("Testing the | operator ", func(t *testing.T) {
 		testCase := TestCase{
@@ -668,10 +665,9 @@ func TestORInput(t *testing.T) {
 			t.Fail()
 		}
 	})
-
 }
 
-//personal
+// personal
 
 //func TestPersonalQueryBuilder(t *testing.T) {
 //	t.Run("TestPersonalQueryBuilder", func(t *testing.T) {

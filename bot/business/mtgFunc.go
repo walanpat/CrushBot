@@ -3,61 +3,73 @@ package business
 import (
 	"errors"
 	"fmt"
-	"github.com/bwmarrin/discordgo"
-	"goland-discord-bot/bot/business/query/builder"
-	response "goland-discord-bot/bot/services/responses"
-
-	"goland-discord-bot/bot/services"
 	"math"
 	"strconv"
 	"strings"
+
+	"github.com/bwmarrin/discordgo"
+
+	"goland-discord-bot/bot/business/query/builder"
+	"goland-discord-bot/bot/services"
+	response "goland-discord-bot/bot/services/responses"
 )
 
-var RulingUri string
-var SetCodeUri string
+var RulingsURI string
+var SetCodeURI string
 var Price response.PriceObj
 
 const (
 	notFoundError = "Scryfall could not find what you searched for."
 )
 
-func GetCard(cardName string, channelId string, s *discordgo.Session) {
+func GetCard(cardName string, channelID string, s *discordgo.Session) {
 	//Get card Service Request
 	data, err := services.GetCardService(cardName)
 	if err != nil {
-		_, err = s.ChannelMessageSend(channelId, "Error in Card Retrieval Service")
-
+		_, err := s.ChannelMessageSend(channelID, "Error in Card Retrieval Service")
+		if err != nil {
+			fmt.Printf("\nError sending message: %v\n", err)
+		}
 	}
+
 	if data.Object == "error" {
-		_, err = s.ChannelMessageSend(channelId, data.Details)
-		return
+		_, err = s.ChannelMessageSend(channelID, data.Details)
+		if err != nil {
+			_, err := s.ChannelMessageSend(channelID, "Error in Card Retrieval Service")
+			if err != nil {
+				fmt.Printf("\nError sending message: %v\n", err)
+			}
+		}
 	}
 
 	//Get Card Image Service
-	res, err := services.GetCardImageService(data.ImageUris.Png)
+	res, err := services.GetCardImageService(data.ImageURIs.Png)
 	if err != nil {
-		_, err = s.ChannelMessageSend(channelId, "Crush can't GET that card image :(")
+		_, err = s.ChannelMessageSend(channelID, "Crush can't GET that card image :(")
+		if err != nil {
+			fmt.Printf("\nError sending message: %v\n", err)
+		}
 		fmt.Println(err)
 		return
 	}
 	//Handling the rest of our attributes (Rulings, Prices, Sets)
 	if res != nil {
-		if len(data.RulingsUri) > 1 {
-			RulingUri = data.RulingsUri
+		if len(data.RulingsURI) > 1 {
+			RulingsURI = data.RulingsURI
 		} else {
-			RulingUri = "No Rulings Found"
+			RulingsURI = "No Rulings Found"
 		}
 		if data.Name == "Island" || data.Name == "Plains" || data.Name == "Mountain" || data.Name == "Forest" || data.Name == "Swamp" {
-			SetCodeUri = "Basic Lands are Printed in Every Set"
-		} else if len(data.SetUri) > 0 {
-			SetCodeUri = data.PrintsSearchUri
+			SetCodeURI = "Basic Lands are Printed in Every Set"
+		} else if len(data.SetURI) > 0 {
+			SetCodeURI = data.PrintsSearchURI
 		}
-		if len(data.PurchaseUris.Tcgplayer) > 0 {
+		if len(data.PurchaseURIs.Tcgplayer) > 0 {
 			Price = data.Prices
 		}
 
-		//_, err = s.ChannelFileSend(channelId, data.Name+".png", res)
-		EmbeddedCardSending(&data, channelId, s)
+		//_, err = s.ChannelFileSend(channelID, data.Name+".png", res)
+		EmbeddedCardSending(&data, channelID, s)
 
 		if err != nil {
 			fmt.Println(err)
@@ -65,49 +77,51 @@ func GetCard(cardName string, channelId string, s *discordgo.Session) {
 	}
 }
 
-func GetRuling(channelId string, s *discordgo.Session) error {
+func GetRuling(channelID string, s *discordgo.Session) error {
 	//Checking Input
-	if RulingUri == "No Rulings Found" || RulingUri == "false" {
-		_, _ = s.ChannelMessageSend(channelId, "No Rulings Found")
+	if RulingsURI == "No Rulings Found" || RulingsURI == "false" {
+		_, err := s.ChannelMessageSend(channelID, "No Rulings Found")
+		if err != nil {
+			fmt.Printf("\nError sending message: %v\n", err)
+		}
 		return errors.New("no rulings found")
 	}
 	//Rules Service Request
-	data, err := services.GetCardRulingService(RulingUri)
+	data, err := services.GetCardRulingService(RulingsURI)
 	if err != nil {
-		_, _ = s.ChannelMessageSend(channelId, "Error in Retrieving Rules")
+		_, _ = s.ChannelMessageSend(channelID, "Error in Retrieving Rules")
 		return err
 	}
 	if data.Object == "error" || len(data.Data) == 0 {
-		_, err = s.ChannelMessageSend(channelId, "```ansi\nNo Rulings Found```")
+		_, err = s.ChannelMessageSend(channelID, "```ansi\nNo Rulings Found```")
 		return errors.New(data.Details)
 	}
 	//Print/Send out our rules
 	for i := 0; i < len(data.Data); i++ {
-		_, err = s.ChannelMessageSend(channelId, "```ansi\n"+strconv.Itoa(i+1)+". "+data.Data[i].Comment+"\n```")
+		_, err = s.ChannelMessageSend(channelID, "```ansi\n"+strconv.Itoa(i+1)+". "+data.Data[i].Comment+"\n```")
 	}
 	return nil
 }
 
-func GetSets(channelId string, s *discordgo.Session) {
-	if SetCodeUri == "Basic Lands are Printed in Every Set" {
-		_, _ = s.ChannelMessageSend(channelId, "```ansi\n"+SetCodeUri+"```")
+func GetSets(channelID string, s *discordgo.Session) {
+	if SetCodeURI == "Basic Lands are Printed in Every Set" {
+		_, _ = s.ChannelMessageSend(channelID, "```ansi\n"+SetCodeURI+"```")
 		return
 	}
-	if SetCodeUri == "No Sets Found" {
-		_, _ = s.ChannelMessageSend(channelId, SetCodeUri)
+	if SetCodeURI == "No Sets Found" {
+		_, _ = s.ChannelMessageSend(channelID, SetCodeURI)
 		return
 	}
 
 	//Get Sets Service
-	data, err := services.GetSetsService(SetCodeUri)
+	data, err := services.GetSetsService(SetCodeURI)
 	if err != nil {
 		return
 	}
 
 	//Formatting/Send Rules
 	x := "```ansi\nSets this card has been printed in: "
-	if data.HasMore {
-	}
+
 	for i := 0; i < len(data.Data); i++ {
 		if strings.Contains(x, "\n   "+data.Data[i].SetName) {
 			if strings.Contains(x, "\n   "+data.Data[i].SetName+" Promos") && data.Data[i].SetName+" Promos" == data.Data[i-1].SetName {
@@ -120,19 +134,19 @@ func GetSets(channelId string, s *discordgo.Session) {
 		}
 	}
 	x += "\n```"
-	_, err = s.ChannelMessageSend(channelId, x)
+	_, err = s.ChannelMessageSend(channelID, x)
 
 }
 
-func GetPrice(channelId string, s *discordgo.Session) {
-	_, _ = s.ChannelMessageSend(channelId, "```ansi\nScryfall Avg Price: $"+Price.Usd+"```")
+func GetPrice(channelID string, s *discordgo.Session) {
+	_, _ = s.ChannelMessageSend(channelID, "```ansi\nScryfall Avg Price: $"+Price.Usd+"```")
 }
 
-func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
+func GetQuery(userQuery string, channelID string, s *discordgo.Session) {
 	//Build our Query
 	getUri, err := builder.MtgQueryBuilder(userQuery)
 	if err != nil {
-		_, _ = s.ChannelMessageSend(channelId, "```ansi\n"+err.Error()+"```")
+		_, _ = s.ChannelMessageSend(channelID, "```ansi\n"+err.Error()+"```")
 		return
 	}
 	fmt.Println(err)
@@ -142,10 +156,10 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 	data, err := services.GetQueryService(getUri)
 	if err != nil {
 		if err.Error() == "scryfall returned an error object, either nothing was found or there is a bad input" {
-			_, _ = s.ChannelMessageSend(channelId, notFoundError)
+			_, _ = s.ChannelMessageSend(channelID, notFoundError)
 			return
 		}
-		_, _ = s.ChannelMessageSend(channelId, err.Error())
+		_, _ = s.ChannelMessageSend(channelID, err.Error())
 		return
 	}
 	if data.TotalCards > 30 {
@@ -167,33 +181,33 @@ func GetQuery(userQuery string, channelId string, s *discordgo.Session) {
 		temp := arrElement
 		x := &temp
 
-		_, err := s.ChannelMessageSendEmbed(channelId, x)
+		_, err := s.ChannelMessageSendEmbed(channelID, x)
 		if err != nil {
 			fmt.Printf("error sending embed %q", err)
 		}
 
 		return
 	} else {
-		EmbeddedCardQuerySending(&data, channelId, s)
+		EmbeddedCardQuerySending(&data, channelID, s)
 		return
 	}
 
 }
 
-func ExtendedMessageSending(data *response.QueryResponse, channelId string, s *discordgo.Session) {
+func ExtendedMessageSending(data *response.QueryResponse, channelID string, s *discordgo.Session) {
 	message := ""
 	//timer1 := time.NewTimer(50 * time.Millisecond)
 	for i := 0; i < len(data.Data); i++ {
 		//fmt.Println(data.Data[i].Name)
 		//<-timer1.C
 		//
-		//res, err := http.Get(data.Data[i].ImageUris.Png)
+		//res, err := http.Get(data.Data[i].ImageURIs.Png)
 		//if err != nil {
-		//	_, err = s.ChannelMessageSend(channelId, "Crushcan'tGETthatcardimage:(")
+		//	_, err = s.ChannelMessageSend(channelID, "Crushcan'tGETthatcardimage:(")
 		//	fmt.Println(err)
 		//	return
 		//}
-		//_, err = s.ChannelFileSend(channelId, data.Data[i].Name+".png", res.Body)
+		//_, err = s.ChannelFileSend(channelID, data.Data[i].Name+".png", res.Body)
 		//if err != nil {
 		//	fmt.Println(err)
 		//}
@@ -212,13 +226,13 @@ func ExtendedMessageSending(data *response.QueryResponse, channelId string, s *d
 		for i := 0; i < iterationsNeeded; i++ {
 			if i+1 != iterationsNeeded {
 				if i == 0 {
-					_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000:(i+1)*2000-11]+"```")
+					_, err := s.ChannelMessageSend(channelID, "```ansi\n"+message[i*2000:(i+1)*2000-11]+"```")
 					if err != nil {
 						fmt.Println("Check1")
 						fmt.Println(err)
 					}
 				} else {
-					_, err := s.ChannelMessageSend(channelId, "```ansi\n"+message[i*2000-11:(i+1)*2000-11]+"```")
+					_, err := s.ChannelMessageSend(channelID, "```ansi\n"+message[i*2000-11:(i+1)*2000-11]+"```")
 					if err != nil {
 						fmt.Println("Check2")
 
@@ -226,7 +240,7 @@ func ExtendedMessageSending(data *response.QueryResponse, channelId string, s *d
 					}
 				}
 			} else {
-				var _, err = s.ChannelMessageSend(channelId, "```ansi\n"+message[(i*2000)-11:]+"```")
+				var _, err = s.ChannelMessageSend(channelID, "```ansi\n"+message[(i*2000)-11:]+"```")
 				if err != nil {
 					fmt.Println("Check3")
 
@@ -235,27 +249,27 @@ func ExtendedMessageSending(data *response.QueryResponse, channelId string, s *d
 			}
 		}
 	} else {
-		_, _ = s.ChannelMessageSend(channelId, "```ansi\n"+message+"```")
+		_, _ = s.ChannelMessageSend(channelID, "```ansi\n"+message+"```")
 
 	}
-	//_, _ = s.ChannelMessageSend(channelId, message+"```")
+	//_, _ = s.ChannelMessageSend(channelID, message+"```")
 
 }
 
-func EmbeddedCardQuerySending(data *response.QueryResponse, channelId string, s *discordgo.Session) {
+func EmbeddedCardQuerySending(data *response.QueryResponse, channelID string, s *discordgo.Session) {
 	var temp []discordgo.MessageEmbed
 	var x []*discordgo.MessageEmbed
 	for i := 0; i < data.TotalCards; i++ {
 		if len(data.Data[i].CardFaces) > 0 {
 
 			image := discordgo.MessageEmbedImage{
-				URL:      data.Data[i].CardFaces[0].ImageUris.Png,
+				URL:      data.Data[i].CardFaces[0].ImageURIs.Png,
 				ProxyURL: "",
 				Width:    10,
 				Height:   20,
 			}
 			arrElement := discordgo.MessageEmbed{
-				URL:         data.Data[i].ScryfallUri,
+				URL:         data.Data[i].ScryfallURI,
 				Type:        "",
 				Title:       data.Data[i].CardFaces[0].Name,
 				Description: "",
@@ -273,13 +287,13 @@ func EmbeddedCardQuerySending(data *response.QueryResponse, channelId string, s 
 			x = append(x, &temp[len(temp)-1])
 
 			image2 := discordgo.MessageEmbedImage{
-				URL:      data.Data[i].CardFaces[1].ImageUris.Png,
+				URL:      data.Data[i].CardFaces[1].ImageURIs.Png,
 				ProxyURL: "",
 				Width:    10,
 				Height:   20,
 			}
 			arrElement2 := discordgo.MessageEmbed{
-				URL:         data.Data[i].ScryfallUri,
+				URL:         data.Data[i].ScryfallURI,
 				Type:        "",
 				Title:       data.Data[i].CardFaces[1].Name,
 				Description: "",
@@ -297,13 +311,13 @@ func EmbeddedCardQuerySending(data *response.QueryResponse, channelId string, s 
 			x = append(x, &temp[len(temp)-1])
 		} else {
 			image := discordgo.MessageEmbedImage{
-				URL:      data.Data[i].ImageUris.Png,
+				URL:      data.Data[i].ImageURIs.Png,
 				ProxyURL: "",
 				Width:    10,
 				Height:   20,
 			}
 			arrElement := discordgo.MessageEmbed{
-				URL:         data.Data[i].ScryfallUri,
+				URL:         data.Data[i].ScryfallURI,
 				Type:        "",
 				Title:       data.Data[i].Name,
 				Description: "",
@@ -321,7 +335,7 @@ func EmbeddedCardQuerySending(data *response.QueryResponse, channelId string, s 
 			x = append(x, &temp[len(temp)-1])
 		}
 		if len(x) == 10 {
-			_, err := s.ChannelMessageSendEmbeds(channelId, x)
+			_, err := s.ChannelMessageSendEmbeds(channelID, x)
 			if err != nil {
 				fmt.Printf("error sending embeds %q", err)
 			}
@@ -329,25 +343,25 @@ func EmbeddedCardQuerySending(data *response.QueryResponse, channelId string, s 
 		}
 	}
 	fmt.Println(x)
-	_, err := s.ChannelMessageSendEmbeds(channelId, x)
+	_, err := s.ChannelMessageSendEmbeds(channelID, x)
 	if err != nil {
 		fmt.Printf("error sending embeds %q", err)
 	}
 
 }
 
-func EmbeddedCardSending(data *response.CardResponse, channelId string, s *discordgo.Session) {
+func EmbeddedCardSending(data *response.CardResponse, channelID string, s *discordgo.Session) {
 	var temp discordgo.MessageEmbed
 	var x *discordgo.MessageEmbed
 
 	image := discordgo.MessageEmbedImage{
-		URL:      data.ImageUris.Png,
+		URL:      data.ImageURIs.Png,
 		ProxyURL: "",
 		Width:    10,
 		Height:   20,
 	}
 	arrElement := discordgo.MessageEmbed{
-		URL:         data.ScryfallUri,
+		URL:         data.ScryfallURI,
 		Type:        "",
 		Title:       data.Name,
 		Description: "",
@@ -365,7 +379,7 @@ func EmbeddedCardSending(data *response.CardResponse, channelId string, s *disco
 	temp = arrElement
 	x = &temp
 
-	_, err := s.ChannelMessageSendEmbed(channelId, x)
+	_, err := s.ChannelMessageSendEmbed(channelID, x)
 	if err != nil {
 		fmt.Printf("error sending embed %q", err)
 	}

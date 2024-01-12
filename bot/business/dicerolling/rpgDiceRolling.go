@@ -7,22 +7,22 @@ import (
 )
 
 // InitiativeRoller
-//Input:
-//Give it the amount of individuals you are rolling for,
-//AND their respective modifier
+// Input:
+// Give it the amount of individuals you are rolling for,
+// AND their respective modifier
 //
-//Output:
-//Returns their initiative roll in order, with their name if needed.
+// Output:
+// Returns their initiative roll in order, with their name if needed.
 func InitiativeRoller(input string) string {
-	//Map created
+	// Map created
 	nameToTotalRollMap := make(map[string]int)
 	nameToModMap := make(map[string]string)
 	nameToFlatRollMap := make(map[string]int)
-	//Input sliced into an array
+	// Input sliced into an array
 	slicedInput := strings.Split(input[12:], ",")
 
-	//Loop through the array,
-	//Then, populate map with rolled value and name pairing.
+	// Loop through the array,
+	// Then, populate map with rolled value and name pairing.
 	for i, value := range slicedInput {
 		value = strings.TrimSpace(value)
 		if i%2 != 0 {
@@ -55,7 +55,7 @@ func InitiativeRoller(input string) string {
 		keys[i] = p[0].(string)
 	}
 
-	//Append onto a message
+	// Append onto a message
 	outputString := "```ansi\n		Initiative:\n"
 	shortOrderString := "\n\n		IN ORDER: \n"
 	for i, k := range keys {
@@ -66,5 +66,4 @@ func InitiativeRoller(input string) string {
 	outputString += "\n```"
 
 	return outputString
-
 }
