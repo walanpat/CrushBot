@@ -2,6 +2,7 @@ package dicerolling
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"regexp"
 	"sort"
@@ -233,48 +234,78 @@ func DiceRollGeneric(m *discordgo.MessageCreate) (string, error) {
 
 func SaveProbabilityCalculator(m *discordgo.MessageCreate) (string, error) {
 	variablesArr := re.FindAllStringSubmatch(m.Content, -1)
-	mod, _ := strconv.ParseFloat(variablesArr[0][1], 64)
-	dc, _ := strconv.ParseFloat(variablesArr[0][2], 64)
+	mod, _ := strconv.ParseFloat(variablesArr[0][1], 32)
+	dc, _ := strconv.ParseFloat(variablesArr[0][2], 32)
 
-	fmt.Printf("\n\nvariablesARr: %v", variablesArr)
-
-	fmt.Printf("\n\nMod: %v", mod)
-	fmt.Printf("\nDC: %v", dc)
+	//fmt.Printf("\n\nvariablesARr: %v", variablesArr)
+	//
+	//fmt.Printf("\n\nMod: %v", mod)
+	//fmt.Printf("\nDC: %v", dc)
 
 	message := "```ansi\n" // \u001B[0m"
+
+	ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(mod, dc)
+	strCritSuccess := strconv.Itoa(ChanceCritSuccess)
+	strNormSuccess := strconv.Itoa(ChanceNormalSuccess)
+	strNormFail := strconv.Itoa(ChanceNormalFail)
+	strCritFail := strconv.Itoa(ChanceCritFail)
+
+	//fmt.Print("\nChance to Crit Succeed: 	 " + strCritSuccess)
+	//fmt.Print("\nChance to Succeed:		 " + strNormSuccess)
+	//fmt.Print("\nChance to Fail:			" + strNormFail)
+	//fmt.Print("\nChance to Crit Fail:   		" + strCritFail)
+
+	message += "\nChance to Crit Succeed: 	" + strCritSuccess + "%\n"
+	message += "\nChance to Succeed:		  " + strNormSuccess + "%\n"
+	message += "\nChance to Fail:			" + strNormFail + "%\n"
+	message += "\nChance to Crit Fail:   	" + strCritFail + "%\n"
+
+	message += "```"
+	return message, nil
+}
+
+func saveProbabilityCalculator(mod float64, dc float64) (critSuccess int, normalSuccess int, normalFailure int, critFailure int) {
 	//Chance for any success = (((21 - (dc - mod)) / 20) * 100)
 	//Chance for any failure = 100 - ((21-(dc-mod))/20)*100
+
 	var ChanceCritSuccess float64
 	var ChanceNormalSuccess float64
 	var ChanceNormalFail float64
 	var ChanceCritFail float64
 
-	//probabilityTimer := time.NewTimer(1 * time.Millisecond)
-	//<-probabilityTimer.C
+	//var floatingCritSuccDice int
+	var floatingCritSuccVar float64
+	//var floatingCritFailVar int
+	if mod >= 10 {
+		floatingCritSuccVar = 18
 
-	ChanceCritSuccess = ((21 - (dc + 9 - mod)) / 20) * 100
-	ChanceNormalSuccess = ((20 - (dc - mod)) / 20) * 100
+	} else {
+		floatingCritSuccVar = 20
+	}
+	ChanceCritSuccess = ((floatingCritSuccVar - (dc + 10 - mod)) / 20) * 100
+	ChanceNormalSuccess = ((floatingCritSuccVar - (dc - mod)) / 20) * 100
 
-	ChanceCritFail = ((21 + 9 - (dc - mod)) / 20) * 100
+	ChanceNormalFail = (((floatingCritSuccVar + 1) - (dc - mod)) / 20) * 100
+
+	ChanceCritFail = (((floatingCritSuccVar + 10) - (dc - mod)) / 20) * 100
 	ChanceCritFail = 100 - ChanceCritFail
 
-	ChanceNormalFail = ((21 - (dc - mod)) / 20) * 100
-	//norm fail check
+	// Norm fail check
 	if ChanceNormalFail > 0 {
 		ChanceNormalFail = 100 - ChanceNormalFail
 	} else {
 		ChanceNormalFail = 0
 	}
 
-	//crit fail interracting with normal fail
+	// Crit fail interacting with normal fail
 	if ChanceCritFail > 0 && ChanceNormalFail > 0 {
 		ChanceNormalFail -= ChanceCritFail
 	}
 
-	//Check to see if regular hit >0
+	// Check to see if regular hit >0
 	if ChanceNormalSuccess >= 0 && ChanceCritSuccess <= 0 {
 		ChanceCritSuccess = 5
-	} else if ChanceNormalSuccess < 0 && ChanceCritFail < 100 {
+	} else if ChanceNormalSuccess < 0 {
 		ChanceCritSuccess = 0
 		if ChanceCritFail < 100 {
 			ChanceNormalSuccess = 5
@@ -282,50 +313,33 @@ func SaveProbabilityCalculator(m *discordgo.MessageCreate) (string, error) {
 			ChanceNormalSuccess = 0
 		}
 	}
-	strCritSuccess := strconv.FormatFloat(ChanceCritSuccess, 'f', -1, 64)
-	strNormSuccess := strconv.FormatFloat(ChanceNormalSuccess, 'f', -1, 64)
-	strNormFail := strconv.FormatFloat(ChanceNormalFail, 'f', -1, 64)
-	strCritFail := strconv.FormatFloat(ChanceCritFail, 'f', -1, 64)
 
-	fmt.Print("\nChance to Crit Succeed: 	 " + strCritSuccess)
-	fmt.Print("\nChance to Succeed:		 " + strNormSuccess)
-	fmt.Print("\nChance to Fail:			" + strNormFail)
-	fmt.Print("\nChance to Crit Fail:   		" + strCritFail)
+	// If chance for failure hard hits 0, needs to rework the formula to just subtract from what is correct.
+	if ChanceNormalFail == 0 && ChanceNormalSuccess > 0 && ChanceCritFail > 0 && ChanceCritSuccess <= 0 {
+		ChanceNormalFail = 100 - ChanceNormalSuccess - ChanceCritFail
+	}
 
-	message += "\nChance to Crit Succeed: 	" + strCritSuccess + "%\n"
-	message += "\nChance to Succeed:		  " + strNormSuccess + "%\n"
-	message += "\nChance to Fail:			" + strNormFail + "%\n"
-	message += "\nChance to Crit Fail:   	" + strCritFail + "%\n"
+	if ChanceCritFail == 0 && ChanceNormalSuccess > 0 && ChanceNormalFail > 0 && ChanceCritSuccess > 0 {
+		ChanceCritFail = 100 - ChanceNormalSuccess - ChanceNormalFail - ChanceCritSuccess
+	}
 
-	//	if ChanceCrit > 0 {
-	//		message += "\nChance to Crit Succeed:	" + strconv.Itoa(int(ChanceCrit)) + "%\n"
-	//	}
-	//	if ChanceCrit < 0 && ChanceNormalSuccess > 0 {
-	//		message += "\nChance to Crit Succeed:	 5%\n"
-	//	} else {
-	//		message += "\nChance to Crit Succeed:	 0%\n"
-	//	}
-	//
-	//	if ChanceNormalSuccess >= 0 {
-	//		if ChanceNormalSuccess == 0 && ChanceCrit < 0 {
-	//			message += "\nChance to Succeed:	  	" + strconv.Itoa(int(ChanceNormalSuccess+5)) + "%	Requires a Crit!\n"
-	//			message += "\nChance to Fail:			" + strconv.Itoa(int(ChanceFailChanceFail-5)) + "%\n"
-	//
-	//		} else {
-	//			message += "\nChance to Succeed:	  	" + strconv.Itoa(int(ChanceNormalSuccess)) + "%\n"
-	//			message += "\nChance to Fail:			" + strconv.Itoa(int(ChanceFail-5)) + "%\n"
-	//			//message += "\nChance to Crit Fail:	" + strconv.Itoa(int(ChanceFail)) + "%\n"
-	//
-	//		}
-	//	} else {
-	//		message += "\nChance to Succeed:	  	0%\n"
-	//		message += "\nChance to Fail:		 100%\n"
-	//	}
-	//
-	message += "```"
+	critSuccess = divisibleBy5Rounder(ChanceCritSuccess)
+	normalSuccess = divisibleBy5Rounder(ChanceNormalSuccess)
+	normalFailure = divisibleBy5Rounder(ChanceNormalFail)
+	critFailure = divisibleBy5Rounder(ChanceCritFail)
 
-	//fmt.Printf("\n%v\n", message)
-	return message, nil
+	return critSuccess, normalSuccess, normalFailure, critFailure
+}
+func divisibleBy5Rounder(n float64) int {
+	integer := int(math.Round(n))
+	if integer%5 != 0 {
+		if (integer+1)%5 == 0 {
+			integer++
+		} else if (integer-1)%5 == 0 {
+			integer--
+		}
+	}
+	return integer
 }
 
 // DiceRollBasic returns arr of dice rolled in int, then string, then returns total in int and string
