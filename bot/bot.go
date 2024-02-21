@@ -96,6 +96,16 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		_, _ = s.ChannelMessageSend(m.ChannelID, message)
 	}
 
+	//Probability code
+	if strings.Contains(m.Content, "!p") {
+		message, err := dicerolling.SaveProbabilityCalculator(m)
+		if err != nil {
+			_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
+		} else {
+			_, _ = s.ChannelMessageSend(m.ChannelID, message)
+		}
+	}
+
 	//Mtg card request Code
 	if strings.Contains(m.Content, "!c") {
 		if m.Content[0:3] != "!c " {

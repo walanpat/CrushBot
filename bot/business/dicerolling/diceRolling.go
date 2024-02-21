@@ -12,6 +12,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+var re = regexp.MustCompile(`([+-]*\d+)*,(\d\d)*`)
+
 func FiveEStats() (string, error) {
 	message := "```ansi\n                             Stats:\n"
 	statHolder := [5]int{}
@@ -226,6 +228,103 @@ func DiceRollGeneric(m *discordgo.MessageCreate) (string, error) {
 		}
 	}
 	message += "\n```"
+	return message, nil
+}
+
+func SaveProbabilityCalculator(m *discordgo.MessageCreate) (string, error) {
+	variablesArr := re.FindAllStringSubmatch(m.Content, -1)
+	mod, _ := strconv.ParseFloat(variablesArr[0][1], 64)
+	dc, _ := strconv.ParseFloat(variablesArr[0][2], 64)
+
+	fmt.Printf("\n\nvariablesARr: %v", variablesArr)
+
+	fmt.Printf("\n\nMod: %v", mod)
+	fmt.Printf("\nDC: %v", dc)
+
+	message := "```ansi\n" // \u001B[0m"
+	//Chance for any success = (((21 - (dc - mod)) / 20) * 100)
+	//Chance for any failure = 100 - ((21-(dc-mod))/20)*100
+	var ChanceCritSuccess float64
+	var ChanceNormalSuccess float64
+	var ChanceNormalFail float64
+	var ChanceCritFail float64
+
+	//probabilityTimer := time.NewTimer(1 * time.Millisecond)
+	//<-probabilityTimer.C
+
+	ChanceCritSuccess = ((21 - (dc + 9 - mod)) / 20) * 100
+	ChanceNormalSuccess = ((20 - (dc - mod)) / 20) * 100
+
+	ChanceCritFail = ((21 + 9 - (dc - mod)) / 20) * 100
+	ChanceCritFail = 100 - ChanceCritFail
+
+	ChanceNormalFail = ((21 - (dc - mod)) / 20) * 100
+	//norm fail check
+	if ChanceNormalFail > 0 {
+		ChanceNormalFail = 100 - ChanceNormalFail
+	} else {
+		ChanceNormalFail = 0
+	}
+
+	//crit fail interracting with normal fail
+	if ChanceCritFail > 0 && ChanceNormalFail > 0 {
+		ChanceNormalFail -= ChanceCritFail
+	}
+
+	//Check to see if regular hit >0
+	if ChanceNormalSuccess >= 0 && ChanceCritSuccess <= 0 {
+		ChanceCritSuccess = 5
+	} else if ChanceNormalSuccess < 0 && ChanceCritFail < 100 {
+		ChanceCritSuccess = 0
+		if ChanceCritFail < 100 {
+			ChanceNormalSuccess = 5
+		} else {
+			ChanceNormalSuccess = 0
+		}
+	}
+	strCritSuccess := strconv.FormatFloat(ChanceCritSuccess, 'f', -1, 64)
+	strNormSuccess := strconv.FormatFloat(ChanceNormalSuccess, 'f', -1, 64)
+	strNormFail := strconv.FormatFloat(ChanceNormalFail, 'f', -1, 64)
+	strCritFail := strconv.FormatFloat(ChanceCritFail, 'f', -1, 64)
+
+	fmt.Print("\nChance to Crit Succeed: 	 " + strCritSuccess)
+	fmt.Print("\nChance to Succeed:		 " + strNormSuccess)
+	fmt.Print("\nChance to Fail:			" + strNormFail)
+	fmt.Print("\nChance to Crit Fail:   		" + strCritFail)
+
+	message += "\nChance to Crit Succeed: 	" + strCritSuccess + "%\n"
+	message += "\nChance to Succeed:		  " + strNormSuccess + "%\n"
+	message += "\nChance to Fail:			" + strNormFail + "%\n"
+	message += "\nChance to Crit Fail:   	" + strCritFail + "%\n"
+
+	//	if ChanceCrit > 0 {
+	//		message += "\nChance to Crit Succeed:	" + strconv.Itoa(int(ChanceCrit)) + "%\n"
+	//	}
+	//	if ChanceCrit < 0 && ChanceNormalSuccess > 0 {
+	//		message += "\nChance to Crit Succeed:	 5%\n"
+	//	} else {
+	//		message += "\nChance to Crit Succeed:	 0%\n"
+	//	}
+	//
+	//	if ChanceNormalSuccess >= 0 {
+	//		if ChanceNormalSuccess == 0 && ChanceCrit < 0 {
+	//			message += "\nChance to Succeed:	  	" + strconv.Itoa(int(ChanceNormalSuccess+5)) + "%	Requires a Crit!\n"
+	//			message += "\nChance to Fail:			" + strconv.Itoa(int(ChanceFailChanceFail-5)) + "%\n"
+	//
+	//		} else {
+	//			message += "\nChance to Succeed:	  	" + strconv.Itoa(int(ChanceNormalSuccess)) + "%\n"
+	//			message += "\nChance to Fail:			" + strconv.Itoa(int(ChanceFail-5)) + "%\n"
+	//			//message += "\nChance to Crit Fail:	" + strconv.Itoa(int(ChanceFail)) + "%\n"
+	//
+	//		}
+	//	} else {
+	//		message += "\nChance to Succeed:	  	0%\n"
+	//		message += "\nChance to Fail:		 100%\n"
+	//	}
+	//
+	message += "```"
+
+	//fmt.Printf("\n%v\n", message)
 	return message, nil
 }
 
