@@ -613,7 +613,7 @@ func TestSaveProbabilityCalculator(t *testing.T) {
 			t.Fail()
 		}
 		if ChanceNormalSuccess != testCase.expectedSucc {
-			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
 			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
 			t.Fail()
 		}
@@ -633,22 +633,81 @@ func TestSaveProbabilityCalculator(t *testing.T) {
 			inputMod: 11,
 			inputDC:  20,
 
+			// crit on 19,20 	(10%)
+			// succ on 9-18   	(50%)
+			//fail on 2-8 		(35%)
+			// crit fail on 1 	(5%)
 			expectedCritSucc: 10,
 			expectedSucc:     50,
-			expectedFail:     45,
+			expectedFail:     35,
 			expectedCritFail: 5,
 		}
-		//crit succ on 19,20
-		//norm succ 10-18
-		//norm fail 1-9
-		//crit fail on 1
 
 		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
 		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
 		if sum != 100 {
-			fmt.Printf("sum not 100:	%v\n\n", sum)
-
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
 			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+	t.Run("mod:12, dc:20", func(t *testing.T) {
+		testCase := TestCase{
+			inputMod: 12,
+			inputDC:  20,
+
+			// crit on 18,19,20 	(15%) 3/20
+			// succ on 8-17   	(50%) 10/20
+			//fail on 2-7 		(30%) 6/20
+			// crit fail on 1 	(5%)  1/20
+			expectedCritSucc: 15,
+			expectedSucc:     50,
+			expectedFail:     30,
+			expectedCritFail: 5,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
 		}
 		if ChanceCritSuccess != testCase.expectedCritSucc {
 			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
@@ -715,4 +774,6 @@ func TestSaveProbabilityCalculator(t *testing.T) {
 		}
 	})
 
+	//highest possible mod 34 ?
+	//highest DC should be 53 (absolute max?)
 }

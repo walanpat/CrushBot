@@ -273,21 +273,40 @@ func saveProbabilityCalculator(mod float64, dc float64) (critSuccess int, normal
 	var ChanceNormalFail float64
 	var ChanceCritFail float64
 
-	//var floatingCritSuccDice int
-	var floatingCritSuccVar float64
-	//var floatingCritFailVar int
-	if mod >= 10 {
-		floatingCritSuccVar = 18
+	var diceVar = float64(20)
 
-	} else {
-		floatingCritSuccVar = 20
+	var critSVar = float64(10)
+	var critFVar = float64(10)
+	var succVar = float64(0)
+	var failVar = float64(1)
+
+	if mod == 10 {
+		diceVar = 19
+		critSVar = 10
+		critFVar = critSVar
+
+	} else if mod == 11 {
+		diceVar = 19
+		critSVar = 8
+		critFVar = 9
+
+		succVar = 0
+		failVar = 2
+	} else if mod >= 12 {
+		diceVar = 19
+		critSVar = 8
+		critFVar = 8
+
+		succVar = 1
+		failVar = 2
 	}
-	ChanceCritSuccess = ((floatingCritSuccVar - (dc + 10 - mod)) / 20) * 100
-	ChanceNormalSuccess = ((floatingCritSuccVar - (dc - mod)) / 20) * 100
 
-	ChanceNormalFail = (((floatingCritSuccVar + 1) - (dc - mod)) / 20) * 100
+	ChanceCritSuccess = (diceVar - (dc + critSVar - mod)) * 5
+	ChanceNormalSuccess = (diceVar - (dc - mod + succVar)) * 5
 
-	ChanceCritFail = (((floatingCritSuccVar + 10) - (dc - mod)) / 20) * 100
+	ChanceNormalFail = ((diceVar + failVar) - (dc - mod)) * 5
+
+	ChanceCritFail = ((diceVar + critFVar) - (dc - mod)) * 5
 	ChanceCritFail = 100 - ChanceCritFail
 
 	// Norm fail check
@@ -321,6 +340,9 @@ func saveProbabilityCalculator(mod float64, dc float64) (critSuccess int, normal
 
 	if ChanceCritFail == 0 && ChanceNormalSuccess > 0 && ChanceNormalFail > 0 && ChanceCritSuccess > 0 {
 		ChanceCritFail = 100 - ChanceNormalSuccess - ChanceNormalFail - ChanceCritSuccess
+		if ChanceCritFail < 0 {
+			ChanceCritFail = 0
+		}
 	}
 
 	critSuccess = divisibleBy5Rounder(ChanceCritSuccess)
@@ -330,6 +352,25 @@ func saveProbabilityCalculator(mod float64, dc float64) (critSuccess int, normal
 
 	return critSuccess, normalSuccess, normalFailure, critFailure
 }
+
+//func round(num float64) int {
+//	return int(num + math.Copysign(0.5, num))
+//}
+//
+//func toFixed(num float64, precision int) float64 {
+//	output := math.Pow(10, float64(precision))
+//	return float64(round(num*output)) / output
+//}
+
+//func rounder(n float64) float64 {
+//	if n < 0.5 && n > -0.5 {
+//		n = math.Ceil(n)
+//	} else {
+//		math.Round(n)
+//	}
+//	return n
+//}
+
 func divisibleBy5Rounder(n float64) int {
 	integer := int(math.Round(n))
 	if integer%5 != 0 {
