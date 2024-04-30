@@ -1,0 +1,10 @@
+# Available Commands
+
+```ansi
+Use the command with no input to get more info on the command!
+
+!roll   Rolls dice
+!p      gets the probability of a die roll using a modifier and a set DC according to Pathfinder 2e rules
+!c      Queries scryfall for a single card and it's rules/price
+!q      Queries scryfall for a set of cards that matches your input parameters.
+```

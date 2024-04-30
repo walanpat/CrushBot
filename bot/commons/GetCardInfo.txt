@@ -1,0 +1,15 @@
+```ansi
+!c command works such that it queries Scryfall for a card.
+
+Use as close to the correct name as possible! and it will work!
+
+The preset reactions have various commands:
+
+Books: I will read you the rules of the card
+Date: I will read you the sets this card has been printed in
+Dollars: I will read you the price of the card according to Scryfall
+
+Example:
+
+!c Avacyn, Angel of Hope
+```

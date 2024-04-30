@@ -77,14 +77,25 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
 		return
 	}
+	if strings.Contains(m.Content, "!help") {
+		if len(m.Content) <= 6 {
+			_, _ = s.ChannelMessageSend(m.ChannelID, commons.Help)
+			return
+		}
+	}
 
 	//Dice Rolling Code
 	if strings.Contains(m.Content, "!roll") {
-		message, err := dicerolling.DiceRollGeneric(m)
-		if err != nil {
-			_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
+		if len(m.Content) == 5 || len(m.Content) == 6 {
+			_, _ = s.ChannelMessageSend(m.ChannelID, commons.RollDiceInfo)
+			return
 		} else {
-			_, _ = s.ChannelMessageSend(m.ChannelID, message)
+			message, err := dicerolling.DiceRollGeneric(m)
+			if err != nil {
+				_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
+			} else {
+				_, _ = s.ChannelMessageSend(m.ChannelID, message)
+			}
 		}
 		return
 	}
@@ -103,7 +114,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//Probability code
 	if strings.Contains(m.Content, "!p") {
 		if len(m.Content) <= 3 {
-			_, _ = s.ChannelMessageSend(m.ChannelID, commons.ProbInstruction())
+			_, _ = s.ChannelMessageSend(m.ChannelID, commons.ProbInfo)
 		} else {
 			message, err := dicerolling.SaveProbabilityCalculator(m)
 			if err != nil {
@@ -117,7 +128,8 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	//Mtg card request Code
 	if strings.Contains(m.Content, "!c") {
-		if m.Content[0:3] != "!c " {
+		if len(m.Content) <= 3 {
+			_, _ = s.ChannelMessageSend(m.ChannelID, commons.CardGetExample)
 			return
 		}
 
@@ -141,6 +153,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	//emoji/reactions code
 	if strings.Contains(m.Content, "[") || strings.Contains(m.Content, "]") {
 		cardName := m.Content[strings.IndexRune(m.Content, '[')+1 : strings.IndexRune(m.Content, ']')]
 		cardName = strings.ReplaceAll(cardName, " ", "+")
@@ -151,8 +164,12 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	//Mtg card query request code
+	//Mtg scryfall query request code
 	if strings.Contains(m.Content, "!q") && m.Author.ID != ID {
+		if len(m.Content) <= 3 {
+			_, _ = s.ChannelMessageSend(m.ChannelID, commons.QueryScryfallInfo)
+
+		}
 		if len(m.Content) > 4 {
 			business.GetQuery(m.Content, m.ChannelID, s)
 		}

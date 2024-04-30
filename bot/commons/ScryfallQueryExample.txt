@@ -1,0 +1,12 @@
+
+```ansi
+I want a legendary, both blue and or white,spirit,card with ETB effect.\n\n
+!q color:uw u w ,cmc:<=6,type:legendary spirit creature,is:etb,\n\n
+I want a goblin card that ISN't a creature\n\n
+!q type: goblin -creature,color:r\n\n\n
+
+-before an attribute negates it(-creature is NOT creatures,-r NOT red cards etc)\n\n
+r=red,b=black,g=green,u=blue,w=white\n\n
+function choices are listed here: https://scryfall.com/docs/tagger-tags \n (there's toomany) and not all of them are useful\n\n
+type can be of any type, instant, creature, spell, legendary,vampire,goblin,merfolk,etc...
+```

@@ -1,0 +1,44 @@
+
+```ansi
+Querying cards can be done multiple ways:
+
+color:r g rg,
+This is red or green or Red-AND-Green.
+
+cmc:>=3,
+This is converted mana greater than or equal to 3
+
+type:instant,goblin,
+All card types are insant AND goblin
+
+power:>=4,
+Here you can use greater than,less than,equal to what ever power
+
+toughness:>=4,
+Same thing as the rules for querying power but with toughness
+
+text:Enters the battle field tapped,
+Here you can query for specific keywords or phrases in the cards text
+
+rarity:r,
+rarity is listed as:mr,m,r,u,c
+(mythic rare,mythic,rare,uncommon,common)
+
+art:squirrel,
+query by what is listed in the card art
+
+function:removal,
+This works off of the oracle tag system used by scryfall.
+
+You can query for specific usertags that people have tagged a card with.
+
+
+
+NOTE:if you want to query for Enter the Battlefield Effects, use:
+
+is:etb,
+This is because of a misnomer goof on scryfalls part
+so having a shortcut that is not included in the oracle tagging system
+
+More info on the available tags here:           https://scryfall.com/docs/tagger-tags
+```

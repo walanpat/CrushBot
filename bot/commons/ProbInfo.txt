@@ -1,0 +1,9 @@
+```ansi
+The format goes as:
+
+!p modifier,difficultyClass
+or
+!p mod,dc
+
+NOTE: I do not like triple digit numbers
+```

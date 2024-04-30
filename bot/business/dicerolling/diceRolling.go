@@ -237,28 +237,14 @@ func SaveProbabilityCalculator(m *discordgo.MessageCreate) (string, error) {
 	mod, _ := strconv.ParseFloat(variablesArr[0][1], 32)
 	dc, _ := strconv.ParseFloat(variablesArr[0][2], 32)
 
-	//fmt.Printf("\n\nvariablesARr: %v", variablesArr)
-	//
-	//fmt.Printf("\n\nMod: %v", mod)
-	//fmt.Printf("\nDC: %v", dc)
-
-	message := "```ansi\n" // \u001B[0m"
+	message := "```ansi\n"
 
 	ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(mod, dc)
-	strCritSuccess := strconv.Itoa(ChanceCritSuccess)
-	strNormSuccess := strconv.Itoa(ChanceNormalSuccess)
-	strNormFail := strconv.Itoa(ChanceNormalFail)
-	strCritFail := strconv.Itoa(ChanceCritFail)
 
-	//fmt.Print("\nChance to Crit Succeed: 	 " + strCritSuccess)
-	//fmt.Print("\nChance to Succeed:		 " + strNormSuccess)
-	//fmt.Print("\nChance to Fail:			" + strNormFail)
-	//fmt.Print("\nChance to Crit Fail:   		" + strCritFail)
-
-	message += "\nChance to Crit Succeed: 	" + strCritSuccess + "%\n"
-	message += "\nChance to Succeed:		  " + strNormSuccess + "%\n"
-	message += "\nChance to Fail:			" + strNormFail + "%\n"
-	message += "\nChance to Crit Fail:   	" + strCritFail + "%\n"
+	message += "\nChance to Crit Succeed: 	" + strconv.Itoa(ChanceCritSuccess) + "%\n"
+	message += "\nChance to Succeed:		  " + strconv.Itoa(ChanceNormalSuccess) + "%\n"
+	message += "\nChance to Fail:			" + strconv.Itoa(ChanceNormalFail) + "%\n"
+	message += "\nChance to Crit Fail:   	" + strconv.Itoa(ChanceCritFail) + "%\n"
 
 	message += "```"
 	return message, nil

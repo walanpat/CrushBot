@@ -1,0 +1,10 @@
+```ansi
+
+DiceRolling Format goes as
+
+!roll numberOfDice[d]numberOfSides,+ or -modifierNumber
+
+Examples:
+!roll 1d20+1
+!roll 1d20-1
+```
