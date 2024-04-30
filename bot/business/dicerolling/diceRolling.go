@@ -273,75 +273,50 @@ func saveProbabilityCalculator(mod float64, dc float64) (critSuccess int, normal
 	var ChanceNormalFail float64
 	var ChanceCritFail float64
 
-	var diceVar = float64(20)
-
-	var critSVar = float64(10)
-	var critFVar = float64(10)
-	var succVar = float64(0)
-	var failVar = float64(1)
-
-	if mod == 10 {
-		diceVar = 19
-		critSVar = 10
-		critFVar = critSVar
-
-	} else if mod == 11 {
-		diceVar = 19
-		critSVar = 8
-		critFVar = 9
-
-		succVar = 0
-		failVar = 2
-	} else if mod >= 12 {
-		diceVar = 19
-		critSVar = 8
-		critFVar = 8
-
-		succVar = 1
-		failVar = 2
-	}
-
-	ChanceCritSuccess = (diceVar - (dc + critSVar - mod)) * 5
-	ChanceNormalSuccess = (diceVar - (dc - mod + succVar)) * 5
-
-	ChanceNormalFail = ((diceVar + failVar) - (dc - mod)) * 5
-
-	ChanceCritFail = ((diceVar + critFVar) - (dc - mod)) * 5
-	ChanceCritFail = 100 - ChanceCritFail
-
-	// Norm fail check
-	if ChanceNormalFail > 0 {
-		ChanceNormalFail = 100 - ChanceNormalFail
-	} else {
-		ChanceNormalFail = 0
-	}
-
-	// Crit fail interacting with normal fail
-	if ChanceCritFail > 0 && ChanceNormalFail > 0 {
-		ChanceNormalFail -= ChanceCritFail
-	}
-
-	// Check to see if regular hit >0
-	if ChanceNormalSuccess >= 0 && ChanceCritSuccess <= 0 {
-		ChanceCritSuccess = 5
-	} else if ChanceNormalSuccess < 0 {
-		ChanceCritSuccess = 0
-		if ChanceCritFail < 100 {
-			ChanceNormalSuccess = 5
+	// Success Checks
+	ChanceCritSuccess = round64((11 - dc + mod) * 5)
+	if 0 < dc-mod && dc-mod <= 10 {
+		ChanceNormalSuccess = round64((21-dc+mod)*5) - ChanceCritSuccess
+	} else if dc-mod <= 0 {
+		if ChanceCritSuccess < 100 {
+			ChanceNormalSuccess = 100 - ChanceCritSuccess
 		} else {
-			ChanceNormalSuccess = 0
+			ChanceNormalSuccess = 5
+			ChanceCritSuccess = 95
+		}
+
+	} else if 20 < dc-mod && dc-mod <= 29 {
+		ChanceNormalSuccess = 5
+
+	} else {
+		ChanceNormalSuccess = round64((21 - dc + mod) * 5)
+		if ChanceCritSuccess <= 0 && ChanceNormalSuccess > 0 {
+			ChanceCritSuccess = 5
+			ChanceNormalSuccess -= 5
 		}
 	}
 
-	// If chance for failure hard hits 0, needs to rework the formula to just subtract from what is correct.
-	if ChanceNormalFail == 0 && ChanceNormalSuccess > 0 && ChanceCritFail > 0 && ChanceCritSuccess <= 0 {
-		ChanceNormalFail = 100 - ChanceNormalSuccess - ChanceCritFail
-	}
+	// Fail Checks
+	ChanceCritFail = round64(100 - ((30 - (dc - mod)) * 5))
+	if 0 < dc-mod && dc-mod <= 10 {
+		ChanceNormalFail = 100 - ChanceNormalSuccess - ChanceCritSuccess
+		ChanceCritFail = 0
+	} else if dc-mod <= 0 {
 
-	if ChanceCritFail == 0 && ChanceNormalSuccess > 0 && ChanceNormalFail > 0 && ChanceCritSuccess > 0 {
-		ChanceCritFail = 100 - ChanceNormalSuccess - ChanceNormalFail - ChanceCritSuccess
-		if ChanceCritFail < 0 {
-			ChanceCritFail = 0
+	} else if 20 < dc-mod && dc-mod <= 30 {
+		ChanceCritFail -= 5
+		ChanceNormalFail = 100 - ChanceNormalSuccess - ChanceCritFail
+	} else if dc-mod >= 30 {
+		ChanceNormalSuccess = 0
+		ChanceCritSuccess = 0
+		ChanceNormalFail = 5
+		ChanceCritFail = 95
+
+	} else {
+		ChanceNormalFail = 100 - ChanceNormalSuccess - ChanceCritSuccess - ChanceCritFail
+		if ChanceCritFail <= 0 && ChanceNormalFail > 0 {
+			ChanceCritFail = 5
+			ChanceNormalFail -= 5
 		}
 	}
 
@@ -353,9 +328,17 @@ func saveProbabilityCalculator(mod float64, dc float64) (critSuccess int, normal
 	return critSuccess, normalSuccess, normalFailure, critFailure
 }
 
-//func round(num float64) int {
-//	return int(num + math.Copysign(0.5, num))
-//}
+func round64(n float64) float64 {
+	if n <= 0 {
+		return 0
+	}
+	n = math.Round(n/5) * 5
+	if n > 100 {
+		n = 100
+	}
+	return n
+}
+
 //
 //func toFixed(num float64, precision int) float64 {
 //	output := math.Pow(10, float64(precision))
@@ -372,15 +355,10 @@ func saveProbabilityCalculator(mod float64, dc float64) (critSuccess int, normal
 //}
 
 func divisibleBy5Rounder(n float64) int {
-	integer := int(math.Round(n))
-	if integer%5 != 0 {
-		if (integer+1)%5 == 0 {
-			integer++
-		} else if (integer-1)%5 == 0 {
-			integer--
-		}
+	if n <= 0 {
+		return 0
 	}
-	return integer
+	return int(math.Round(n/5) * 5)
 }
 
 // DiceRollBasic returns arr of dice rolled in int, then string, then returns total in int and string

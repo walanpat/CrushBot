@@ -5,6 +5,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"goland-discord-bot/bot/business"
 	"goland-discord-bot/bot/business/dicerolling"
+	"goland-discord-bot/bot/commons"
 	"goland-discord-bot/config"
 	"strings"
 	"time"
@@ -74,6 +75,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	//If we message ping to our bot in our discord it will return us pong .
 	if m.Content == "ping" {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
+		return
 	}
 
 	//Dice Rolling Code
@@ -84,6 +86,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		} else {
 			_, _ = s.ChannelMessageSend(m.ChannelID, message)
 		}
+		return
 	}
 
 	//Rolls 6 different 5e stats, drops the lowest.
@@ -94,16 +97,22 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 		_, _ = s.ChannelMessageSend(m.ChannelID, message)
+		return
 	}
 
 	//Probability code
 	if strings.Contains(m.Content, "!p") {
-		message, err := dicerolling.SaveProbabilityCalculator(m)
-		if err != nil {
-			_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
+		if len(m.Content) <= 3 {
+			_, _ = s.ChannelMessageSend(m.ChannelID, commons.ProbInstruction())
 		} else {
-			_, _ = s.ChannelMessageSend(m.ChannelID, message)
+			message, err := dicerolling.SaveProbabilityCalculator(m)
+			if err != nil {
+				_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
+			} else {
+				_, _ = s.ChannelMessageSend(m.ChannelID, message)
+			}
 		}
+		return
 	}
 
 	//Mtg card request Code
@@ -117,6 +126,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		mtgRulesMessageFlag = false
 		mtgPriceMessageFlag = false
+		return
 	}
 
 	// initiative mass rolling
@@ -127,8 +137,8 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			_, _ = s.ChannelMessageSend(m.ChannelID, dicerolling.InitiativeRoller(m.Content))
 		} else {
 			_, _ = s.ChannelMessageSend(m.ChannelID, dicerolling.InitiativeRoller("Initiative roll needs 2 things.  a play"))
-
 		}
+		return
 	}
 
 	if strings.Contains(m.Content, "[") || strings.Contains(m.Content, "]") {
@@ -138,6 +148,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		business.GetCard(cardName, m.ChannelID, s)
 		mtgRulesMessageFlag = false
 		mtgPriceMessageFlag = false
+		return
 	}
 
 	//Mtg card query request code
@@ -145,6 +156,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if len(m.Content) > 4 {
 			business.GetQuery(m.Content, m.ChannelID, s)
 		}
+		return
 	}
 
 	//Encode testing code
@@ -187,7 +199,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		x := []*discordgo.MessageEmbed{&temp[0], &temp[1]}
 
 		_, _ = s.ChannelMessageSendEmbeds(m.ChannelID, x)
-
+		return
 	}
 
 	//if m.Content[0:6] == "!play " {

@@ -349,7 +349,7 @@ func TestSaveProbabilityCalculator(t *testing.T) {
 			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
 			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
 			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
-			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Output:		%v\n\n", ChanceCritFail)
 			t.Fail()
 		}
 		if ChanceCritSuccess != testCase.expectedCritSucc {
@@ -584,16 +584,18 @@ func TestSaveProbabilityCalculator(t *testing.T) {
 		}
 	})
 
-	//Floating Point Math rounds a lot, I dislike it.
+	//dc-mod <=10
 	t.Run("mod:10, dc:20", func(t *testing.T) {
 		testCase := TestCase{
 			inputMod: 10,
 			inputDC:  20,
-
+			//20 = crit
+			//10-19 = succ
+			//1-9 = fail
 			expectedCritSucc: 5,
-			expectedSucc:     45,
+			expectedSucc:     50,
 			expectedFail:     45,
-			expectedCritFail: 5,
+			expectedCritFail: 0,
 		}
 		//crit succ on 20
 		//norm succ 11-19
@@ -639,8 +641,8 @@ func TestSaveProbabilityCalculator(t *testing.T) {
 			// crit fail on 1 	(5%)
 			expectedCritSucc: 10,
 			expectedSucc:     50,
-			expectedFail:     35,
-			expectedCritFail: 5,
+			expectedFail:     40,
+			expectedCritFail: 0,
 		}
 
 		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
@@ -690,6 +692,774 @@ func TestSaveProbabilityCalculator(t *testing.T) {
 			// crit fail on 1 	(5%)  1/20
 			expectedCritSucc: 15,
 			expectedSucc:     50,
+			expectedFail:     35,
+			expectedCritFail: 0,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+	t.Run("mod:13, dc:20", func(t *testing.T) {
+		testCase := TestCase{
+			inputMod: 13,
+			inputDC:  20,
+
+			// crit on 17,18,19,20 	(15%) 4/20
+			// succ on 7-16   	(50%) 10/20
+			//fail on 2,3,4,5,6 (25%) 5/20
+			// crit fail on 1 	(5%)  1/20
+			expectedCritSucc: 20,
+			expectedSucc:     50,
+			expectedFail:     30,
+			expectedCritFail: 0,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+
+	//dc-mod>=20
+	t.Run("mod:0 dc:21", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 0,
+			inputDC:  21,
+
+			// crit on
+			// succ on 20
+			//fail on 11-19
+			//critfail on 1-10
+			expectedCritSucc: 0,
+			expectedSucc:     5,
+			expectedFail:     45,
+			expectedCritFail: 50,
+		}
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+
+	t.Run("mod:0 dc:22", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 0,
+			inputDC:  22,
+
+			// crit on
+			// succ on 20
+			//fail on 11-19
+			//critfail on 1-10
+			expectedCritSucc: 0,
+			expectedSucc:     5,
+			expectedFail:     40,
+			expectedCritFail: 55,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+
+	t.Run("mod:0 dc:23", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 0,
+			inputDC:  23,
+
+			// crit on
+			// succ on 20
+			//fail on 11-19
+			//critfail on 1-10
+			expectedCritSucc: 0,
+			expectedSucc:     5,
+			expectedFail:     35,
+			expectedCritFail: 60,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+	t.Run("mod:0 dc:24", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 0,
+			inputDC:  24,
+
+			expectedCritSucc: 0,
+			expectedSucc:     5,
+			expectedFail:     30,
+			expectedCritFail: 65,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+	t.Run("mod:0 dc:25", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 0,
+			inputDC:  25,
+
+			// crit on
+			// succ on 20
+			//fail on 11-19
+			//critfail on 1-10
+			expectedCritSucc: 0,
+			expectedSucc:     5,
+			expectedFail:     25,
+			expectedCritFail: 70,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+	t.Run("mod:0 dc:26", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 0,
+			inputDC:  26,
+
+			// crit on
+			// succ on 20
+			//fail on 11-19
+			//critfail on 1-10
+			expectedCritSucc: 0,
+			expectedSucc:     5,
+			expectedFail:     20,
+			expectedCritFail: 75,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+	t.Run("mod:0 dc:27", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 0,
+			inputDC:  27,
+
+			// crit on
+			// succ on 20
+			//fail on 11-19
+			//critfail on 1-10
+			expectedCritSucc: 0,
+			expectedSucc:     5,
+			expectedFail:     15,
+			expectedCritFail: 80,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+	t.Run("mod:0 dc:28", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 0,
+			inputDC:  28,
+
+			// crit on
+			// succ on 20
+			//fail on 11-19
+			//critfail on 1-10
+			expectedCritSucc: 0,
+			expectedSucc:     5,
+			expectedFail:     10,
+			expectedCritFail: 85,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+	t.Run("mod:0 dc:29", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 0,
+			inputDC:  29,
+
+			// crit on
+			// succ on 20
+			//fail on 11-19
+			//critfail on 1-10
+			expectedCritSucc: 0,
+			expectedSucc:     5,
+			expectedFail:     5,
+			expectedCritFail: 90,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+	t.Run("mod:0 dc:30", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 0,
+			inputDC:  30,
+
+			expectedCritSucc: 0,
+			expectedSucc:     0,
+			expectedFail:     5,
+			expectedCritFail: 95,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+	t.Run("mod:0 dc:31", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 0,
+			inputDC:  31,
+
+			expectedCritSucc: 0,
+			expectedSucc:     0,
+			expectedFail:     5,
+			expectedCritFail: 95,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+
+	//high numbers, within 10 and 20 diff
+	t.Run("mod:37 dc:50", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 37,
+			inputDC:  50,
+			//37-30 = 7
+			//50-30 = 20
+
+			expectedCritSucc: 5,
+			expectedSucc:     35,
+			expectedFail:     45,
+			expectedCritFail: 15,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+	t.Run("mod:40 dc:50", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 40,
+			inputDC:  50,
+			//40-30 = 10
+			//50-30 = 20
+			expectedCritSucc: 5,
+			expectedSucc:     50,
+			expectedFail:     45,
+			expectedCritFail: 0,
+		}
+
+		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+		if sum != 100 {
+			fmt.Printf("\nsum not 100:		%v\n\n", sum)
+			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+			t.FailNow()
+		}
+		if ChanceCritSuccess != testCase.expectedCritSucc {
+			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+			t.Fail()
+		}
+		if ChanceNormalSuccess != testCase.expectedSucc {
+			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+			t.Fail()
+		}
+		if ChanceNormalFail != testCase.expectedFail {
+			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+			t.Fail()
+		}
+		if ChanceCritFail != testCase.expectedCritFail {
+			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+			t.Fail()
+		}
+	})
+
+	t.Run("mod:i dc:20", func(t *testing.T) {
+
+		testCase := TestCase{
+			inputMod: 13,
+			inputDC:  20,
+
+			// crit on 17,18,19,20 	(15%) 3/20
+			// succ on 7-16   	(50%) 10/20
+			//fail on 2-6 		(30%) 6/20
+			// crit fail on 1 	(5%)  1/20
+			expectedCritSucc: 20,
+			expectedSucc:     50,
 			expectedFail:     30,
 			expectedCritFail: 5,
 		}
@@ -730,49 +1500,48 @@ func TestSaveProbabilityCalculator(t *testing.T) {
 			t.Fail()
 		}
 	})
-
-	t.Run("mod:, dc:", func(t *testing.T) {
-		testCase := TestCase{
-			inputMod:         0,
-			inputDC:          20,
-			expectedCritSucc: 0,
-			expectedSucc:     0,
-			expectedFail:     0,
-			expectedCritFail: 0,
-		}
-
-		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
-		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
-		if sum != 100 {
-			fmt.Printf("sum not 100:	%v\n\n", sum)
-
-			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
-			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
-			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
-			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
-			t.Fail()
-		}
-		if ChanceCritSuccess != testCase.expectedCritSucc {
-			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
-			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
-			t.Fail()
-		}
-		if ChanceNormalSuccess != testCase.expectedSucc {
-			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
-			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
-			t.Fail()
-		}
-		if ChanceNormalFail != testCase.expectedFail {
-			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
-			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
-			t.Fail()
-		}
-		if ChanceCritFail != testCase.expectedCritFail {
-			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
-			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
-			t.Fail()
-		}
-	})
+	//t.Run("mod:, dc:", func(t *testing.T) {
+	//	testCase := TestCase{
+	//		inputMod:         0,
+	//		inputDC:          20,
+	//		expectedCritSucc: 0,
+	//		expectedSucc:     0,
+	//		expectedFail:     0,
+	//		expectedCritFail: 0,
+	//	}
+	//
+	//	ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+	//	sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+	//	if sum != 100 {
+	//		fmt.Printf("sum not 100:	%v\n\n", sum)
+	//
+	//		fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+	//		fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+	//		fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+	//		fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+	//		t.Fail()
+	//	}
+	//	if ChanceCritSuccess != testCase.expectedCritSucc {
+	//		fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+	//		fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+	//		t.Fail()
+	//	}
+	//	if ChanceNormalSuccess != testCase.expectedSucc {
+	//		fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+	//		fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+	//		t.Fail()
+	//	}
+	//	if ChanceNormalFail != testCase.expectedFail {
+	//		fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+	//		fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+	//		t.Fail()
+	//	}
+	//	if ChanceCritFail != testCase.expectedCritFail {
+	//		fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+	//		fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+	//		t.Fail()
+	//	}
+	//})
 
 	//highest possible mod 34 ?
 	//highest DC should be 53 (absolute max?)

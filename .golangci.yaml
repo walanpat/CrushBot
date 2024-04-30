@@ -1,8 +1,8 @@
-issues:
-  exclude-rules:
-    - path: /
-      linters:
-        - typecheck
+#issues:
+#  exclude-rules:
+#    - path: /
+#      linters:
+#        - typecheck
 
 linters:
   disable-all: true
@@ -12,7 +12,7 @@ linters:
     - govet # Reports suspicious constructs
     - ineffassign # Detects unused variables
     - staticcheck # Go vet on steroids
-    - typecheck # Standard go type checks
+#    - typecheck # Standard go type checks #Kinda broken
     - unused # Detect unused constants, variables, functions, and types.
 
     # suggest optional linters
