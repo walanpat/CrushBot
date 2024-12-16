@@ -21,6 +21,11 @@ const (
 	notFoundError      = "Scryfall could not find what you searched for."
 	beginningAnsiChars = "```ansi\n"
 	endAnsiChars       = "```"
+	PLAINS             = "Plains"
+	MOUNTAIN           = "Mountain"
+	FOREST             = "Forest"
+	SWAMP              = "Swamp"
+	ISLAND             = "Island"
 )
 
 func GetCard(cardName string, channelID string, s *discordgo.Session) {
@@ -29,7 +34,7 @@ func GetCard(cardName string, channelID string, s *discordgo.Session) {
 	if err != nil {
 		_, err := s.ChannelMessageSend(channelID, "Error in Card Retrieval Service")
 		if err != nil {
-			fmt.Printf("\nError sending message: %v\n", err)
+			fmt.Printf("\nError sending message: %e\n", err)
 		}
 	}
 
@@ -60,7 +65,7 @@ func GetCard(cardName string, channelID string, s *discordgo.Session) {
 		} else {
 			RulingsURI = "No Rulings Found"
 		}
-		if data.Name == "Island" || data.Name == "Plains" || data.Name == "Mountain" || data.Name == "Forest" || data.Name == "Swamp" {
+		if data.Name == ISLAND || data.Name == PLAINS || data.Name == MOUNTAIN || data.Name == FOREST || data.Name == SWAMP {
 			SetCodeURI = "Basic Lands are Printed in Every Set"
 		} else if len(data.SetURI) > 0 {
 			SetCodeURI = data.PrintsSearchURI
@@ -72,9 +77,6 @@ func GetCard(cardName string, channelID string, s *discordgo.Session) {
 		//_, err = s.ChannelFileSend(channelID, data.Name+".png", res)
 		EmbeddedCardSending(&data, channelID, s)
 
-		if err != nil {
-			fmt.Println(err)
-		}
 	}
 }
 
@@ -83,7 +85,7 @@ func GetRuling(channelID string, s *discordgo.Session) error {
 	if RulingsURI == "No Rulings Found" || RulingsURI == "false" {
 		_, err := s.ChannelMessageSend(channelID, "No Rulings Found")
 		if err != nil {
-			fmt.Printf("\nError sending message: %v\n", err)
+			fmt.Printf("\nError sending message: %e\n", err)
 		}
 		return errors.New("no rulings found")
 	}

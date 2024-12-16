@@ -71,150 +71,151 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == ID {
 		return
 	}
-
-	if m.Content[0] == '!' {
-		//If we message ping to our bot in our discord it will return us pong .
-		if m.Content == "ping" {
-			_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
-			return
-		}
-
-		if strings.Contains(m.Content, "!help") {
-			if len(m.Content) <= 6 {
-				_, _ = s.ChannelMessageSend(m.ChannelID, commons.Help)
+	if m.Content != "" {
+		if m.Content[0] == '!' {
+			//If we message ping to our bot in our discord it will return us pong .
+			if m.Content == "ping" {
+				_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
 				return
 			}
-		}
 
-		//Dice Rolling Code
-		if strings.Contains(m.Content, "!roll") {
-			if len(m.Content) == 5 || len(m.Content) == 6 {
-				_, _ = s.ChannelMessageSend(m.ChannelID, commons.RollDiceInfo)
-				return
-			} else {
-				message, err := dicerolling.DiceRollGeneric(m)
-				if err != nil {
-					_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
-				} else {
-					_, _ = s.ChannelMessageSend(m.ChannelID, message)
+			if strings.Contains(m.Content, "!help") {
+				if len(m.Content) <= 6 {
+					_, _ = s.ChannelMessageSend(m.ChannelID, commons.Help)
+					return
 				}
 			}
-			return
-		}
 
-		//Rolls 6 different 5e stats, drops the lowest.
-		if strings.Contains(m.Content, "!stats") {
-			message, err := dicerolling.FiveEStats()
-			if err != nil {
-				_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
+			//Dice Rolling Code
+			if strings.Contains(m.Content, "!roll") {
+				if len(m.Content) == 5 || len(m.Content) == 6 {
+					_, _ = s.ChannelMessageSend(m.ChannelID, commons.RollDiceInfo)
+					return
+				} else {
+					message, err := dicerolling.DiceRollGeneric(m)
+					if err != nil {
+						_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
+					} else {
+						_, _ = s.ChannelMessageSend(m.ChannelID, message)
+					}
+				}
 				return
 			}
-			_, _ = s.ChannelMessageSend(m.ChannelID, message)
-			return
-		}
 
-		//Probability code
-		if strings.Contains(m.Content, "!p") {
-			if len(m.Content) <= 3 {
-				_, _ = s.ChannelMessageSend(m.ChannelID, commons.ProbInfo)
-			} else {
-				message, err := dicerolling.SaveProbabilityCalculator(m)
+			//Rolls 6 different 5e stats, drops the lowest.
+			if strings.Contains(m.Content, "!stats") {
+				message, err := dicerolling.FiveEStats()
 				if err != nil {
 					_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
-				} else {
-					_, _ = s.ChannelMessageSend(m.ChannelID, message)
+					return
 				}
-			}
-			return
-		}
-
-		//Mtg card request Code
-		if strings.Contains(m.Content, "!c") {
-			if len(m.Content) <= 3 {
-				_, _ = s.ChannelMessageSend(m.ChannelID, commons.CardGetExample)
+				_, _ = s.ChannelMessageSend(m.ChannelID, message)
 				return
 			}
 
-			cardName := strings.ReplaceAll(m.Content[3:len(m.Content)], " ", "+")
-			business.GetCard(cardName, m.ChannelID, s)
+			//Probability code
+			if strings.Contains(m.Content, "!p") {
+				if len(m.Content) <= 3 {
+					_, _ = s.ChannelMessageSend(m.ChannelID, commons.ProbInfo)
+				} else {
+					message, err := dicerolling.SaveProbabilityCalculator(m)
+					if err != nil {
+						_, _ = s.ChannelMessageSend(m.ChannelID, err.Error())
+					} else {
+						_, _ = s.ChannelMessageSend(m.ChannelID, message)
+					}
+				}
+				return
+			}
 
-			mtgRulesMessageFlag = false
-			mtgPriceMessageFlag = false
-			return
+			//Mtg card request Code
+			if strings.Contains(m.Content, "!c") {
+				if len(m.Content) <= 3 {
+					_, _ = s.ChannelMessageSend(m.ChannelID, commons.CardGetExample)
+					return
+				}
+
+				cardName := strings.ReplaceAll(m.Content[3:len(m.Content)], " ", "+")
+				business.GetCard(cardName, m.ChannelID, s)
+
+				mtgRulesMessageFlag = false
+				mtgPriceMessageFlag = false
+				return
+			}
+
+			// initiative mass rolling
+			if strings.Contains(m.Content, "!initiative ") {
+				//!Initiative name, +4, name, +2, name, +4
+				//Take map[string][int]
+				if len(m.Content) > 12 {
+					_, _ = s.ChannelMessageSend(m.ChannelID, dicerolling.InitiativeRoller(m.Content))
+				} else {
+					_, _ = s.ChannelMessageSend(m.ChannelID, dicerolling.InitiativeRoller("Initiative roll needs 2 things.  a play"))
+				}
+				return
+			}
+
+			//Mtg scryfall query request code
+			if strings.Contains(m.Content, "!q") && m.Author.ID != ID {
+				if len(m.Content) <= 3 {
+					_, _ = s.ChannelMessageSend(m.ChannelID, commons.QueryScryfallInfo)
+
+				}
+				if len(m.Content) > 4 {
+					business.GetQuery(m.Content, m.ChannelID, s)
+				}
+				return
+			}
+
+			//Encode testing code
+			//todo - finish out youtube tomfoolery
+			if strings.Contains(m.Content, "!encode") {
+				y := discordgo.MessageEmbed{
+					URL:         "https://www.youtube.com/",
+					Type:        "Youtube",
+					Title:       "title",
+					Description: "Youtube Embed description",
+					Timestamp:   "",
+					Color:       0,
+					Footer:      nil,
+					Image:       nil,
+					Thumbnail:   nil,
+					Video:       nil,
+					Provider:    nil,
+					Author:      nil,
+					Fields:      nil,
+				}
+				z := discordgo.MessageEmbed{
+					URL:         "https://www.google.com/",
+					Type:        "Google",
+					Title:       "title",
+					Description: "Google Embed description",
+					Timestamp:   "",
+					Color:       0,
+					Footer:      nil,
+					Image:       nil,
+					Thumbnail:   nil,
+					Video:       nil,
+					Provider:    nil,
+					Author:      nil,
+					Fields:      nil,
+				}
+				var temp [2]discordgo.MessageEmbed
+				temp[0] = y
+				temp[1] = z
+
+				x := []*discordgo.MessageEmbed{&temp[0], &temp[1]}
+
+				_, _ = s.ChannelMessageSendEmbeds(m.ChannelID, x)
+				return
+			}
+
+			//if m.Content[0:6] == "!play " {
+			//
+			//}
 		}
 
-		// initiative mass rolling
-		if strings.Contains(m.Content, "!initiative ") {
-			//!Initiative name, +4, name, +2, name, +4
-			//Take map[string][int]
-			if len(m.Content) > 12 {
-				_, _ = s.ChannelMessageSend(m.ChannelID, dicerolling.InitiativeRoller(m.Content))
-			} else {
-				_, _ = s.ChannelMessageSend(m.ChannelID, dicerolling.InitiativeRoller("Initiative roll needs 2 things.  a play"))
-			}
-			return
-		}
-
-		//Mtg scryfall query request code
-		if strings.Contains(m.Content, "!q") && m.Author.ID != ID {
-			if len(m.Content) <= 3 {
-				_, _ = s.ChannelMessageSend(m.ChannelID, commons.QueryScryfallInfo)
-
-			}
-			if len(m.Content) > 4 {
-				business.GetQuery(m.Content, m.ChannelID, s)
-			}
-			return
-		}
-
-		//Encode testing code
-		//todo - finish out youtube tomfoolery
-		if strings.Contains(m.Content, "!encode") {
-			y := discordgo.MessageEmbed{
-				URL:         "https://www.youtube.com/",
-				Type:        "Youtube",
-				Title:       "title",
-				Description: "Youtube Embed description",
-				Timestamp:   "",
-				Color:       0,
-				Footer:      nil,
-				Image:       nil,
-				Thumbnail:   nil,
-				Video:       nil,
-				Provider:    nil,
-				Author:      nil,
-				Fields:      nil,
-			}
-			z := discordgo.MessageEmbed{
-				URL:         "https://www.google.com/",
-				Type:        "Google",
-				Title:       "title",
-				Description: "Google Embed description",
-				Timestamp:   "",
-				Color:       0,
-				Footer:      nil,
-				Image:       nil,
-				Thumbnail:   nil,
-				Video:       nil,
-				Provider:    nil,
-				Author:      nil,
-				Fields:      nil,
-			}
-			var temp [2]discordgo.MessageEmbed
-			temp[0] = y
-			temp[1] = z
-
-			x := []*discordgo.MessageEmbed{&temp[0], &temp[1]}
-
-			_, _ = s.ChannelMessageSendEmbeds(m.ChannelID, x)
-			return
-		}
-
-		//if m.Content[0:6] == "!play " {
-		//
-		//}
 	}
-
 	//emoji/reactions code
 	if strings.Contains(m.Content, "[") || strings.Contains(m.Content, "]") {
 		cardName := m.Content[strings.IndexRune(m.Content, '[')+1 : strings.IndexRune(m.Content, ']')]

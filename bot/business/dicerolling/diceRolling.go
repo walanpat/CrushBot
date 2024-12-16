@@ -91,34 +91,39 @@ func DiceRollGeneric(m *discordgo.MessageCreate) (string, error) {
 	variablesArr := re.FindAllStringSubmatch(m.Content, -1)
 	message := "```ansi\n \u001B[0m"
 	sumTotal := 0
+	singleDiceType := len(variablesArr) == 1
+	multipleDiceType := len(variablesArr) > 1
+
 	for i := 0; i < len(variablesArr); i++ {
 		total := 0
-		if len(variablesArr) == 1 {
-			// This IF statement only occurs if there is a single "roll" (x^n)d(y^n)+(z^n) occurring
-			numbOfRoll, _ := strconv.Atoi(variablesArr[i][1])
-			diceToBeRolled, _ := strconv.Atoi(variablesArr[i][2])
+		numbOfRoll, _ := strconv.Atoi(variablesArr[i][1])
+		diceToBeRolled, _ := strconv.Atoi(variablesArr[i][2])
+		if diceToBeRolled == 0 {
+			return "```ansi\nDice cannot be 0 sided.```", nil
+		}
 
+		message += fmt.Sprintf("%s LETS ROLL\n\n", m.Author.Username)
+		message += fmt.Sprintf("\u001B[3m%dd%d\u001B[0m\t\n", numbOfRoll, diceToBeRolled)
+		// This IF statement only occurs if there is a single "roll" (x^n)d(y^n)+(z^n) occurring
+		if singleDiceType {
 			// Basic math, modifier regexp
 			basicMathRE := regexp.MustCompile(`([+\-]?\d*)`)
 			arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][3], -1)
-			message += m.Author.Username + " LETS ROLL\n\n"
-			message += "\u001B[3m" + strconv.Itoa(numbOfRoll) + "d" + strconv.Itoa(diceToBeRolled) + "\u001B[0m	"
 
 			// Actual for loop for the "dice rolls"
 			for j := 0; j < numbOfRoll; j++ {
 				// This has to be diceToBeRolled +1 because rand.intn uses [0,n) noninclusive n.
-				if diceToBeRolled == 0 {
-					return "```ansi\nDice cannot be 0 sided.```", nil
-				}
 				rollValueInt := rand.Intn(diceToBeRolled) + 1
-				rollValueStr := strconv.Itoa(rollValueInt)
 				total += rollValueInt
 				if rollValueInt == 1 {
-					message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[31m" + rollValueStr + "\u001B[0m]	"
+					message += fmt.Sprintf("\tRoll %d: [\u001B[31m%d\u001B[0m]", j+1, rollValueInt)
 				} else if rollValueInt == diceToBeRolled {
-					message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[32m" + rollValueStr + "\u001B[0m]	"
+					message += fmt.Sprintf("\tRoll %d: [\u001B[32m%d\u001B[0m]", j+1, rollValueInt)
 				} else {
-					message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[37m" + rollValueStr + "\u001B[0m]	"
+					message += fmt.Sprintf("\tRoll %d: [\u001B[37m%d\u001B[0m]", j+1, rollValueInt)
+				}
+				if ((j + 1) % 3) == 0 {
+					message += "\n"
 				}
 			}
 			arithmeticResult := 0
@@ -129,34 +134,28 @@ func DiceRollGeneric(m *discordgo.MessageCreate) (string, error) {
 			}
 			if arithmeticResult != 0 {
 				total += arithmeticResult
-				message += "\n\n	Modifiers: [\u001B[37m" + strconv.Itoa(arithmeticResult) + "\u001B[0m]\n"
+				message += fmt.Sprintf("\n\n\tModifiers: [\u001B[37m%d\u001B[0m]\n", arithmeticResult)
 			}
-			message += "\n\n	Total Roll: " + "[\u001B[37m" + strconv.Itoa(total) + "\u001B[0m]\n\n"
-		} else if i == 0 && len(variablesArr) > 1 {
-			// this code block occurs only if (x^n)d(y^n)+(z^n) occurs more than once.
-			numbOfRoll, _ := strconv.Atoi(variablesArr[i][1])
-			diceToBeRolled, _ := strconv.Atoi(variablesArr[i][2])
-
+			message += fmt.Sprintf("\n\n	Total Roll: [\u001B[37m%d\u001B[0m]\n\n", total)
+		} else
+		// this code block occurs only if (x^n)d(y^n)+(z^n) occurs more than once.
+		if i == 0 && multipleDiceType {
 			// used to find any modifiers added or subtracted to various dice roll
 			basicMathRE := regexp.MustCompile(`([+\-]?\d*)`)
 			arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][3], -1)
-
-			message += m.Author.Username + " LETS ROLL\n\n"
-			message += strconv.Itoa(numbOfRoll) + "d" + strconv.Itoa(diceToBeRolled) + "	"
 
 			// Actual for loop for the "dice rolls"
 			for j := 0; j < numbOfRoll; j++ {
 				// This has to be diceToBeRolled +1 because rand.intn uses [0,n) noninclusive n.
 				rollValueInt := rand.Intn(diceToBeRolled) + 1
-				rollValueStr := strconv.Itoa(rollValueInt)
 				total += rollValueInt
 				sumTotal += rollValueInt
 				if rollValueInt == 1 {
-					message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[31m" + rollValueStr + "\u001B[0m]	"
+					message += fmt.Sprintf("\tRoll %d: [\u001B[31m%d\u001B[0m]", j+1, rollValueInt)
 				} else if rollValueInt == diceToBeRolled {
-					message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[32m" + rollValueStr + "\u001B[0m]	"
+					message += fmt.Sprintf("\tRoll %d: [\u001B[32m%d\u001B[0m]", j+1, rollValueInt)
 				} else {
-					message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[37m" + rollValueStr + "\u001B[0m]	"
+					message += fmt.Sprintf("\tRoll %d: [\u001B[37m%d\u001B[0m]", j+1, rollValueInt)
 				}
 			}
 			arithmeticResult := 0
@@ -167,14 +166,13 @@ func DiceRollGeneric(m *discordgo.MessageCreate) (string, error) {
 			}
 			if arithmeticResult != 0 {
 				total += arithmeticResult
-				message += "\n\n	Modifiers: [\u001B[37m" + strconv.Itoa(arithmeticResult) + "\u001B[0m]\n"
+				message += fmt.Sprintf("\n\n\tModifiers: [\u001B[37m%d\u001B[0m]\n", arithmeticResult)
 				sumTotal += arithmeticResult
 			}
-			message += "\n	Total Roll: " + "[\u001B[37m" + strconv.Itoa(total) + "\u001B[0m]\n\n"
+			message += fmt.Sprintf("\n\n	Total Roll: [\u001B[37m%d\u001B[0m]\n\n", total)
 		} else {
 			// This code block is for ALL code after the original (x^n)d(y^n)+(z^n) amount of dice/things rolled.
 			basicMathRE := regexp.MustCompile(`([+\-]?\d*)`)
-			numbOfRoll, _ := strconv.Atoi(variablesArr[i][1])
 
 			if i != 0 {
 				initialArray := basicMathRE.FindAllStringSubmatch(variablesArr[i-1][3], -1)
@@ -182,7 +180,6 @@ func DiceRollGeneric(m *discordgo.MessageCreate) (string, error) {
 			}
 
 			// this has to be initialized weirdly.  So.  Here's what we do
-			diceToBeRolled, _ := strconv.Atoi(variablesArr[i][2])
 			arithmetic := basicMathRE.FindAllStringSubmatch(variablesArr[i][3], -1)
 			// message now tells us what we're rolling
 			message += strconv.Itoa(numbOfRoll) + "d" + strconv.Itoa(diceToBeRolled) + "	"
@@ -191,15 +188,14 @@ func DiceRollGeneric(m *discordgo.MessageCreate) (string, error) {
 			for j := 0; j < numbOfRoll; j++ {
 				// This has to be diceToBeRolled +1 because rand.intn uses [0,n) noninclusive n.
 				rollValueInt := rand.Intn(diceToBeRolled) + 1
-				rollValueStr := strconv.Itoa(rollValueInt)
 				total += rollValueInt
 				sumTotal += rollValueInt
 				if rollValueInt == 1 {
-					message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[31m" + rollValueStr + "\u001B[0m]	"
+					message += fmt.Sprintf("\tRoll %d: [\u001B[31m%d\u001B[0m]", j+1, rollValueInt)
 				} else if rollValueInt == diceToBeRolled {
-					message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[32m" + rollValueStr + "\u001B[0m]	"
+					message += fmt.Sprintf("\tRoll %d: [\u001B[32m%d\u001B[0m]", j+1, rollValueInt)
 				} else {
-					message += "Roll " + strconv.Itoa(j+1) + ": [\u001B[37m" + rollValueStr + "\u001B[0m]	"
+					message += fmt.Sprintf("\tRoll %d: [\u001B[37m%d\u001B[0m]", j+1, rollValueInt)
 				}
 			}
 			arithmeticResult := 0
@@ -220,11 +216,11 @@ func DiceRollGeneric(m *discordgo.MessageCreate) (string, error) {
 			if arithmeticResult != 0 {
 				total += arithmeticResult
 				sumTotal += arithmeticResult
-				message += "\n\n	Modifiers: [\u001B[37m" + strconv.Itoa(arithmeticResult) + "\u001B[0m]\n"
+				message += fmt.Sprintf("\n\n\tModifiers: [\u001B[37m%d\u001B[0m]\n", arithmeticResult)
 			}
-			message += "\n	Total Roll: " + "[\u001B[37m" + strconv.Itoa(total) + "\u001B[0m]\n\n"
+			message += fmt.Sprintf("\n\tTotal Roll: [\u001B[37m%d\u001B[0m]\n\n", total)
 			if i+1 == len(variablesArr) {
-				message += "\n Sum Total of All Values: \u001B[37m" + strconv.Itoa(sumTotal) + "\u001B[0m"
+				message += fmt.Sprintf("\n Sum Total of All Values: \u001B[37m%d\u001B[0m", sumTotal)
 			}
 		}
 	}

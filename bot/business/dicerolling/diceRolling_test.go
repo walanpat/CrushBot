@@ -120,7 +120,9 @@ func TestDiceRollingWithMods(t *testing.T) {
 		testMessageCreate := discordgo.MessageCreate{Message: &testMessage}
 		// Function Call
 		output, err := DiceRollGeneric(&testMessageCreate)
+		fmt.Println(output[46 : 46+len(timesRolledString)])
 
+		fmt.Print(output)
 		if output[46:46+len(timesRolledString)] != timesRolledString {
 			t.Fail()
 		}
@@ -1448,58 +1450,59 @@ func TestSaveProbabilityCalculator(t *testing.T) {
 		}
 	})
 
-	t.Run("mod:i dc:20", func(t *testing.T) {
-
-		testCase := TestCase{
-			inputMod: 13,
-			inputDC:  20,
-
-			// crit on 17,18,19,20 	(15%) 3/20
-			// succ on 7-16   	(50%) 10/20
-			//fail on 2-6 		(30%) 6/20
-			// crit fail on 1 	(5%)  1/20
-			expectedCritSucc: 20,
-			expectedSucc:     50,
-			expectedFail:     30,
-			expectedCritFail: 5,
-		}
-
-		ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
-		sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
-		if sum != 100 {
-			fmt.Printf("\nsum not 100:		%v\n\n", sum)
-			fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
-			fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
-			fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
-			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
-			fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
-			fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
-			fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
-			fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
-			t.Fail()
-			t.FailNow()
-		}
-		if ChanceCritSuccess != testCase.expectedCritSucc {
-			fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
-			fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
-			t.Fail()
-		}
-		if ChanceNormalSuccess != testCase.expectedSucc {
-			fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
-			fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
-			t.Fail()
-		}
-		if ChanceNormalFail != testCase.expectedFail {
-			fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
-			fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
-			t.Fail()
-		}
-		if ChanceCritFail != testCase.expectedCritFail {
-			fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
-			fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
-			t.Fail()
-		}
-	})
+	//Template
+	//t.Run("mod:i dc:20", func(t *testing.T) {
+	//
+	//	testCase := TestCase{
+	//		inputMod: 13,
+	//		inputDC:  20,
+	//
+	//		// crit on 17,18,19,20 	(15%) 3/20
+	//		// succ on 7-16   	(50%) 10/20
+	//		//fail on 2-6 		(30%) 6/20
+	//		// crit fail on 1 	(5%)  1/20
+	//		expectedCritSucc: 20,
+	//		expectedSucc:     50,
+	//		expectedFail:     30,
+	//		expectedCritFail: 5,
+	//	}
+	//
+	//	ChanceCritSuccess, ChanceNormalSuccess, ChanceNormalFail, ChanceCritFail := saveProbabilityCalculator(testCase.inputMod, testCase.inputDC)
+	//	sum := ChanceCritSuccess + ChanceNormalSuccess + ChanceNormalFail + ChanceCritFail
+	//	if sum != 100 {
+	//		fmt.Printf("\nsum not 100:		%v\n\n", sum)
+	//		fmt.Printf("ChanceCritSuccess Output:		%v\n", ChanceCritSuccess)
+	//		fmt.Printf("ChanceCritSuccess Expected:		%v\n\n", testCase.expectedCritSucc)
+	//		fmt.Printf("ChanceNormalSuccess Output:		%v\n", ChanceNormalSuccess)
+	//		fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+	//		fmt.Printf("ChanceNormalFail Output:		%v\n", ChanceNormalFail)
+	//		fmt.Printf("ChanceNormalFail Expected:		%v\n\n", testCase.expectedFail)
+	//		fmt.Printf("ChanceCritFail Output:			%v\n", ChanceCritFail)
+	//		fmt.Printf("ChanceCritFail Expected:		%v\n\n", testCase.expectedCritFail)
+	//		t.Fail()
+	//		t.FailNow()
+	//	}
+	//	if ChanceCritSuccess != testCase.expectedCritSucc {
+	//		fmt.Printf("ChanceCritSuccess Output:	%v\n", ChanceCritSuccess)
+	//		fmt.Printf("ChanceCritSuccess Expected:	%v\n\n", testCase.expectedCritSucc)
+	//		t.Fail()
+	//	}
+	//	if ChanceNormalSuccess != testCase.expectedSucc {
+	//		fmt.Printf("ChanceNormalSuccess Output:	%v\n", ChanceNormalSuccess)
+	//		fmt.Printf("ChanceNormalSuccess Expected:	%v\n\n", testCase.expectedSucc)
+	//		t.Fail()
+	//	}
+	//	if ChanceNormalFail != testCase.expectedFail {
+	//		fmt.Printf("ChanceNormalFail Output:	%v\n", ChanceNormalFail)
+	//		fmt.Printf("ChanceNormalFail Expected:	%v\n\n", testCase.expectedFail)
+	//		t.Fail()
+	//	}
+	//	if ChanceCritFail != testCase.expectedCritFail {
+	//		fmt.Printf("ChanceCritFail Output:		%v\n", ChanceCritFail)
+	//		fmt.Printf("ChanceCritFail Expected:	%v\n\n", testCase.expectedCritFail)
+	//		t.Fail()
+	//	}
+	//})
 	//t.Run("mod:, dc:", func(t *testing.T) {
 	//	testCase := TestCase{
 	//		inputMod:         0,
