@@ -1,3 +1,4 @@
+version: 2
 #issues:
 #  exclude-rules:
 #    - path: /
@@ -5,14 +6,14 @@
 #        - typecheck
 
 linters:
-  disable-all: true
+  default: none
   enable:
     - errcheck # Detect unchecked errors
     - gosimple # Suggest code simplifications
     - govet # Reports suspicious constructs
     - ineffassign # Detects unused variables
     - staticcheck # Go vet on steroids
-#    - typecheck # Standard go type checks #Kinda broken
+    #    - typecheck # Standard go type checks #Kinda broken
     - unused # Detect unused constants, variables, functions, and types.
 
     # suggest optional linters
@@ -26,7 +27,7 @@ linters:
     - unparam # Detect unused function parameters
     - whitespace
 
-      #Optional
+    #Optional
     - bodyclose  #Check Whether HTTP Response bodies are closed
     - nakedret # Detect naked returns
     - tparallel # Detects inappropriate use of t.Parallel()
@@ -42,17 +43,18 @@ output:
   # Default: colored-line-number
   format: colored-line-number
     # Print lines of code with issue.
-    # Default: true
+  # Default: true
   print-issued-lines: true
     # Print linter name in the end of issue text.
-    # Default: true
+  # Default: true
   print-linter-name: true
     # Make issues output unique by line.
-    # Default: true
+  # Default: true
   uniq-by-line: true
     # Add a prefix to the output file references.
-    # Default: ""
+  # Default: ""
   path-prefix: ""
     # Sort results by: filepath, line and column.
-    # Default: false
+  # Default: false
   sort-results: true
+
